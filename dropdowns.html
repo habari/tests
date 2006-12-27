@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Dropdowns</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="http://myintarweb.com/system/admin/admin.css" />
+	<script type="text/javascript" src="http://myintarweb.com/scripts/jquery.js"></script>
+	<script type="text/javascript">
+	  $(document).ready(function(){
+			$("#nav-one li").hover(
+				function(){ $("ul", this).fadeIn("fast"); }, 
+				function() { } 
+			);
+	  	if (document.all) {
+				$("#nav-one li").hoverClass ("sfHover");
+			}
+	  });
+	  
+		$.fn.hoverClass = function(c) {
+			return this.each(function(){
+				$(this).hover( 
+					function() { $(this).addClass(c);  },
+					function() { $(this).removeClass(c); }
+				);
+			});
+		};	  
+	</script>
+<style type="text/css">
+	/* new css */
+
+a { text-decoration: none; color: #000; }
+
+body
+{
+	background-color: #fff;
+	font-family: Arial, Helvetica San-Serif;
+	font-size: 1.0em;
+	color: #000;
+	margin: 0.0em auto;
+}
+
+#logout
+{
+	float: right;
+	display: inline;
+	padding-right: 0.5em;
+}
+
+#logout img
+{
+	border: none;
+}
+
+#last-menu
+{
+	margin-left: -152px;
+	width: 17.5em;
+}
+
+	#menu
+	{
+		float: left;
+		background: transparent url(http://myintarweb.com/system/admin/images/bar-back.png) repeat-x;
+		display: inline;
+		margin: 0.0em 0.0em 0.5em 0.0em;
+		width: 100%;
+		min-width: 1000px;
+		clear: both;
+		text-align: left;
+		height: 36px;
+	}
+	
+	#menu-items a, #site-name a
+	{
+		color: #fff;
+		padding: 0.4em 1.0em;
+	}
+
+	#menu-items a:hover
+	{
+		background-color: #2FAEA3;
+	}
+	
+	#options-list li
+	{
+		padding: 0.0em !important;
+	}
+		
+	#site-name
+	{
+		float: left;
+		display: inline;
+		background: transparent url(http://myintarweb.com/system/admin/images/home.png) no-repeat;
+		background-position: 1.0em 0.0em;
+		text-indent: 2.2em;
+		font-size: 0.8em;
+		padding-top: 0.1em;
+		line-height: 1.7em;
+	}
+	
+	#second-menu
+	{
+		margin-left: -73px;
+	}
+	
+</style>
+<style type="text/css">
+/* Navigation */
+.nav, .nav ul { 
+	list-style: none;
+	float: right;
+	display: inline;
+	margin: 0.0em;
+	padding: 0;
+}
+
+.nav li {
+	float: left;
+	margin: 0.0em 0.5em;
+	line-height: 1.8em;
+	font-size: 0.8em;
+	font-weight: normal;
+	padding: 0;
+	position: relative;
+}
+
+.nav li a, .nav li a:link, 
+.nav li a:active, .nav li a:visited 
+{
+	background: transparent;
+	color: #fff;
+	padding: 0.4em 1.0em;
+	text-decoration: none;
+}
+
+#menu-items a, #site-name a
+{
+	color: #fff;
+	padding: 0.4em 1.0em;
+}
+
+.nav li a:hover {
+	background-color: #2FAEA3;	
+}
+
+#nav-one li:hover a, 
+#nav-one li.sfHover a {
+	background-color: #2FAEA3;
+	color: #fff;
+}
+#nav-one li:hover ul a, 
+#nav-one li.sfHover ul a {
+	background: transparent;
+	display: block;
+	width: 16.0em;
+	margin: 0.0em;
+	padding: 0.0em;
+}
+#nav-one li:hover ul a:hover, 
+#nav-one li.sfHover ul a:hover {
+	background: #2FAEA3;
+}
+
+#nav-one li:hover ul
+{
+	padding-left: 0.0em;
+}
+
+.nav ul 
+{
+	background: #007174;
+	list-style: none;
+	margin: 0;
+	position: absolute;
+	top: -999em;
+}
+
+.nav li:hover ul,
+.nav li.sfHover ul 
+{
+	top: 25px;
+	float: left;
+	display: inline;
+	margin-right: 0.0em;
+}
+
+.nav li:hover ul li,
+.nav li.sfHover ul li
+{
+	border-bottom: 1px solid #509D9F;
+	font-size: 1.0em;
+}
+
+.nav ul li 
+{
+  border: 0;
+  float: none;
+}
+
+.nav ul a 
+{
+  border-bottom: 0;
+  padding-right: 20px;
+  width: 80px;
+  white-space: nowrap;
+}
+
+.nav ul a:hover 
+{
+  background: #ccc;
+  color: #000;
+}
+	</style>
+</head>
+<body>	
+<div id="menu">
+	<div id="site-name">
+		<a href="/" title="Myintarweb.com">Myintarweb.com</a>
+	</div>
+	<div id="logout">
+		<a href="http://myintarweb.com/logout" title="logout of Habari">
+			<img src="http://myintarweb.com/system/admin/images/logout.png" alt="Logout of Habari" />
+		</a>
+	</div>
+		<ul id="nav-one" class="nav">
+			<li>
+				<a href="/admin">Admin</a>
+				<ul id="options-list">
+					<li> 
+						<a href="<?php URL::out('admin', 'page=options'); ?>" title="Options">Options</a>
+					</li>
+					<li> 
+						<a href="<?php URL::out('admin', 'page=plugins'); ?>" title="Plugins">Plugins</a>
+					</li>
+					<li>
+						<a href="<?php URL::out('admin', 'page=themes'); ?>" title="Themes">Themes</a> 
+					</li>
+					<li>
+						<a href="<?php URL::out('admin', 'page=users'); ?>" title="Users">Users</a> 
+					</li>
+				</ul>
+			</li>
+			<li>
+				<a href="/admin/publish">Publish</a>
+				<ul id="second-menu">
+					<li><a href="/admin/publish/">Post</a></li>
+					<li><a href="/admin/publish/podcast">Podcast</a></li>
+				</ul>
+			</li>
+			<li>
+				<a href="/admin/content">Manage</a>
+				<ul id="last-menu">
+					<li><a href="#item3.1">Posts</a></li>
+					<li><a href="#item3.2">Comments</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="content-area">
+		<div id="left-column">
+				<h1>Welcome back chrisjdavis!</h1>
+				<p>Good to see you round these parts again.&nbsp; Before you get back to creating your masterpiece of blogginess, you might want to take a moment to catch up on things around Myintarweb.com.</p>
+			<div class="stats">
+				<h4>Site Statistics</h4>
+					<ul id="site-stats">
+						<li><span class="right">567</span> Visits Today</li>
+						<li><span class="right">10067</span> Visits Past Week</li>
+						<li><span class="right">627</span> Total Posts</li>
+						<li><span class="right">627</span> Number of Your Posts</li>
+						<li><span class="right">3586</span> Number of Comments</li>			
+					</ul>
+			</div>
+			<div class="system-info">
+				<h4>System Health</h4>
+				<ul>
+					<li>&raquo; You are running Habari 0.1alpha.</li>
+					<li>&raquo; A Habari <a href="http://habariblog.org/download" title="A habari Update is available">Update is Available</a>.</li>
+					<li>&raquo; <a href="plugins" title="Updates Ready">3 plugins</a> have updates ready.</li>
+					<li>&raquo; An <a href="http://www.chrisjdavis.org/download/believe2.zip" title="An Update is Available">Update is Available</a> for your Theme.</li>
+				</ul>
+			</div>
+			<div class="drafts">
+					<h4>Drafts (<a href="manage/drafts" title="View Your Drafts">more</a> &raquo;)</h4>
+					<ul id="site-drafts">
+										<li>
+							<span class="right">
+								<a href="http://myintarweb.com/k3-project-blackbox-1jpg" title="View k3_project_blackbox_1.jpg">
+									<img src="/system/admin/images/view.png" alt="View this draft" />
+								</a>
+								<a href="http://myintarweb.com/admin/publish?slug=k3-project-blackbox-1jpg" title="Edit k3_project_blackbox_1.jpg">
+									<img src="/system/admin/images/edit.png" alt="Edit this draft" />
+								</a>
+							</span>
+							k3_project_blackbox_1.jpg					</li>
+										<li>
+							<span class="right">
+								<a href="http://myintarweb.com/php-abuse" title="View One's Proper Place">
+									<img src="/system/admin/images/view.png" alt="View this draft" />
+								</a>
+								<a href="http://myintarweb.com/admin/publish?slug=php-abuse" title="Edit One's Proper Place">
+									<img src="/system/admin/images/edit.png" alt="Edit this draft" />
+								</a>
+							</span>
+							One's Proper Place					</li>
+										<li>
+							<span class="right">
+								<a href="http://myintarweb.com/pirate-downloadjpg" title="View pirate-download.jpg">
+									<img src="/system/admin/images/view.png" alt="View this draft" />
+								</a>
+								<a href="http://myintarweb.com/admin/publish?slug=pirate-downloadjpg" title="Edit pirate-download.jpg">
+									<img src="/system/admin/images/edit.png" alt="Edit this draft" />
+								</a>
+							</span>
+							pirate-download.jpg					</li>
+										<li>
+							<span class="right">
+								<a href="http://myintarweb.com/it-crowdjpg" title="View it-crowd.jpg">
+									<img src="/system/admin/images/view.png" alt="View this draft" />
+								</a>
+								<a href="http://myintarweb.com/admin/publish?slug=it-crowdjpg" title="Edit it-crowd.jpg">
+									<img src="/system/admin/images/edit.png" alt="Edit this draft" />
+								</a>
+							</span>
+							it-crowd.jpg					</li>
+										<li>
+							<span class="right">
+								<a href="http://myintarweb.com/secrets-of-wp-themeing-part-4-" title="View Secrets of WP Themeing: Part 4!">
+									<img src="/system/admin/images/view.png" alt="View this draft" />
+								</a>
+								<a href="http://myintarweb.com/admin/publish?slug=secrets-of-wp-themeing-part-4-" title="Edit Secrets of WP Themeing: Part 4!">
+									<img src="/system/admin/images/edit.png" alt="Edit this draft" />
+								</a>
+							</span>
+							Secrets of WP Themeing: Part 4!					</li>
+									</ul>
+							</div>
+			<div class="incoming">
+				<h4>Incoming Links (<a href="http://technorati.com/search/myintarweb.com" title="More incoming links">more</a> &raquo;)</h4>
+				<ul id="incoming-links">
+					<li>
+						<img src="http://drbacchus.com/journal/favicon.ico" alt="favicon" /> <a href="http://wooga.drbacchus.com/journal" title="Dr Bacchus' Journal">Dr Bacchus' Journal</a>
+					</li>
+					<li>
+						<img src="http://skippy.net/blog/favicon.ico" alt="favicon" /> <a href="http://skippy.net" title="Skippy dot net">Skippy Dot Net</a>
+					</li>
+					<li>
+						<img src="http://brokenkode.com/favicon.ico" alt="favicon" /> <a href="http://brokenkode.com" title="Broken Kode">Broken Kode</a>
+					</li>
+					<li>
+						<img src="http://asymptomatic.net/favicon.ico" alt="favicon" /> <a href="http://asymptomatic.net/" title="Asymptomatic">Asymptomatic</a>
+					</li>
+					<li>
+						<img src="http://www.chrisjdavis.org/favicon.ico" alt="favicon" /> <a href="http://www.chrisjdavis.org" title="Sillyness Spelled Wrong Intentionally">Sillyness Spelled Wrong Intentionally</a>
+					</li>
+				</ul>
+			</div>
+			<div class="recent-comments">
+				<h4>Recent Comments 
+								</h4>
+								<table name="comment-data" width="100%" cellspacing="0">
+						<thead>
+							<th colspan="1" align="left">Post</th>
+							<th colspan="1" align="left">Name</th>
+							<th colspan="1" align="left">URL</th>
+							<th colspan="1" align="center">Action</th>
+						</thead>
+										</table>
+							</div>
+		</div>
+		<div id="right-column">
+			<div class="options">
+				<p><small>Support &amp; Help</small></p>
+				<ul id="help-items">
+					<script type="text/javascript">
+					function popUp() {
+					 	window.open ("/system/help/index.html", "mywindow",
+									 "location=0,status=1,scrollbars=1, width=700,height=500");
+					}
+					</script>
+					<li>&raquo; <a href="javascript: popUp();" title="The Habari Help Center">The Help Center</a></li>
+					<li>&raquo; <a href="http://habariblog.org/support" title="Support Forums">Support Forums</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<p>
+			Powered by <a href="http://code.google.com/p/habari/" title="Habari">Habari</a>
+		</p>
+	</div>
+	</body>
+	</html>
