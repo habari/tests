@@ -9,14 +9,6 @@ function bs( $v ) { return $v ? 'TRUE' : 'FALSE'; }
 
 $tests_failed= array();
 
-$green= ColorUtils::rgb_rgbarr( 127, 255, 64 );
-$green_hex= ColorUtils::rgb_hex( $green );
-$green_hsv= ColorUtils::rgb_hsv( $green );
-$green_from_hsv= ColorUtils::hsv_rgb( $green_hsv );
-$orange= ColorUtils::hex_rgb( '#ed691f' );
-$cyan= ColorUtils::hex_rgb( '8bc' );
-$red= ColorUtils::hex_rgb( 'f0' );
-
 $tests= array(
 	'R, G, B to Array' => array(
 		"\$green == array ( 'r' => 127, 'g' => 255, 'b' => 64, )",
@@ -36,6 +28,14 @@ $tests= array(
 		"\$red == array ( 'r' => 240, 'g' => 0, 'b' => 0, )",
 	),
 );
+
+$green= ColorUtils::rgb_rgbarr( 127, 255, 64 );
+$green_hex= ColorUtils::rgb_hex( $green );
+$green_hsv= ColorUtils::rgb_hsv( $green );
+$green_from_hsv= ColorUtils::hsv_rgb( $green_hsv );
+$orange= ColorUtils::hex_rgb( '#ed691f' );
+$cyan= ColorUtils::hex_rgb( '8bc' );
+$red= ColorUtils::hex_rgb( 'f0' );
 
 print( "<h1>Running tests</h1>\n" );
 
