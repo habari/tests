@@ -10,6 +10,8 @@ include('../htdocs/system/classes/socketrequestprocessor.php');
 include('../htdocs/system/classes/utils.php');
 include('../htdocs/system/classes/error.php');
 
+error_reporting( E_ALL | E_STRICT );
+
 function bs( $v ) { return $v ? 'TRUE' : 'FALSE'; }
 
 $tests_failed= array();
