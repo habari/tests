@@ -21,7 +21,7 @@ $html_strs[]= <<<_EOF_
 <body>
 <h1>Hello World</h1>
 <p>This is a good <a href="http://google.com/search?q=html">HTML</a> document.</p>
-<![CDATA[This is &amp; <a href="foo">CDATA</a>.]]>
+<![CDATA[This is &amp; <a href="foo">CDATA</a>.]]><strong>Lo bob</strong>.
 </body>
 </html>
 _EOF_;

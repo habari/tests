@@ -4,6 +4,8 @@
  * Test for the InputFilter class.
  */
 include('../htdocs/system/classes/inputfilter.php');
+include('../htdocs/system/classes/htmltokenizer.php');
+
 include('../htdocs/system/classes/utils.php');
 
 function bs( $v ) { return $v ? 'TRUE' : 'FALSE'; }
@@ -30,6 +32,13 @@ $tests= array(
 	'invalid entity: invalid numeric' => array(
 		"InputFilter::strip_illegal_entities( 'This entity is invalid: &#XfFdE9;.' ) == 'This entity is invalid: .'",
 	),
+	'filtering malicious html' => array(
+		"InputFilter::filter_html_elements( '<p onclick=\"window.alert(\\'boo\\')\">Hey.</p><a href=\"#\" style=\"position: absolute; left: 1px; top: 3px;\">Whee!</a>' ) == '<p>Hey.</p><a href=\"#\">Whee!</a>'",
+		"InputFilter::filter_html_elements( '<a href=\"javascript:alert(\\'yay\\')\" style=\"text-decoration: none;\">Whee!</a>' ) == '<a>Whee!</a>'",
+	),
+//	'complete filtering run' => array(
+//		"InputFilter::filter( '' ) = ''",
+//	),
 );
 
 print( "<h1>Running tests</h1>\n" );
