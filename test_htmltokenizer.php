@@ -12,10 +12,18 @@ $html_strs[]= <<<_EOF_
 <!DOCTYPE HTML><title>Hello World</title><p title="example">Some text.</p><!-- A comment. -->
 _EOF_;
 
+// BigJibby's tag soup
 $html_strs[]= <<<_EOF_
-<!DOCTYPE HTML>
+<p>I am <div><script src="ohnoes" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>
+_EOF_;
+
+$html_strs[]= <<<_EOF_
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+[ <!ATTLIST html habari CDATA #IMPLIED> ]
+>
 <html>
-<head>
+<head habari="rocks">
 <title>Foo Bar</title>
 </head>
 <body>
