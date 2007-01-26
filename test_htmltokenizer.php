@@ -17,6 +17,11 @@ $html_strs[]= <<<_EOF_
 <p>I am <div><script src="ohnoes" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>
 _EOF_;
 
+// ha.ckers.org
+$html_strs[]= <<<_EOF_
+<IMG src="http://ha.ckers.org/" style"="style="a/onerror=alert(String.fromCharCode(88,83,83))//" &ampgt;`&gt
+_EOF_;
+
 $html_strs[]= <<<_EOF_
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
