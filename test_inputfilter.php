@@ -36,9 +36,12 @@ $tests= array(
 		"InputFilter::filter_html_elements( '<p onclick=\"window.alert(\\'boo\\')\">Hey.</p><a href=\"#\" style=\"position: absolute; left: 1px; top: 3px;\">Whee!</a>' ) == '<p>Hey.</p><a href=\"#\">Whee!</a>'",
 		"InputFilter::filter_html_elements( '<a href=\"javascript:alert(\\'yay\\')\" style=\"text-decoration: none;\">Whee!</a>' ) == '<a>Whee!</a>'",
 	),
-//	'complete filtering run' => array(
-//		"InputFilter::filter( '' ) = ''",
-//	),
+	'complete filtering run' => array(
+		"InputFilter::filter( '<p>I am <div><script src=\"ohnoes\" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>' ) == '<p>I am <div><a>not a paragraph.</a><p><span> Or am I?</span>'",
+		"InputFilter::filter( '<p onClick=\"window.alert(\\'stole yer cookies!\\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ) == '<p>Do not click here.</p> '",
+		// http://ha.ckers.org/blog/20070124/stopping-xss-but-allowing-html-is-hard/
+		"InputFilter::filter( '<IMG src=\"http://ha.ckers.org/\" style\"=\"style=\"a/onerror=alert(String.fromCharCode(88,83,83))//\" &ampgt;`&gt' ) == ''",
+	),
 );
 
 print( "<h1>Running tests</h1>\n" );
