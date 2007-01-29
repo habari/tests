@@ -60,9 +60,9 @@ foreach ( $processors as $processor ) {
 		$results[]= array( get_class( $processor ), $res_get, );
 	}
 	
-	$rr= new RemoteRequest( 'http://test.habariproject.org/', 'POST' );
+	$rr= new RemoteRequest( 'http://test.habariproject.org/post', 'POST' );
 	$rr->__set_processor( $processor );
-	$rr->set_body( 'RemoteRequest test' );
+	$rr->set_body( 'If you can read this, the test was successful.' );
 	$res_post= $rr->execute();
 	if ( $res_post ) {
 	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
