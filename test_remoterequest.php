@@ -17,11 +17,14 @@ function bs( $v ) { return $v ? 'TRUE' : 'FALSE'; }
 $tests_failed= array();
 
 $tests= array(
-	'GET http://habariblog.org/' => array(
+	'GET http://test.habariproject.org/' => array(
 		"\$res",
 	),
-	'GET http://google.com/search' => array(
-		"\$google",
+	'GET http://test.habariproject.org/get' => array(
+		"\$res_get",
+	),
+	'POST http://test.habariproject.org/post' => array(
+		"\$res_post",
 	),
 );
 
@@ -33,7 +36,7 @@ $processors= array(
 );
 
 foreach ( $processors as $processor ) {
-	$rr= new RemoteRequest( 'http://habariblog.org/' );
+	$rr= new RemoteRequest( 'http://test.habariproject.org/' );
 	$rr->__set_processor( $processor );
 	$res= $rr->execute();
 	if ( $res ) {
@@ -43,21 +46,31 @@ foreach ( $processors as $processor ) {
 		$results[]= array( get_class( $processor ), $res, );
 	}
 	
-	$google_rr= new RemoteRequest( 'http://google.com/search', 'GET' );
-	$google_rr->__set_processor( $processor );
-	$google_rr->set_params( array(
-		'q' => 'habari',
-		'hl' => 'en',
-		'btnG' => 'Search',
+	$rr= new RemoteRequest( 'http://test.habariproject.org/get' );
+	$rr->__set_processor( $processor );
+	$rr->set_params( array (
+		'query' => 'var',
+		'another' => 'variable',
 	) );
-	$google= $google_rr->execute();
-	if ( $google ) {
-	 	$results[]= array( get_class( $processor ), $google_rr->get_response_headers(), substr( $google_rr->get_response_body(), 0 ) );
+	$res_get= $rr->execute();
+	if ( $res_get ) {
+	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
 	}
 	else {
-		$results[]= array( get_class( $processor ), $google, );
+		$results[]= array( get_class( $processor ), $res_get, );
 	}
-		
+	
+	$rr= new RemoteRequest( 'http://test.habariproject.org/', 'POST' );
+	$rr->__set_processor( $processor );
+	$rr->set_body( 'RemoteRequest test' );
+	$res_post= $rr->execute();
+	if ( $res_post ) {
+	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
+	}
+	else {
+		$results[]= array( get_class( $processor ), $res_post, );
+	}
+	
 	foreach ( $tests as $name => $group ) {
 		print( "<h2>{$name}</h2>\n" );
 		foreach ( $group as $test ) {
