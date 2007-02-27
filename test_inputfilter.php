@@ -32,13 +32,22 @@ $tests= array(
 	'invalid entity: invalid numeric' => array(
 		"InputFilter::strip_illegal_entities( 'This entity is invalid: &#XfFdE9;.' ) == 'This entity is invalid: .'",
 	),
+	'URL parsing' => array(
+		"InputFilter::parse_url( 'http://hey:there@moeffju.net:8137/foo/bar?baz=quux#blah' ) == array ( 'scheme' => 'http', 'host' => 'moeffju.net', 'port' => '8137', 'user' => 'hey', 'pass' => 'there', 'path' => '/foo/bar', 'query' => 'baz=quux', 'fragment' => 'blah', 'pseudo_args' => '', 'is_relative' => false, 'is_pseudo' => false, )",
+		"InputFilter::parse_url( '/furanzen/bla' ) == array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/furanzen/bla', 'query' => '', 'fragment' => '', 'pseudo_args' => '', 'is_relative' => true, 'is_pseudo' => false, )",
+		"InputFilter::parse_url( '?bla=barbaz&foo' ) == array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => 'bla=barbaz&foo', 'fragment' => '', 'pseudo_args' => '', 'is_relative' => true, 'is_pseudo' => false, )",
+		"InputFilter::parse_url( '#' ) == array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'pseudo_args' => '', 'is_relative' => true, 'is_pseudo' => false, )",
+		"InputFilter::parse_url( 'about:blank' ) == array ( 'scheme' => 'about', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'pseudo_args' => 'blank', 'is_relative' => false, 'is_pseudo' => true, )",
+		"InputFilter::parse_url( 'javascript:alert(document.cookie)' ) == array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'pseudo_args' => 'alert(document.cookie)', 'is_relative' => false, 'is_pseudo' => true, )",
+		"InputFilter::parse_url( 'javascript:alert(\'/hey/there/foo?how=about#bar\')' ) == array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'pseudo_args' => 'alert(\'/hey/there/foo?how=about#bar\')', 'is_relative' => false, 'is_pseudo' => true, )",
+	),
 	'filtering malicious html' => array(
 		"InputFilter::filter_html_elements( '<p onclick=\"window.alert(\\'boo\\')\">Hey.</p><a href=\"#\" style=\"position: absolute; left: 1px; top: 3px;\">Whee!</a>' ) == '<p>Hey.</p><a href=\"#\">Whee!</a>'",
 		"InputFilter::filter_html_elements( '<a href=\"javascript:alert(\\'yay\\')\" style=\"text-decoration: none;\">Whee!</a>' ) == '<a>Whee!</a>'",
 	),
 	'complete filtering run' => array(
 		"InputFilter::filter( '<p>I am <div><script src=\"ohnoes\" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>' ) == '<p>I am <div><a>not a paragraph.</a><p><span> Or am I?</span>'",
-		"InputFilter::filter( '<p onClick=\"window.alert(\\'stole yer cookies!\\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ) == '<p>Do not click here.</p> '",
+		"InputFilter::filter( '<p onClick=\"window.alert(\\'stole yer cookies!\\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ) == '<p>Do not click here.</p>\n'",
 		// http://ha.ckers.org/blog/20070124/stopping-xss-but-allowing-html-is-hard/
 		"InputFilter::filter( '<IMG src=\"http://ha.ckers.org/\" style\"=\"style=\"a/onerror=alert(String.fromCharCode(88,83,83))//\" &ampgt;`&gt' ) == ''",
 	),
