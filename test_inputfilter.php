@@ -52,7 +52,7 @@ $tests= array(
 		"InputFilter::filter( '<p onClick=\"window.alert(\\'stole yer cookies!\\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ) == '<p>Do not click here.</p>\n'",
 		// http://ha.ckers.org/blog/20070124/stopping-xss-but-allowing-html-is-hard/
 		"InputFilter::filter( '<IMG src=\"http://ha.ckers.org/\" style\"=\"style=\"a/onerror=alert(String.fromCharCode(88,83,83))//\" &ampgt;`&gt' ) == ''",
-		"InputFilter::filter( '<b>Hello world</b>\n\nThis is a <test>test</test> post.\n\nHere's a first XSS attack. <<SCRIPT>alert(\'XSS\');//<</SCRIPT>\n\nHere's a second try at a <a href=\"#\">second link</a>.\n\nHere's a second XSS attack. <IMG SRC=\" &#14;  javascript:alert(\'XSS\');\">\n\nHere's a third link hopefully <a href=\"#\">it won\'t get removed</a>.\n\n<em>Thanks!</em>' ) == ''",
+		"InputFilter::filter( '<b>Hello world</b>\n\nThis is a <test>test</test> post.\n\nHere\\'s a first XSS attack. <<SCRIPT>alert(\\'XSS\\');//<</SCRIPT>\n\nHere\\'s a second try at a <a href=\"#\">second link</a>.\n\nHere\\'s a second XSS attack. <IMG SRC=\" &#14;  javascript:alert(\\'XSS\\');\">\n\nHere\\'s a third link hopefully <a href=\"#\">it won\\'t get removed</a>.\n\n<em>Thanks!</em>' ) == '<b>Hello world</b>\n\nThis is a test post.\n\nHere\\'s a first XSS attack. alert(\\'XSS\\');//SCRIPT>\n\nHere\\'s a second try at a <a href=\"#\">second link</a>.\n\nHere\\'s a second XSS attack. \n\nHere\\'s a third link hopefully <a href=\"#\">it won\\'t get removed</a>.\n\n<em>Thanks!</em>'",
 	),
 );
 
