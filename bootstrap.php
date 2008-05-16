@@ -54,6 +54,10 @@ class UnitTestCase
 
 		foreach($methods as $method) {
 			$this->messages = array();
+			
+			if(method_exists($this, 'setup')) {
+				$this->setup();
+			}
 
 			echo '<h2>' . $method . '</h2>';
 
@@ -61,6 +65,10 @@ class UnitTestCase
 
 			foreach($this->messages as $message) {
 				echo '<div><em>Fail:</em> ' . $message[0] . '<br/>' . $message[1][0]['file'] . ':' . $message[1][0]['line'] . '</div>';
+			}
+
+			if(method_exists($this, 'teardown')) {
+				$this->teardown();
 			}
 
 			$cases++;
