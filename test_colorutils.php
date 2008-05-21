@@ -3,64 +3,54 @@
 /**
  * Test for the ColorUtils class.
  */
-include('../htdocs/system/classes/colorutils.php');
 
-function bs( $v ) { return $v ? 'TRUE' : 'FALSE'; }
+include('bootstrap.php');
 
-$tests_failed= array();
+class ColorUtilsTest extends UnitTestCase
+{
 
-$tests= array(
-	'R, G, B to Array' => array(
-		"\$green == array ( 'r' => 127, 'g' => 255, 'b' => 64, )",
-	),
-	'RGB to HEX' => array(
-		"\$green_hex == '7fff40'",
-	),
-	'RGV to HSV' => array(
-		"\$green_hsv == array ( 'h' => 100, 's' => 75, 'v' => 255, )",
-	),
-	'HSV back to RGB (conversion introduces rounding errors)' => array(
-		"\$green_from_hsv == array ( 'r' => 128, 'g' => 255, 'b' => 64, )",
-	),
-	'HEX to RGB' => array(
-		"\$orange == array ( 'r' => 237, 'g' => 105, 'b' => 31, )",
-		"\$cyan == array ( 'r' => 136, 'g' => 187, 'b' => 204, )",
-		"\$red == array ( 'r' => 240, 'g' => 0, 'b' => 0, )",
-	),
-);
-
-$green= ColorUtils::rgb_rgbarr( 127, 255, 64 );
-$green_hex= ColorUtils::rgb_hex( $green );
-$green_hsv= ColorUtils::rgb_hsv( $green );
-$green_from_hsv= ColorUtils::hsv_rgb( $green_hsv );
-$orange= ColorUtils::hex_rgb( '#ed691f' );
-$cyan= ColorUtils::hex_rgb( '8bc' );
-$red= ColorUtils::hex_rgb( 'f0' );
-
-print( "<h1>Running tests</h1>\n" );
-
-foreach ( $tests as $name => $group ) {
-	print( "<h2>{$name}</h2>\n" );
-	foreach ( $group as $test ) {
-		$result= eval( 'return (' . $test . ');' );
-		printf( "<p><strong>%s</strong> == ( %s )</p>\n", bs( $result ), $test );
-		if ( ! $result ) {
-			$tests_failed[$name][]= $test;
-		}
+	function setup()
+	{
+		$this->green= ColorUtils::rgb_rgbarr( 127, 255, 64 );
+		$this->green_hex= ColorUtils::rgb_hex( $this->green );
+		$this->green_hsv= ColorUtils::rgb_hsv( $this->green );
+		$this->green_from_hsv= ColorUtils::hsv_rgb( $this->green_hsv );
+		$this->orange= ColorUtils::hex_rgb( '#ed691f' );
+		$this->cyan= ColorUtils::hex_rgb( '8bc' );
+		$this->red= ColorUtils::hex_rgb( 'f0' );
 	}
+
+
+	function test_RGB_to_Array()
+	{
+		$this->assert_equal($this->green, array ( 'r' => 127, 'g' => 255, 'b' => 64, ) );
+	}
+
+	function test_RGB_to_HEX()
+	{
+		$this->assert_equal($this->green_hex, '7fff40');
+	}
+
+	function test_RGV_to_HSV()
+	{
+		$this->assert_equal($this->green_hsv, array ( 'h' => 100, 's' => 75, 'v' => 255, ) );
+	}
+
+	function test_HSV_back_to_RGB()
+	{
+		//(conversion introduces rounding errors)
+		$this->assert_equal($this->green_from_hsv, array ( 'r' => 128, 'g' => 255, 'b' => 64, ) );
+	}
+
+	function test_HEX_to_RGB()
+	{
+		$this->assert_equal($this->orange, array ( 'r' => 237, 'g' => 105, 'b' => 31, ) );
+		$this->assert_equal($this->cyan, array ( 'r' => 136, 'g' => 187, 'b' => 204, ) );
+		$this->assert_equal($this->red, array ( 'r' => 240, 'g' => 0, 'b' => 0, ) );
+	}
+
 }
 
-if ( count( $tests_failed ) ) {
-	print( "<h1>Failed tests</h1>\n" );
-	foreach ( $tests_failed as $name => $tests ) {
-		print( "<h2>{$name}</h2>\n" );
-		foreach ( $tests as $test ) {
-			print( "<p>{$test}</p>\n" );
-		}
-	}
-}
-else {
-	print( "<h1>All tests successful</h1>\n" );
-}
+ColorUtilsTest::run_one('ColorUtilsTest');
 
 ?>

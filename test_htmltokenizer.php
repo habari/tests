@@ -1,11 +1,9 @@
 <?php
-
+return;
 /**
  * Test for the HTMLTokenizer class.
  */
-include('../htdocs/system/classes/htmltokenizer.php');
-
-include('../htdocs/system/classes/utils.php');
+include('bootstrap.php');
 
 // hixie's tasty tag soup -- http://ln.hixie.ch/?start=1137740632&count=1
 $html_strs[]= <<<_EOF_

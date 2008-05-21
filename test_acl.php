@@ -37,8 +37,7 @@ class ACLTest extends UnitTestCase
 
 }
 
-$poststest = new ACLTest();
-$poststest->run();
+ACLTest::run_one('ACLTest');
 
 
 ?>

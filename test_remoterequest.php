@@ -1,5 +1,5 @@
 <?php
-
+return;
 /**
  * Test for the ColorUtils class.
  */
@@ -45,7 +45,7 @@ foreach ( $processors as $processor ) {
 	else {
 		$results[]= array( get_class( $processor ), $res, );
 	}
-	
+
 	$rr= new RemoteRequest( 'http://test.habariproject.org/get' );
 	$rr->__set_processor( $processor );
 	$rr->set_params( array (
@@ -59,7 +59,7 @@ foreach ( $processors as $processor ) {
 	else {
 		$results[]= array( get_class( $processor ), $res_get, );
 	}
-	
+
 	$rr= new RemoteRequest( 'http://test.habariproject.org/post', 'POST' );
 	$rr->__set_processor( $processor );
 	$rr->set_body( 'If you can read this, the test was successful.' );
@@ -70,13 +70,13 @@ foreach ( $processors as $processor ) {
 	else {
 		$results[]= array( get_class( $processor ), $res_post, );
 	}
-	
+
 	foreach ( $tests as $name => $group ) {
 		print( "<h2>{$name}</h2>\n" );
 		foreach ( $group as $test ) {
 			$result= eval( 'return (' . $test . ');' );
 			printf( "<p><strong>%s</strong> == ( %s )</p>\n", bs( $result ), var_export( $test, TRUE ) );
-			
+
 			Utils::debug( array_shift( $results ) );
 			if ( ! $result ) {
 				$tests_failed[$name][]= $test;
