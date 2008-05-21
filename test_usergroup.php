@@ -101,8 +101,7 @@ class UserGroupTest extends UnitTestCase
 
 }
 
-$usergrouptest = new UserGroupTest();
-$usergrouptest->run();
 
+UserGroupTest::run_one('UserGroupTest');
 
 ?>

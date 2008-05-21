@@ -1,20 +1,38 @@
 <?php
 
-include('../htdocs/system/classes/utils.php');
-include('../htdocs/system/classes/error.php');
+include('bootstrap.php');
 
-// test string
-$str= 'Hello, World';
+class CryptTest extends UnitTestCase
+{
 
-// create digest
-$crypt= Utils::crypt( $str );
+	function setup()
+	{
+		$this->plaintext = 'Hello, World';
+		$this->crypt = Utils::crypt( $this->plaintext );
+	}
 
-// verify
-Utils::debug( array(
-	'crypt' => $crypt,
-	'invalid' => Utils::crypt( 'failure', $crypt ),
-	'valid' => Utils::crypt( $str, $crypt ),
-	'legacy' => Utils::crypt( $str, sha1( $str ) ),
-) );
+	function test_crypt()
+	{
+		$this->assert_equal($this->crypt, 'what value crypt should be');
+	}
+
+	function test_invalid()
+	{
+		$this->assert_equal($this->plaintext, Utils::crypt('failure', $this->crypt) );
+	}
+
+	function test_valid()
+	{
+		$this->assert_equal($this->plaintext, Utils::crypt($this->plaintext, $this->crypt) );
+	}
+
+	function test_legacy()
+	{
+		$this->assert_equal($this->plaintext, sha1($this->plaintext) );
+	}
+
+}
+
+CryptTest::run_one('CryptTest');
 
 ?>
