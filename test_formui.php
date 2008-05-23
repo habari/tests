@@ -14,7 +14,7 @@ class FormUITest extends UnitTestCase
 
 	function test_basic_form() {
 		$form = new FormUI('test');
-		$form->add('myfield', 'text', 'option:test', 'My Field:');
+		$form->add('text', 'myfield', 'My Field:', Options::get('test:myfield'));
 		$form->out();
 	}
 
