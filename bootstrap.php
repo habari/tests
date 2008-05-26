@@ -29,6 +29,7 @@ class UnitTestCase
 	public $exception_count = 0;
 	public $case_count = 0;
 	private $exceptions = array();
+	private $checks = array();
 	private $asserted_exception = null;
 
 	public function assert_true($value, $message = 'Assertion failed')
@@ -69,6 +70,16 @@ class UnitTestCase
 		$this->asserted_exception = array($exception, $message);
 	}
 
+	public function check($checkval, $message = 'Expected check')
+	{
+		$this->checks[$checkval] = $message;
+	}
+
+	public function pass_check($checkval)
+	{
+		unset($this->checks[$checkval]);
+	}
+
 	public function named_test_filter( $function_name )
 	{
 		return preg_match('%^test_%', $function_name);
@@ -78,6 +89,7 @@ class UnitTestCase
 	{
 		$this->asserted_exceptions = array();
 		$this->exceptions = array();
+		$this->checks = array();
 	}
 
 	private final function post_test()
@@ -85,6 +97,10 @@ class UnitTestCase
 		if(isset($this->asserted_exception)) {
 			$this->fail_count++;
 			echo '<div><em>Fail:</em> ' . $this->asserted_exception[1] . '<br/>' . $this->asserted_exception[0] . '</div>';
+		}
+		foreach($this->checks as $check => $message) {
+			$this->fail_count++;
+			echo '<div><em>Fail:</em> ' . $message . '</div>';
 		}
 	}
 
@@ -115,7 +131,14 @@ class UnitTestCase
 				}
 				else {
 					$this->exception_count++;
-					echo '<div><em>Exception:</em> ' . $e->getMessage() . '<br/>' . $e->getFile() . ':' . $e->getLine() . '</div>';
+					$trace = $e->getTrace();
+					$ary = current($trace);
+					while( strpos($ary['file'], 'error.php') != false ) {
+						$ary = next($trace);
+					}
+					$ary = current($trace);
+					echo '<div><em>Exception:</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
+					echo '<pre>' . print_r($trace, 1) . '</pre>';
 				}
 			}
 
