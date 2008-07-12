@@ -32,7 +32,6 @@ class UnitTestCase
 	private $exceptions = array();
 	private $checks = array();
 	private $asserted_exception = null;
-	static $head = false;
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
