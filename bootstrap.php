@@ -11,6 +11,7 @@
 if(!defined('HABARI_PATH')) {
 	define('HABARI_PATH', dirname( dirname( __FILE__ ) ) );
 }
+
 if(!defined('UNIT_TEST')) {
 	define('UNIT_TEST', true);
 }
@@ -31,6 +32,7 @@ class UnitTestCase
 	private $exceptions = array();
 	private $checks = array();
 	private $asserted_exception = null;
+	static $head = false;
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
@@ -163,7 +165,10 @@ class UnitTestCase
 			return;
 		}
 		$testobj = new $classname();
+		echo '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>';
+
 		$testobj->run();
+		echo '</body></html>';
 	}
 
 	public static function run_all()
@@ -177,6 +182,7 @@ class UnitTestCase
 		$classes = get_declared_classes();
 		$classes = array_unique($classes);
 		sort($classes);
+		echo '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>';
 		foreach($classes as $class) {
 			$parents = class_parents($class, false);
 			if(in_array('UnitTestCase', $parents)) {
@@ -190,6 +196,7 @@ class UnitTestCase
 			}
 		}
 		echo "<div class=\"all test complete\">{$case_count}/{$case_count} tests complete.  {$fail_count} failed assertions.  {$pass_count} passed assertions.  {$exception_count} exceptions.</div>";
+		echo '</body></html>';
 	}
 
 	public static function run_dir($directory = null)
