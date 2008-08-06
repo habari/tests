@@ -39,7 +39,7 @@ foreach ( $processors as $processor ) {
 	$rr= new RemoteRequest( 'http://test.habariproject.org/' );
 	$rr->__set_processor( $processor );
 	$res= $rr->execute();
-	if ( $res ) {
+	if ( $res === TRUE ) {
 	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
 	}
 	else {
@@ -53,7 +53,7 @@ foreach ( $processors as $processor ) {
 		'another' => 'variable',
 	) );
 	$res_get= $rr->execute();
-	if ( $res_get ) {
+	if ( $res_get === TRUE ) {
 	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
 	}
 	else {
@@ -64,7 +64,7 @@ foreach ( $processors as $processor ) {
 	$rr->__set_processor( $processor );
 	$rr->set_body( 'If you can read this, the test was successful.' );
 	$res_post= $rr->execute();
-	if ( $res_post ) {
+	if ( $res_post === TRUE ) {
 	 	$results[]= array( get_class( $processor ), $rr->get_response_headers(), substr( $rr->get_response_body(), 0 ) );
 	}
 	else {
