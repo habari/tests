@@ -21,6 +21,7 @@ class ACLTest extends UnitTestCase
 		$this->acl_user_bob = User::create( array( 'username' => 'acl-bob' ) );
 		$this->acl_group->add( 'acl-alice' );
 		$this->acl_group->add( 'acl-bob' );
+		$this->acl_group->update();
 	}
 	
 	function test_group_permissions()
@@ -56,7 +57,7 @@ class ACLTest extends UnitTestCase
 		// full > read/write
 		$this->assert_true(
 			$this->acl_group->can( 'acltest', 'read' ),
-			"Group with 'full' acltest permission cannot not 'read'."
+			"Group with 'full' acltest permission cannot 'read'."
 		);
 		$this->assert_true(
 			$this->acl_group->can( 'acltest', 'write' ),
@@ -100,6 +101,10 @@ class ACLTest extends UnitTestCase
 		// Add acl-alice to the admin group
 		//(which has been granted admin priviliges in installhandler).
 		$this->acl_user_alice->add_to_group( 'admin' );
+		$admin_group = UserGroup::get_by_name('admin');
+		if ( $admin_group instanceOf UserGroup ) {
+			$admin_group->update();
+		}
 
 		$this->assert_true(
 			$this->acl_user_alice->can( 'admin' ),
