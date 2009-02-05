@@ -9,7 +9,8 @@
 			'tokenizer' => 'http://php.net/tokenizer',
 			'simplexml' => 'http://php.net/simplexml',
 			'mbstring' => 'http://php.net/mbstring',
-			'json' => 'http://php.net/json'
+			'json' => 'http://php.net/json',
+			'pcre' => 'http://php.net/pcre'
 			);
 		$requirements_met = true;
 
@@ -30,7 +31,6 @@
 				$requirements_met = false;
 			}
 		}
-		/*$this->theme->assign('missing_extensions',  $missing_extensions);*/
 
 		if ( extension_loaded('pdo') ) {
 			/* Check for PDO drivers */
@@ -50,12 +50,15 @@
 			}
 
 			$pdo_drivers_ok = count( $pdo_drivers );
-			/*$this->theme->assign( 'pdo_drivers_ok', $pdo_drivers_ok );*/
-			/*$this->theme->assign( 'pdo_drivers', $pdo_drivers );*/
-			/*$this->theme->assign( 'pdo_missing_drivers', $pdo_missing_drivers );*/
+
 			if ( ! $pdo_drivers_ok ) {
 				$requirements_met = false;
 			}
+
+			if ( ! (bool) preg_match( '/\p{L}/u', 'a' ) ) {
+				$requirements_met = false;
+			}
+
 		}
 		else {
 			$pdo_drivers_ok = false ;
@@ -137,6 +140,8 @@ a {
 	
 ul {
 	list-style: none;
+	padding: 0;
+	margin: 0;
 	}
 
 </style>
@@ -160,7 +165,7 @@ ul {
 	<div id="header">
 		<h1>Before you install <em>Habari</em>...</h1>
 	</div>
-	<?php echo ("local_writable $local_writable"); ?>
+	<?php /* This whole chunk can probably be removed */ ?>
 	<?php if (! $local_writable == true ) {?>
 		<h2>Writable directory needed...</h2>
 		<?php if (PHP_OS != 'WIN') {?>
@@ -221,6 +226,14 @@ ul {
 			<em>Habari</em> requires that the following PHP extensions to be installed: <?php echo $missing_ext_html; ?>. Please contact your web hosting provider if you do not have access to your server.
 		</p>
 	<?php }?>
+
+	<?php if ( extension_loaded( 'pcre' ) && !(bool) preg_match( '/\p{L}/u', 'a' ) ) : ?>
+		<h2>Unicode support needed...</h2>
+		<p class="instructions">
+			<em>Habari</em> requires PHP's PCRE extension to have Unicode support enabled. Please contact your web hosting provider if you do not have access to your server.
+		</p>
+
+	<?php endif; ?>
 
 	<?php if ( ! $pdo_drivers_ok && ! array_key_exists( 'pdo', $missing_extensions )  ) { ?>
 		<h2>No PDO drivers enabled</h2>
