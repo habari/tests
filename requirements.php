@@ -1,5 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <?php
+		define('MIN_PHP_VERSION', '5.2.0');
+
 		// Required extensions, this list will augment with time
 		// Even if they are enabled by default, it seems some install turn them off
 		// We use the URL in the Installer template to link to the installation page
@@ -241,6 +243,7 @@ ul {
 <?php } else { ?>
 	<div id="header">
 	<h1>Your system is ready for Habari!</h1>
+	</div>
 	<ul>
 		<li>Download the <a href="http://www.habariproject.org/en/download">latest stable version of Habari</a></li>
 		<li>View the <a href="http://wiki.habariproject.org/en/Installation#Installing_Habari">installation instructions</a></li>
