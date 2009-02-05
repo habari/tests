@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <?php
 		// Required extensions, this list will augment with time
 		// Even if they are enabled by default, it seems some install turn them off
@@ -17,9 +18,6 @@
 		/* Check versions of PHP */
 		$php_version_ok = version_compare(phpversion(), MIN_PHP_VERSION, '>=');
 		
-		/*$this->theme->assign('php_version_ok', $php_version_ok);*/
-		/*$this->theme->assign('PHP_OS', PHP_OS);;*/
-		/*$this->theme->assign('PHP_VERSION',  phpversion());*/
 		if (! $php_version_ok) {
 			$requirements_met = false;
 		}
@@ -55,7 +53,7 @@
 				$requirements_met = false;
 			}
 
-			if ( ! (bool) preg_match( '/\p{L}/u', 'a' ) ) {
+			if ( $requirements_met && ! preg_match( '/\p{L}/u', 'a' ) ) {
 				$requirements_met = false;
 			}
 
@@ -78,9 +76,9 @@
 ?>
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Language" content="en"/>
-	<meta name="robots" content="no index,no follow" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Language" content="en">
+	<meta name="robots" content="no index,no follow">
 	<title>Habari Requirements Check</title>
 <style type="text/css">
 body {
@@ -227,7 +225,7 @@ ul {
 		</p>
 	<?php }?>
 
-	<?php if ( extension_loaded( 'pcre' ) && !(bool) preg_match( '/\p{L}/u', 'a' ) ) : ?>
+	<?php if ( extension_loaded( 'pcre' ) && ! preg_match( '/\p{L}/u', 'a' ) ) : ?>
 		<h2>Unicode support needed...</h2>
 		<p class="instructions">
 			<em>Habari</em> requires PHP's PCRE extension to have Unicode support enabled. Please contact your web hosting provider if you do not have access to your server.
