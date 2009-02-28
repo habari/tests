@@ -1,0 +1,10 @@
+    <table id="table1">
+        <tr>
+            <th>Number</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Bicycle Tires</td>
+        </tr>
+    </table>
