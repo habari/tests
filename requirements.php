@@ -19,60 +19,63 @@
 
 		/* Check versions of PHP */
 		$php_version_ok = version_compare(phpversion(), MIN_PHP_VERSION, '>=');
-		
+
+		/* If the version isn't ok, there's no point going any further*/
 		if (! $php_version_ok) {
 			$requirements_met = false;
 		}
-		/* Check for required extensions */
-		$missing_extensions = array();
-		foreach ($required_extensions as $ext_name => $ext_url) {
-			if (!extension_loaded($ext_name)) {
-				$missing_extensions[$ext_name] = $ext_url;
-				$requirements_met = false;
-			}
-		}
-
-		if ( extension_loaded('pdo') ) {
-			/* Check for PDO drivers */
-			$pdo_drivers = PDO::getAvailableDrivers();
-			if ( ! empty( $pdo_drivers ) ) {
-				$pdo_drivers = array_combine( $pdo_drivers, $pdo_drivers );
-				// Include only those drivers that we include database support for
-				$pdo_schemas = array( 'mysql', 'pgsql', 'sqlite' );
-				$pdo_drivers = array_intersect(
-					$pdo_drivers,
-					$pdo_schemas
-				);
-				$pdo_missing_drivers = array_diff(
-					$pdo_schemas,
-					$pdo_drivers
-				);
-			}
-
-			$pdo_drivers_ok = count( $pdo_drivers );
-
-			if ( ! $pdo_drivers_ok ) {
-				$requirements_met = false;
-			}
-
-			if ( $requirements_met && ! preg_match( '/\p{L}/u', 'a' ) ) {
-				$requirements_met = false;
-			}
-
-		}
 		else {
-			$pdo_drivers_ok = false ;
-			$pdo_drivers = array();
-			$requirements_met = false;
-		}
+			/* Check for required extensions */
+			$missing_extensions = array();
+			foreach ($required_extensions as $ext_name => $ext_url) {
+				if (!extension_loaded($ext_name)) {
+					$missing_extensions[$ext_name] = $ext_url;
+					$requirements_met = false;
+				}
+			}
 
-		/**
-		 * $local_writable is used in the template, but never set in Habari
-		 * Won't remove the template code since it looks like it should be there
-		 *
-		 * This will only meet the requirement so there's no "undefined variable" exception
-		 */
-		$local_writable = true ;
+			if ( extension_loaded('pdo') ) {
+				/* Check for PDO drivers */
+				$pdo_drivers = PDO::getAvailableDrivers();
+				if ( ! empty( $pdo_drivers ) ) {
+					$pdo_drivers = array_combine( $pdo_drivers, $pdo_drivers );
+					// Include only those drivers that we include database support for
+					$pdo_schemas = array( 'mysql', 'pgsql', 'sqlite' );
+					$pdo_drivers = array_intersect(
+						$pdo_drivers,
+						$pdo_schemas
+					);
+					$pdo_missing_drivers = array_diff(
+						$pdo_schemas,
+						$pdo_drivers
+					);
+				}
+
+				$pdo_drivers_ok = count( $pdo_drivers );
+
+				if ( ! $pdo_drivers_ok ) {
+					$requirements_met = false;
+				}
+
+				if ( $requirements_met && ! preg_match( '/\p{L}/u', 'a' ) ) {
+					$requirements_met = false;
+				}
+
+			}
+			else {
+				$pdo_drivers_ok = false ;
+				$pdo_drivers = array();
+				$requirements_met = false;
+			}
+
+			/**
+			* $local_writable is used in the template, but never set in Habari
+			* Won't remove the template code since it looks like it should be there
+			*
+			* This will only meet the requirement so there's no "undefined variable" exception
+			*/
+			$local_writable = true ;
+		}
 
 		/*return $requirements_met;*/
 ?>
@@ -165,79 +168,80 @@ ul {
 	<div id="header">
 		<h1>Before you install <em>Habari</em>...</h1>
 	</div>
-	<?php /* This whole chunk can probably be removed */ ?>
-	<?php if (! $local_writable == true ) {?>
-		<h2>Writable directory needed...</h2>
-		<?php if (PHP_OS != 'WIN') {?>
-			<p class="instructions">
-				Before you can install Habari, you first need to make the install directory writable by php, so that the installation script can write your configuration information properly. The exact process depends on the web server and the ownership of the directory.
-			</p>
-			<p>
-				If your webserver is part of the group which owns the directory, you'll need to add group write permissions to the directory. The procedure for this is as follows:
-			</p>
-			<ol>
-				<li>
-					Open a terminal window, and then change to the installation directory:
-					<pre><strong>$&gt;</strong> cd <i>/path/to/habari/</i></pre>
-				</li>
-				<li>
-					Change the <em>mode</em> (permissions) of the current directory:
-					<pre><strong>$&gt;</strong> chmod g+w .</pre><br />
-					<pre><strong>$&gt;</strong> chmod g+x .</pre>
-					<p class="note">
-						<em>Note</em>: You may need to use <strong>sudo</strong> and enter an administrator password if you do not own the directory.
-					</p>
-				</li>
-			</ol>
-			<p>
-				If the webserver is not part of the group which owns the directory, you will need to <strong>temporarily</strong> grant world write permissions to the directory:
-			</p>
-			<ol>
-				<li>
-					<pre><strong>$&gt;</strong> chmod o+w .</pre><br />
-					<pre><strong>$&gt;</strong> chmod o+x .</pre>
-				</li>
-			</ol>
-			<p>
-				<strong>Be sure to remove the write permissions on the directory as soon as the installation is completed.</strong>
-			</p>
-		<?php } else {?>
-			<strong>@todo Windows instructions</strong>
-		<?php }?>
-	<?php }?>
 
-	<?php if (! $php_version_ok) {?>
+	<?php if (! $php_version_ok) { ?>
 		<h2>PHP Upgrade needed...</h2>
 		<p class="instructions">
-			<em>Habari</em> <?php echo('requires PHP 5.2 or newer. Your current PHP version is %s.');
-			echo(phpversion()); ?>
+			<em>Habari</em> <?php echo('requires PHP 5.2 or newer. Your current PHP version is ' . phpversion()); ?>
 		</p>
 		<strong>@todo Upgrading PHP instructions</strong>
-	<?php }?>
+	<?php } else { ?>
 
-	<?php if (! empty($missing_extensions)) {
-		foreach ($missing_extensions as $ext_name => $ext_url) {
-			$missing_ext_html[]= '<a href="' . $ext_url . '">' . $ext_name . '</a>';
-		}
-		$missing_ext_html = implode( ', ', $missing_ext_html );
-	?>
-		<h2>Missing Extensions</h2>
-		<p class="instructions">
-			<em>Habari</em> requires the following PHP extensions to be installed: <?php echo $missing_ext_html; ?>. Please contact your web hosting provider if you do not have access to your server.
-		</p>
-	<?php }?>
+		<?php /* This whole chunk can probably be removed */ ?>
+		<?php if (! $local_writable == true ) {?>
+			<h2>Writable directory needed...</h2>
+			<?php if (PHP_OS != 'WIN') {?>
+				<p class="instructions">
+					Before you can install Habari, you first need to make the install directory writable by php, so that the installation script can write your configuration information properly. The exact process depends on the web server and the ownership of the directory.
+				</p>
+				<p>
+					If your webserver is part of the group which owns the directory, you'll need to add group write permissions to the directory. The procedure for this is as follows:
+				</p>
+				<ol>
+					<li>
+						Open a terminal window, and then change to the installation directory:
+						<pre><strong>$&gt;</strong> cd <i>/path/to/habari/</i></pre>
+					</li>
+					<li>
+						Change the <em>mode</em> (permissions) of the current directory:
+						<pre><strong>$&gt;</strong> chmod g+w .</pre><br />
+						<pre><strong>$&gt;</strong> chmod g+x .</pre>
+						<p class="note">
+							<em>Note</em>: You may need to use <strong>sudo</strong> and enter an administrator password if you do not own the directory.
+						</p>
+					</li>
+				</ol>
+				<p>
+					If the webserver is not part of the group which owns the directory, you will need to <strong>temporarily</strong> grant world write permissions to the directory:
+				</p>
+				<ol>
+					<li>
+						<pre><strong>$&gt;</strong> chmod o+w .</pre><br />
+						<pre><strong>$&gt;</strong> chmod o+x .</pre>
+					</li>
+				</ol>
+				<p>
+					<strong>Be sure to remove the write permissions on the directory as soon as the installation is completed.</strong>
+				</p>
+			<?php } else {?>
+				<strong>@todo Windows instructions</strong>
+			<?php }?>
+		<?php }?>
 
-	<?php if ( extension_loaded( 'pcre' ) && ! preg_match( '/\p{L}/u', 'a' ) ) : ?>
-		<h2>Unicode support needed...</h2>
-		<p class="instructions">
-			<em>Habari</em> requires PHP's PCRE extension to have Unicode support enabled. Please contact your web hosting provider if you do not have access to your server.
-		</p>
+		<?php if (! empty($missing_extensions)) {
+			foreach ($missing_extensions as $ext_name => $ext_url) {
+				$missing_ext_html[]= '<a href="' . $ext_url . '">' . $ext_name . '</a>';
+			}
+			$missing_ext_html = implode( ', ', $missing_ext_html );
+		?>
+			<h2>Missing Extensions</h2>
+			<p class="instructions">
+				<em>Habari</em> requires the following PHP extensions to be installed: <?php echo $missing_ext_html; ?>. Please contact your web hosting provider if you do not have access to your server.
+			</p>
+		<?php }?>
 
-	<?php endif; ?>
+		<?php if ( extension_loaded( 'pcre' ) && ! preg_match( '/\p{L}/u', 'a' ) ) { ?>
+			<h2>Unicode support needed...</h2>
+			<p class="instructions">
+				<em>Habari</em> requires PHP's PCRE extension to have Unicode support enabled. Please contact your web hosting provider if you do not have access to your server.
+			</p>
 
-	<?php if ( ! $pdo_drivers_ok && ! array_key_exists( 'pdo', $missing_extensions )  ) { ?>
-		<h2>No PDO drivers enabled</h2>
-		<p class="instructions"><em>Habari</em> requires that at least one <a href="http://www.php.net/pdo">PDO driver</a> be installed. Please ask your hosting provider to enable one of the PDO drivers supported by Habari.</p>
+		<?php } ?>
+
+		<?php if ( ! $pdo_drivers_ok && ! array_key_exists( 'pdo', $missing_extensions )  ) { ?>
+			<h2>No PDO drivers enabled</h2>
+			<p class="instructions"><em>Habari</em> requires that at least one <a href="http://www.php.net/pdo">PDO driver</a> be installed. Please ask your hosting provider to enable one of the PDO drivers supported by Habari.</p>
+		<?php } ?>
 	<?php } ?>
 
 <?php } else { ?>
