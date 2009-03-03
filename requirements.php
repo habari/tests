@@ -170,7 +170,7 @@ ul {
 		<h2>Writable directory needed...</h2>
 		<?php if (PHP_OS != 'WIN') {?>
 			<p class="instructions">
-				Before you can install Habari, you first need to make the install directory writable by php, so that the installation script can write your configuration information properly. The exact process of server and the ownership of the directory.
+				Before you can install Habari, you first need to make the install directory writable by php, so that the installation script can write your configuration information properly. The exact process depends on the web server and the ownership of the directory.
 			</p>
 			<p>
 				If your webserver is part of the group which owns the directory, you'll need to add group write permissions to the directory. The procedure for this is as follows:
@@ -223,7 +223,7 @@ ul {
 	?>
 		<h2>Missing Extensions</h2>
 		<p class="instructions">
-			<em>Habari</em> requires that the following PHP extensions to be installed: <?php echo $missing_ext_html; ?>. Please contact your web hosting provider if you do not have access to your server.
+			<em>Habari</em> requires the following PHP extensions to be installed: <?php echo $missing_ext_html; ?>. Please contact your web hosting provider if you do not have access to your server.
 		</p>
 	<?php }?>
 
