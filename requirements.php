@@ -185,7 +185,7 @@ ul {
 					Before you can install Habari, you first need to make the install directory writable by php, so that the installation script can write your configuration information properly. The exact process depends on the web server and the ownership of the directory.
 				</p>
 				<p>
-					If your webserver is part of the group which owns the directory, you'll need to add group write permissions to the directory. The procedure for this is as follows:
+					If your web server is part of the group which owns the directory, you'll need to add group write permissions to the directory. The procedure for this is as follows:
 				</p>
 				<ol>
 					<li>
@@ -202,7 +202,7 @@ ul {
 					</li>
 				</ol>
 				<p>
-					If the webserver is not part of the group which owns the directory, you will need to <strong>temporarily</strong> grant world write permissions to the directory:
+					If the web server is not part of the group which owns the directory, you will need to <strong>temporarily</strong> grant world write permissions to the directory:
 				</p>
 				<ol>
 					<li>
