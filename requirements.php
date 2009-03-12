@@ -13,7 +13,8 @@
 			'simplexml' => 'http://php.net/simplexml',
 			'mbstring' => 'http://php.net/mbstring',
 			'json' => 'http://php.net/json',
-			'pcre' => 'http://php.net/pcre'
+			'pcre' => 'http://php.net/pcre',
+			'spl' => 'http://php.net/spl',
 			);
 		$requirements_met = true;
 
