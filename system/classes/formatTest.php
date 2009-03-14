@@ -10,10 +10,9 @@ class system_classes_FormatTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('<p>foo</p>', Format::autop('foo'));
 	}
 
-	/*
 	public function autopDataProvider()
 	{
-		$autopTestDataPath = dirname(__FILE__) . '/../data/autop';
+		$autopTestDataPath = dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'autop';
 		$data = array();
 		for ($n=1; $n<=99; $n++) {
 			$suff = str_pad($n, 2, '0', STR_PAD_LEFT);
@@ -31,11 +30,9 @@ class system_classes_FormatTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider autopDataProvider
 	 */
-	/*
 	public function testAutop($in, $out)
 	{
 		$this->assertEquals($out, Format::autop($in));
 	}
-	*/
 }
 ?>
