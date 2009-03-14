@@ -38,8 +38,6 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	public function test_write_by_value()
 	{
 		$this->bitmask->value = 1;
-		print_r($this->bitmask);
-		print_r($this->bitmask->read);
 		$this->assertTrue($this->bitmask->read, 'Read bit should be true and is not.');
 		$this->assertFalse($this->bitmask->edit, 'Edit bit should be false and is not.');
 
@@ -69,6 +67,31 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('read', (string)$this->bitmask);
 
 		$this->markTestIncomplete();
+	}
+
+	/**
+	 * Ported from old test suite
+	 */
+	function test_bitmask()
+	{
+		define('POST_FLAG_ALLOWS_COMMENTS'  ,1);
+		define('POST_FLAG_ALLOWS_TRACKBACKS',1 << 1);
+		define('POST_FLAG_ALLOWS_PINGBACKS' ,1 << 2);
+
+		$flags= array(
+		        'allows_comments'=>POST_FLAG_ALLOWS_COMMENTS
+		      , 'allows_trackbacks'=>POST_FLAG_ALLOWS_TRACKBACKS
+		      , 'allows_pingbacks'=>POST_FLAG_ALLOWS_PINGBACKS);
+
+		$bitmask= new Bitmask($flags);
+
+		$bitmask->allows_comments   = true;
+		$bitmask->allows_trackbacks = false;
+		$bitmask->allows_pingbacks  = true;
+
+		$this->assertTrue($bitmask->allows_comments);
+		$this->assertFalse($bitmask->allows_trackbacks);
+		$this->assertTrue($bitmask->allows_pingbacks);
 	}
 }
 ?>
