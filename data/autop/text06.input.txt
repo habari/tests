@@ -1,3 +1,7 @@
+start
+
 <b>foo
 
 bar</b>
+
+end
