@@ -1,1 +1,3 @@
-<p><b>foo</b></p><p><b>bar</b></p>
+<p><b>foo
+
+bar</b></p>
