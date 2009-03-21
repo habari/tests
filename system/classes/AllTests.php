@@ -18,10 +18,9 @@ require_once 'PHPUnit/TextUI/TestRunner.php';
 // PHPEdit Inclusions -- dot not remove this comment
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'formatTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bitmaskTest.php';
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'ColorUtilsTest.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'colorUtilsTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'utilsTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uuidTest.php';
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'UtilsTest.php';
 // /PHPEdit Inclusions -- dot not remove this comment
 
 class system_classes_AllTests
