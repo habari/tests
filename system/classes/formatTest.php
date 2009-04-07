@@ -32,7 +32,7 @@ class system_classes_FormatTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testAutop($in, $out)
 	{
-		$this->assertEquals($out, Format::autop($in));
+		$this->assertEquals(trim($out), trim(Format::autop($in)));
 	}
 }
 ?>
