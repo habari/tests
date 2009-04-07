@@ -18,7 +18,6 @@ class system_classes_FormatTest extends PHPUnit_Framework_TestCase
 			$suff = str_pad($n, 2, '0', STR_PAD_LEFT);
 			$inputFile = $autopTestDataPath . '/text' . $suff . '.input.txt';
 			$wantedFile = $autopTestDataPath . '/text' . $suff . '.wanted.txt';
-			echo $inputFile;
 			if (!is_readable($inputFile)) {
 				break; // no need to keep looping
 			}
