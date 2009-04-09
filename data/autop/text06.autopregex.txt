@@ -1,1 +1,0 @@
-<p>start</p><p><b>foo</p><p>bar</b></p><p>end</p>
