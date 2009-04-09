@@ -1,1 +1,0 @@
-<p>foo bar</p><h2>heading!</h2><p>bar baz</p>
