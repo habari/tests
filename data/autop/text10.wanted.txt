@@ -1,3 +1,5 @@
-<div><![CDATA[
+<div>
+<![CDATA[
 test
-]]></div>
+]]>
+</div>
