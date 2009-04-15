@@ -1,1 +1,1 @@
-<p><strong>Bori:</strong>Balja, jobbja!<br><strong>én:</strong> Bal<em>r</em>a, jobb<em>r</em>a!<br><strong>Bori:</strong> Nem kell csúnyán mondani!<br></p>
+<p><strong>foo</strong>bar</p>
