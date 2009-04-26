@@ -18,7 +18,6 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 	/* Vocabulary tests */
 	public function test_construct_vocabulary()
 	{
-		$this->markTestSkipped('The cache constant must be set to "FileCache" to test the file cache.');
 		// Features are 'hierarchical', 'unique', 'required', 'free'
 		$m = Vocabulary::feature_mask(true, false, false, false);
 		$v = new Vocabulary($this->vocab_name, $this->vocab_desc, $m);
@@ -60,18 +59,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_delete_vocabulary()
 	{
+		$this->markTestSkipped('Vocabularies not created yet, so cannot delete.');
 		$vocab_count = count(Vocabulary::names());
 		$v = Vocabulary::get($this->vocab_name);
 		$v->delete();
-
-		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()));
-		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()));
-	}
-
-	public function test_static_delete_vocabulary()
-	{
-		$vocab_count = count(Vocabulary::names());
-		Vocabulary::delete($this->vocab_rename);
 
 		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()));
 		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()));
