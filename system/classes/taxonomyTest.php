@@ -25,7 +25,13 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertType('Vocabulary', $v);
 		$this->assertEquals($v->name, $this->vocab_name);
 		$this->assertEquals($v->description, $this->vocab_desc);
-		$this->assertEquals(1, $v->required);
+		$this->assertEquals(true, $v->hierarchical);
+		$this->assertEquals(false, $v->free);
+	}
+
+	public function test_get_names()
+	{
+		$this->assertTrue(is_array(Vocabulary::names()));
 	}
 
 	public function test_add_vocabulary()
@@ -34,8 +40,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$v = new Vocabulary($this->vocab_name, $this->vocab_desc, Vocabulary::feature_mask(true, false, false, false));
 		$v->insert();
 
-		$this->assertEquals($vocab_count + 1, count(Vocabulary::names()));
-		$this->assertTrue(in_array($this->vocab_name, Vocabulary::names()));
+		$this->assertEquals($vocab_count + 1, count(Vocabulary::names()), 'Count of names should increase by one');
+		$this->assertTrue(in_array($this->vocab_name, Vocabulary::names()), 'Test vocabulary name should be in the list of names');
 	}
 
 	public function test_get_vocabulary()
@@ -59,7 +65,6 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_delete_vocabulary()
 	{
-		$this->markTestSkipped('Vocabularies not created yet, so cannot delete.');
 		$vocab_count = count(Vocabulary::names());
 		$v = Vocabulary::get($this->vocab_name);
 		$v->delete();

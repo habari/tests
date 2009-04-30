@@ -61,6 +61,15 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	public function test_write_by_array()
+	{
+		// TODO Bitmask should support this but the current implementation uses a public variable called value rather than the value setter.
+		$mask = array(true, false, false, true);
+		$this->bitmask->value = $mask;
+
+		$this->assertEquals($this->bitmask->value, 9);
+	}
+
 	public function test__tostring()
 	{
 		$this->bitmask->value = 1;
