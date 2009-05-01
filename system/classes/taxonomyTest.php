@@ -58,19 +58,19 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$vocab_count = count(Vocabulary::names());
 		Vocabulary::rename($this->vocab_name, $this->vocab_rename);
 
-		$this->assertTrue(in_array($this->vocab_rename, Vocabulary::names()));
-		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()));
-		$this->assertEquals($vocab_count, count(Vocabulary::names()));
+		$this->assertTrue(in_array($this->vocab_rename, Vocabulary::names()), 'New vocabulary name should be in list of vocabulary names');
+		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Old vocabulary name should not be in list of vocabulary names');
+		$this->assertEquals($vocab_count, count(Vocabulary::names()), 'Number of vocabularies should not change on rename');
 	}
 
 	public function test_delete_vocabulary()
 	{
 		$vocab_count = count(Vocabulary::names());
-		$v = Vocabulary::get($this->vocab_name);
+		$v = Vocabulary::get($this->vocab_rename);
 		$v->delete();
 
-		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()));
-		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()));
+		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()), 'Number of vocabularies should decrease by one');
+		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Deleted vocabulary name should not be in list of vocabulary names');
 	}
 
 	/* TODO write term tests */
