@@ -19,8 +19,12 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 	public function test_construct_vocabulary()
 	{
 		// Features are 'hierarchical', 'unique', 'required', 'free'
-		$m = Vocabulary::feature_mask(true, false, false, false);
-		$v = new Vocabulary($this->vocab_name, $this->vocab_desc, $m);
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+		);
+		$v = new Vocabulary($params);
 
 		$this->assertType('Vocabulary', $v);
 		$this->assertEquals($v->name, $this->vocab_name);
@@ -34,10 +38,15 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(is_array(Vocabulary::names()));
 	}
 
-	public function test_add_vocabulary()
+	public function test_insert_vocabulary()
 	{
 		$vocab_count = count(Vocabulary::names());
-		$v = new Vocabulary($this->vocab_name, $this->vocab_desc, Vocabulary::feature_mask(true, false, false, false));
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+		);
+		$v = new Vocabulary($params);
 		$v->insert();
 
 		$this->assertEquals($vocab_count + 1, count(Vocabulary::names()), 'Count of names should increase by one');
