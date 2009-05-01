@@ -8,11 +8,15 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 	private $vocab_desc;
 	private $vocab_rename;
 
+	private $term_name;
+
 	public function setup()
 	{
 		$this->vocab_name = 'test';
 		$this->vocab_desc = 'test vocabulary';
 		$this->vocab_rename = 'test_rename';
+
+		$this->term_name = 'Test Term';
 	}
 
 	/* Vocabulary tests */
@@ -82,7 +86,19 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Deleted vocabulary name should not be in list of vocabulary names');
 	}
 
-	/* TODO write term tests */
+	/* Term tests */
+	public function test_construct_term()
+	{
+		$params = array(
+			'term' => Utils::slugify($this->term_name),
+			'term_display' => $this->term_name
+		);
+		$t = new Term($params);
+
+		$this->assertType('Term', $t);
+		$this->assertEquals($t->term, Utils::slugify($this->term_name));
+		$this->assertEquals($t->term_display, $this->term_name);
+	}
 
 	public function teardown()
 	{
