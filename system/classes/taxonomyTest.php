@@ -100,6 +100,35 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($t->term_display, $this->term_name);
 	}
 
+	public function test_get_terms()
+	{
+		$v = new Vocabulary(array(
+			'name' => 'foods',
+			'description' => 'Types of foods you might eat.',
+			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+		));
+
+		$fruit = $v->add_term('Fruit');
+		$red_apples = $v->add_term(new Term(array('term' => 'red_apples', 'term_display' => 'Red Apples')), $fruit);
+		$v->add_term('green_tomatoes', $fruit, $red_apples)->term_display = 'Green Tomatoes';
+		$v->add_term('Les oranges', $fruit);
+
+		$root = $v->get_term();
+
+		$this->assertType('Term', $root, 'A term should be of type Term');
+		$this->assertEquals('Fruit', $root->term_display, 'The first term entered should be the root');
+
+		$descendants = $root->descendants();
+		$this->assertEquals(3, count($descendants), 'Number of descendants of the root should equal the number terms added after the root');
+		$this->assertType('Term', $descendants[0], 'Descendants should be of type Term');
+
+		$term = $v->get_term(Utils::slugify('Les oranges'));
+		$this->assertType('Term', $term, 'Should be able to retrieve terms by term');
+
+		$parent = $term->parent();
+		$this->assertEquals($root, $parent, 'Should be able to retrieve a term\'s parent');
+	}
+
 	public function teardown()
 	{
 	}
