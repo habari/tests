@@ -252,7 +252,7 @@ ul {
 	<ul>
 		<li>Download the <a href="http://www.habariproject.org/en/download">latest stable version of Habari</a></li>
 		<li>View the <a href="http://wiki.habariproject.org/en/Installation#Installing_Habari">installation instructions</a></li>
-		<li>Get <a href="http://www.mibbit.com/?server=irc.freenode.net&channel=%23habari">live help</a></li>
+		<li>Get <a href="http://webchat.freenode.net/?randomnick=1&channels=habari">live help</a></li>
 	</ul>
 <?php } ?>
 
