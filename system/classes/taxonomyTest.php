@@ -55,32 +55,99 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($vocab_count + 1, count(Vocabulary::names()), 'Count of names should increase by one');
 		$this->assertTrue(in_array($this->vocab_name, Vocabulary::names()), 'Test vocabulary name should be in the list of names');
+
+		// Clean up
+		// Delete the vocabulary
+		try {
+			$v->delete();
+		}
+		catch (Exception $e) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
 	}
 
 	public function test_get_vocabulary()
 	{
+		// Set up
+		// Create and insert a vocabulary
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'features' => array('hierarchical')
+		);
+		$v = new Vocabulary($params);
+		$v->insert();
+
+		// Retrieve the vocabulary
 		$v = Vocabulary::get($this->vocab_name);
 
 		$this->assertType('Vocabulary', $v);
 		$this->assertEquals($v->name, $this->vocab_name);
 		$this->assertEquals($v->description, $this->vocab_desc);
+
+		// Clean up
+		// Delete the vocabulary
+		try {
+			$v->delete();
+		}
+		catch (Exception $e) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
 	}
 
 	public function test_rename_vocabulary()
 	{
+		// Set up
+		// Create and insert a vocabulary
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'features' => array('hierarchical')
+		);
+		$v = new Vocabulary($params);
+		$v->insert();
+
+		// Rename vocabulary
 		$vocab_count = count(Vocabulary::names());
 		Vocabulary::rename($this->vocab_name, $this->vocab_rename);
 
 		$this->assertTrue(in_array($this->vocab_rename, Vocabulary::names()), 'New vocabulary name should be in list of vocabulary names');
 		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Old vocabulary name should not be in list of vocabulary names');
 		$this->assertEquals($vocab_count, count(Vocabulary::names()), 'Number of vocabularies should not change on rename');
+
+		// Clean up
+		// Delete the vocabulary
+		try {
+			$v->delete();
+		}
+		catch (Exception $e) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
 	}
 
 	public function test_delete_vocabulary()
 	{
+		// Set up
+		// Create and insert a vocabulary
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'features' => array('hierarchical')
+		);
+		$v = new Vocabulary($params);
+		$v->insert();
+
+		// Count the number of vocabularies before deletion
 		$vocab_count = count(Vocabulary::names());
-		$v = Vocabulary::get($this->vocab_rename);
-		$v->delete();
+
+		// Retrieve and delete vocabulary
+		$v = Vocabulary::get($this->vocab_name);
+		try {
+			$v->delete();
+		}
+		catch (Exception $e) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
 
 		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()), 'Number of vocabularies should decrease by one');
 		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Deleted vocabulary name should not be in list of vocabulary names');
