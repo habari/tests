@@ -26,7 +26,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+			'features' => array('hierarchical')
 		);
 		$v = new Vocabulary($params);
 
@@ -48,7 +48,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+			'features' => array('hierarchical')
 		);
 		$v = new Vocabulary($params);
 		$v->insert();
@@ -105,7 +105,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$v = new Vocabulary(array(
 			'name' => 'foods',
 			'description' => 'Types of foods you might eat.',
-			'feature_mask' => Vocabulary::feature_mask(true, false, false, false)
+			'features' => array('hierarchical')
 		));
 
 		$fruit = $v->add_term('Fruit');
