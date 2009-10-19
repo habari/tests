@@ -49,8 +49,8 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 		$res = $this->tag->insert();
 		$this->assertEquals( $res, TRUE );
 		$this->assertEquals( $count + 1, count( Tags::get() ) );
-		$t = Tag::get( $this->text );
-//		$this->assertType( 'Tag', $t );
+		$t = Tag::get( $this->slug );
+		$this->assertType( 'Tag', $t );
 		$this->assertEquals( $t->tag, $this->text );
 		$this->tag->delete();
 
@@ -61,7 +61,6 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 
 		$this->tag->insert();
 		$t = Tag::get( $this->tag->tag_text );
-		$t = new Tag( array( 'tag_text' => $t->tag, 'tag_slug' => $t->slug, 'id' => $t->id ) );
 		$t->tag_text = 'Updated Test Tag';
 		$t->update();
 		$new_tag = Tag::get( $this->tag->tag_slug );
