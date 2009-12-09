@@ -6,6 +6,7 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 {
 	private $text = 'Test Tag';
 	private $slug;
+	private $tag;
 
 	public function setup()
 	{
@@ -47,12 +48,17 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 	{
 		$count = count( Tags::get() );
 		$res = $this->tag->insert();
-		$this->assertEquals( $res, TRUE );
-		$this->assertEquals( $count + 1, count( Tags::get() ) );
-		$t = Tag::get( $this->slug );
-		$this->assertType( 'Tag', $t );
-		$this->assertEquals( $t->tag, $this->text );
-		$this->tag->delete();
+		if ( $res ) {
+			$this->assertType( 'Tag', $res );
+			$this->assertEquals( $count + 1, count( Tags::get() ) );
+			$t = Tag::get( $this->text );
+			$this->assertType( 'Tag', $t );
+			$this->assertEquals( $t->tag_text, $this->text );
+			$t->delete();
+		}
+		else {
+			$this->assertEquals( $res, FALSE );
+		}
 
 	}
 
@@ -71,9 +77,9 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 	public function test_delete_tag()
 	{
 		$count = count( Tags::get() );
-		$this->tag->insert();
+		$t = $this->tag->insert();
 		$this->assertEquals( $count + 1, count( Tags::get() ) );
-		$this->tag->delete();
+		$t->delete();
 		$this->assertEquals( $count, count( Tags::get() ) );
 	}
 
@@ -81,8 +87,8 @@ class system_classes_TagTest extends PHPUnit_Framework_TestCase
 	{
 		$this->tag->insert();
 		$t = Tag::get( $this->text );
-		$this->assertEquals( $t->tag, $this->tag->tag_text );
-		$this->tag->delete();
+		$this->assertEquals( $t->tag_text, $this->tag->tag_text );
+		$t->delete();
 	}
 
 	public function test_attach_to_post_tag()
