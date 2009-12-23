@@ -23,9 +23,9 @@ class system_classes_BlockTest extends PHPUnit_Framework_TestCase
 		);
 		$block = new Block($params);
 
-		$this->assertType('Block', $block);
-		$this->assertEquals($block->title, $this->title );
-		$this->assertEquals($block->type, $this->type );
+		$this->assertType('Block', $block, 'Created object should be a Block');
+		$this->assertEquals($block->title, $this->title, 'Block title should be the title passed to the constructor' );
+		$this->assertEquals($block->type, $this->type, 'Block type should be the type passed to the construtor' );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class system_classes_BlockTest extends PHPUnit_Framework_TestCase
 
 		$block->insert();
 
-		$this->assertEquals( $count + 1, DB::get_value('SELECT count(*) FROM {blocks}') );
+		$this->assertEquals( $count + 1, DB::get_value('SELECT count(*) FROM {blocks}'), 'Count of blocks should increase by one' );
 	}
 
 	public function test_update_block()
@@ -55,7 +55,6 @@ class system_classes_BlockTest extends PHPUnit_Framework_TestCase
 		);
 		$block = new Block($params);
 
-		// Should return the inserted block
 		$block->insert();
 		$block_id = $block->id;
 
@@ -66,14 +65,34 @@ class system_classes_BlockTest extends PHPUnit_Framework_TestCase
 		$block->update();
 
 		$updated_block = DB::get_row('SELECT * FROM {blocks} WHERE id=:id', array('id' => $block_id), 'Block');
-		$this->assertEquals( $updated_block->title, $updated_title );
-		$this->assertEquals( $updated_block->type, $updated_type );
+		$this->assertEquals( $updated_block->title, $updated_title, 'Block title should be updated' );
+		$this->assertEquals( $updated_block->type, $updated_type, 'Block type should be updated' );
+
+		// Try updating data as well
+		$block->data_test = 'foo';
+		$block->update();
+
+		$updated_block = DB::get_row('SELECT * FROM {blocks} WHERE id=:id', array('id' => $block_id), 'Block');
+		$this->assertEquals( $updated_block->data_test, $block->data_test, 'Block data should be updated' );
 	}
 
 	public function test_delete_block()
 	{
-		$this->markTestIncomplete('This test has not been implemented yet.');
+		$params = array(
+			'title' => $this->title,
+			'type' => $this->type
+		);
+		$block = new Block($params);
+
+		$block->insert();
+
+		$count = DB::get_value('SELECT count(*) FROM {blocks}');
+
+		$block->delete();
+
+		$this->assertEquals( $count - 1, DB::get_value('SELECT count(*) FROM {blocks}'), 'Count of blocks should decrease by one' );
 	}
 
 }
+
 ?>
