@@ -1,5 +1,6 @@
 <?php
 
+require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
 
 class system_classes_FileCacheTest extends PHPUnit_Framework_TestCase
 {
