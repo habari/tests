@@ -125,7 +125,13 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals( $new_val, $newfields[$key] );
 			$this->assertEquals( $val, $fields[$key] );
 		}
-		
+
+		// make sure brand new field goes in newfield
+		$testqueryrecord->pony = 'ponies';
+		$fields = $testqueryrecord->get_fields();
+		$newfields = $testqueryrecord->get_newfields();
+		$this->assertEquals( 'ponies', $newfields['pony'] );
+		$this->assertTrue( !isset( $fields['pony'] ) );
 	}
 
 	/**
@@ -154,6 +160,12 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals( $val, $fields[$key] );
 		}
 
+		// make sure brand new field goes in newfield
+		$testqueryrecord->pony = 'ponies';
+		$fields = $testqueryrecord->get_fields();
+		$newfields = $testqueryrecord->get_newfields();
+		$this->assertEquals( 'ponies', $newfields['pony'] );
+		$this->assertTrue( !isset( $fields['pony'] ) );
 	}
 
 	/**
