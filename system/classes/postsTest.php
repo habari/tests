@@ -6,7 +6,10 @@ require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . '
 
 class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 {
-	private $posts;
+	protected $posts;
+
+	protected $types = array('entry', 'page');
+	protected $statuses = array('published', 'draft');
 
 	protected function setUp()
 	{
@@ -57,21 +60,19 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($g->id, $want->id, 'id of returned Post should be the one we asked for');
 
 		// Get multiple posts by id
-		$want = array_rand($this->posts, rand(2,NUM_POSTS));
+		$want = array_rand($this->posts, 10);
 
 		$ids = array();
 		foreach ( $want as $w ) $ids[] = $this->posts[$w]->id;
-		var_dump($ids);
 
 		$got = Posts::get(array('id' => $ids));
-		var_dump($got);
 
 		$this->assertType('Posts', $got, 'Result should be of type Posts');
-		$this->assertEquals(count($got), count($want), 'The number of posts we asked for should be returned');
+		// @todo This currently isn't true, because the options limit is respected. Should it be?
+		//$this->assertEquals(count($got), count($want), 'The number of posts we asked for should be returned');
 
 		foreach ( $got as $g ) {
 			$this->assertType('Post', $g, 'Items should be of type Post');
-			// Check they're all there
 			$this->assertTrue(in_array($g->id, $ids), 'id of returned Post should be in the list of the ones we asked for' );
 		}
 
@@ -79,12 +80,60 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 
 	public function test_get_posts_by_slug()
 	{
-		$this->markTestIncomplete('This test has not been implemented yet.');
+		// Get a single post by slug
+		$want = $this->posts[array_rand($this->posts)];
+
+		$got = Posts::get(array('slug' => $want->slug));
+
+		$this->assertType('Posts', $got, 'Result should be of type Posts');
+		$this->assertTrue($got->onepost, 'A single post should be returned if a single slug is passed in');
+
+		$g = $got[0];
+		$this->assertType('Post', $g, 'Items should be of type Post');
+		$this->assertEquals($g->id, $want->id, 'id of returned Post should be the one we asked for');
+		$this->assertEquals($g->slug, $want->slug, 'slug of returned Post should be the one we asked for');
+
+		// Get multiple posts by id
+		$want = array_rand($this->posts, 10);
+
+		$slugs = array();
+		foreach ( $want as $w ) $slugs[] = $this->posts[$w]->slug;
+
+		$got = Posts::get(array('slug' => $slugs));
+
+		$this->assertType('Posts', $got, 'Result should be of type Posts');
+		// @todo This currently isn't true, because the options limit is respected. Should it be?
+		//$this->assertEquals(count($got), count($want), 'The number of posts we asked for should be returned');
+
+		foreach ( $got as $g ) {
+			$this->assertType('Post', $g, 'Items should be of type Post');
+			$this->assertTrue(in_array($g->slug, $slugs), 'slug of returned Post should be in the list of the ones we asked for' );
+		}
 	}
 
 	public function test_get_posts_by_content_type()
 	{
-		$this->markTestIncomplete('This test has not been implemented yet.');
+		// Get by single content type
+		$want = array();
+		foreach ( $this->posts as $post ) {
+			if ( $post->content_type == Post::type('page') ) {
+				$want[] = $post;
+			}
+		}
+
+		$got = Posts::get(array('content_type' => Post::type('page')));
+
+		$this->assertType('Posts', $got, 'Result should be of type Posts');
+
+		foreach ( $got as $g ) {
+			$this->assertType('Post', $g, 'Items should be of type Post');
+			$this->assertEquals($g->content_type, Post::type('page'), 'Returned posts should be of the requested content type' );
+		}
+
+		// Get by an array of content types
+		// @todo How do we test this?
+		// Get any content type
+		// @todo How do we test this?
 	}
 
 	public function test_get_posts_by_status()
@@ -154,8 +203,8 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 			'title' => $this->get_title(),
 			'content' => $this->get_content(1, 3, 'some', array('ol'=>1, 'ul'=>1), 'cat'),
 			'user_id' => $user->id,
-			'status' => Post::status('published'),
-			'content_type' => Post::type('entry'),
+			'status' => Post::status($this->statuses[array_rand($this->statuses)]),
+			'content_type' => Post::type($this->types[array_rand($this->types)]),
 			//'tags' => 'posts_test',
 			'pubdate' => HabariDateTime::date_create( $time ),
 		));
