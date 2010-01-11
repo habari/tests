@@ -35,7 +35,6 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 	protected function tearDown()
 	{
 		foreach ( $this->posts as $post ) {
-			echo get_class($post)."\n";
 			$post->delete();
 		}
 		unset($this->posts);
@@ -50,23 +49,31 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 
 		$got = Posts::get(array('id' => $want->id));
 
-		$this->assertType('Posts', $got);
-		$this->assertTrue($got->onepost);
-		/*
-		$this->assertEquals($got->id, $want->id );
+		$this->assertType('Posts', $got, 'Result should be of type Posts');
+		$this->assertTrue($got->onepost, 'A single post should be returned if a single id is passed in');
+
+		$g = $got[0];
+		$this->assertType('Post', $g, 'Items should be of type Post');
+		$this->assertEquals($g->id, $want->id, 'id of returned Post should be the one we asked for');
 
 		// Get multiple posts by id
 		$want = array_rand($this->posts, rand(2,NUM_POSTS));
+
 		$ids = array();
-		foreach ( $want as $w ) $ids[] = $w->id;
+		foreach ( $want as $w ) $ids[] = $this->posts[$w]->id;
+		var_dump($ids);
 
 		$got = Posts::get(array('id' => $ids));
+		var_dump($got);
+
+		$this->assertType('Posts', $got, 'Result should be of type Posts');
+		$this->assertEquals(count($got), count($want), 'The number of posts we asked for should be returned');
 
 		foreach ( $got as $g ) {
-			$this->assertType('Post', $g);
-			//$this->assertEquals($g->id, $want->id );
+			$this->assertType('Post', $g, 'Items should be of type Post');
+			// Check they're all there
+			$this->assertTrue(in_array($g->id, $ids), 'id of returned Post should be in the list of the ones we asked for' );
 		}
-		*/
 
 	}
 
@@ -149,7 +156,7 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 			'user_id' => $user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'tags' => 'posts_test',
+			//'tags' => 'posts_test',
 			'pubdate' => HabariDateTime::date_create( $time ),
 		));
 		$post->info->posts_test = true;
