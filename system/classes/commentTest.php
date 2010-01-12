@@ -139,13 +139,26 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @todo Implement testCommentInfo().
+	 * 
 	 */
-	public function testCommentInfo() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+	public function testCommentInfo()
+	{
+		$this->comment->info->test = 'test';
+		$this->assertEquals( 'test', $this->comment->info->test );
+		$this->comment->update();
+		$test_comment = Comment::get($this->comment->id);
+		$this->assertEquals( $this->comment->info->test, $test_comment->info->test );
+		unset($test_comment);
+
+		$new_comment = new Comment();
+		$this->assertType( 'CommentInfo', $new_comment->info );
+		$this->assertFalse( $new_comment->info->is_key_set() );
+		$new_comment->info->test = 'test';
+		$new_comment->insert();
+		$this->assertTrue( $new_comment->info->is_key_set() );
+		$test_comment = Comment::get($new_comment->id);
+		$this->assertEquals( $new_comment->info->test, $test_comment->info->test );
+		unset($test_comment);
 	}
 
 	/**
