@@ -143,6 +143,7 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testCommentInfo()
 	{
+		// make sure adding info to comment works
 		$this->comment->info->test = 'test';
 		$this->assertEquals( 'test', $this->comment->info->test );
 		$this->comment->update();
@@ -150,6 +151,7 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $this->comment->info->test, $test_comment->info->test );
 		unset($test_comment);
 
+		// make sure construction works with info
 		$new_comment = new Comment();
 		$this->assertType( 'CommentInfo', $new_comment->info );
 		$this->assertFalse( $new_comment->info->is_key_set() );
@@ -158,6 +160,7 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $new_comment->info->is_key_set() );
 		$test_comment = Comment::get($new_comment->id);
 		$this->assertEquals( $new_comment->info->test, $test_comment->info->test );
+		$new_comment->delete();
 		unset($test_comment);
 	}
 
