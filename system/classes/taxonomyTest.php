@@ -196,7 +196,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($root, $parent, 'Should be able to retrieve a term\'s parent');
 	}
 
-	public function test_not_descendents()
+	public function test_not_descendants()
 	{
 		$v = new Vocabulary( array(
 			'name' => 'animals',
@@ -225,14 +225,14 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$spider = $v->add_term( 'Spider', $legs );
 		$crustacean  = $v->add_term( 'Crustacean', $legs );
 
-		$not_descendents = $backbone->not_descendants();
+		$not_descendants = $backbone->not_descendants();
 		$s = array();
-		foreach($not_descendents as $el ) {
+		foreach($not_descendants as $el ) {
 			$s[] = (string)$el;
 		}
 		$expected = array( $root, $no_backbone, $starfish, $mollusk, $legs, $snail, $clam, $insect, $spider, $crustacean );
-		$this->assertTrue( 10 == count( $not_descendents ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
-		$this->assertTrue( $not_descendents == $expected );
+		$this->assertTrue( 10 == count( $not_descendants ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
+		$this->assertTrue( $not_descendants == $expected );
 
 		$v->delete();
 	}
