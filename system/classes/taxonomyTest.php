@@ -196,6 +196,91 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($root, $parent, 'Should be able to retrieve a term\'s parent');
 	}
 
+	public function test_not_descendents()
+	{
+		$v = new Vocabulary( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+		$v->insert();
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
+		$mammal = $v->add_term( 'Mammal', $backbone );
+		$lungs = $v->add_term( 'Lungs', $backbone );
+		$reptile = $v->add_term( 'Reptile', $backbone );
+		$bird = $v->add_term( 'Bird', $backbone );
+		$gills = $v->add_term( 'Gills', $backbone );
+		$fish = $v->add_term( 'Fish', $gills );
+		$amphibian = $v->add_term( 'Amphibian', $gills );
+
+		$no_backbone = $v->add_term( 'No Backbone', $root );
+		$starfish = $v->add_term( 'Starfish', $no_backbone );
+		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
+		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
+		$snail = $v->add_term( 'Snail', $mollusk );
+		$clam = $v->add_term( 'Clam', $mollusk );
+		$insect = $v->add_term( 'Insect', $legs );
+		$spider = $v->add_term( 'Spider', $legs );
+		$crustacean  = $v->add_term( 'Crustacean', $legs );
+
+		$not_descendents = $backbone->not_descendants();
+		$s = array();
+		foreach($not_descendents as $el ) {
+			$s[] = (string)$el;
+		}
+		$expected = array( $root, $no_backbone, $starfish, $mollusk, $legs, $snail, $clam, $insect, $spider, $crustacean );
+		$this->assertTrue( 10 == count( $not_descendents ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
+		$this->assertTrue( $not_descendents == $expected );
+
+		$v->delete();
+	}
+
+	public function test_not_ancestors()
+	{
+		$v = new Vocabulary( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+		$v->insert();
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
+		$mammal = $v->add_term( 'Mammal', $backbone );
+		$lungs = $v->add_term( 'Lungs', $backbone );
+		$reptile = $v->add_term( 'Reptile', $backbone );
+		$bird = $v->add_term( 'Bird', $backbone );
+		$gills = $v->add_term( 'Gills', $backbone );
+		$fish = $v->add_term( 'Fish', $gills );
+		$amphibian = $v->add_term( 'Amphibian', $gills );
+
+		$no_backbone = $v->add_term( 'No Backbone', $root );
+		$starfish = $v->add_term( 'Starfish', $no_backbone );
+		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
+		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
+		$snail = $v->add_term( 'Snail', $mollusk );
+		$clam = $v->add_term( 'Clam', $mollusk );
+		$insect = $v->add_term( 'Insect', $legs );
+		$spider = $v->add_term( 'Spider', $legs );
+		$crustacean  = $v->add_term( 'Crustacean', $legs );
+
+		$not_ancestors = $snail->not_ancestors();
+		$s = array();
+		foreach( $not_ancestors as $el ) {
+			$s[] = (string)$el;
+		}
+
+		$expected = array($clam, $insect, $spider, $crustacean, $legs, $starfish,
+			$backbone, $mammal, $lungs, $reptile, $bird, $gills, $fish, $amphibian );
+
+		$this->assertTrue( 14 == count( $not_ancestors ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
+		$this->assertTrue( $not_ancestors == $expected );
+
+		$v->delete();
+	}
+
 	public function teardown()
 	{
 	}
