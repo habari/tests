@@ -24,6 +24,8 @@ class system_classes_BlockTest extends PHPUnit_Framework_TestCase
 		$block = new Block($params);
 
 		$this->assertType('Block', $block, 'Created object should be a Block');
+		$this->assertTrue( isset( $block->title ) );
+		$this->assertFalse( isset( $block->thiskeydoesnotexist ) );
 		$this->assertEquals($block->title, $this->title, 'Block title should be the title passed to the constructor' );
 		$this->assertEquals($block->type, $this->type, 'Block type should be the type passed to the construtor' );
 	}
