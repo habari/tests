@@ -89,21 +89,6 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $this->bitmask->value, 0 );
 	}
 
-	public function test_set_Exception()
-	{
-		try {
-			$mask = new Bitmask( array( 'dog', 'cat', 'mule' ) );
-			$val = null;
-			$mask->$val = true;
-
-		}
-		catch ( InvalidArgumentException $e ) {
-			$this->assertEquals( 'Bitmask names must be pre-defined strings or bitmask indexes', $e->getMessage() );
-			return;
-		}
-		$this->fail( 'An expected InvalidArgumentException has not been raised in test_setException()' );
-	}
-
 	public function test_write_by_array()
 	{
 		// TODO Bitmask should support this but the current implementation uses a public variable called value rather than the value setter.
