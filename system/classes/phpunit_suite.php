@@ -1,5 +1,5 @@
 <?php
-// vim: le=unix syntax=php ts=4 noet sw=4
+// vim: syntax=php ts=4 noet sw=4
 
 require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
 require_once 'PHPUnit/Framework.php';
