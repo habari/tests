@@ -130,6 +130,7 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 		$testqueryrecord->pony = 'ponies';
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
+		$this->assertTrue( isset( $newfields['pony'] ) );
 		$this->assertEquals( 'ponies', $newfields['pony'] );
 		$this->assertTrue( !isset( $fields['pony'] ) );
 	}
@@ -164,6 +165,7 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 		$testqueryrecord->pony = 'ponies';
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
+		$this->assertTrue( isset( $newfields['pony'] ) );
 		$this->assertEquals( 'ponies', $newfields['pony'] );
 		$this->assertTrue( !isset( $fields['pony'] ) );
 	}
