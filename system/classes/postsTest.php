@@ -294,6 +294,3 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 }
 
 ?>
-
-
-}
