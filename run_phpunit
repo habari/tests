@@ -4,7 +4,7 @@ phpunit \
  -d 'memory_limit=-1' \
  -d 'error_reporting=E_ALL' \
  --verbose \
- --report report/ \
- --log-xml report/out.xml \
+ --coverage-html report/ \
+ --log-junit report/out.xml \
  phpunit_suite.php
 
