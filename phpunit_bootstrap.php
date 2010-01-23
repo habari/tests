@@ -1,5 +1,5 @@
 <?php
-// vim: le=unix syntax=php ts=4 noet sw=4
+// vim: syntax=php ts=4 noet sw=4
 // This is used to find the starting point of Habari
 if ( !defined( 'HABARI_PATH' ) ) {
 	if ( isset( $_ENV['HABARI_PATH'] ) ) {
