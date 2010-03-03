@@ -16,7 +16,6 @@ require_once 'PHPUnit/Framework/TestSuite.php';
 require_once 'PHPUnit/TextUI/TestRunner.php';
 
 // PHPEdit Inclusions -- dot not remove this comment
-// require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vocabularyTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'filecacheTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'remoterequestTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'aclTest.php';
@@ -40,7 +39,6 @@ class system_classes_AllTests
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit_Framework');
 
 		// PHPEdit Tests suites -- dot not remove this comment
-//		$suite->addTestSuite('system_classes_VocabularyTest');
 		$suite->addTestSuite('system_classes_FileCacheTest');
 		$suite->addTestSuite('system_classes_RemoteRequestTest');
 		$suite->addTestSuite('system_classes_FormatTest');
