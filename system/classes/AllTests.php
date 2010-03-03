@@ -16,7 +16,7 @@ require_once 'PHPUnit/Framework/TestSuite.php';
 require_once 'PHPUnit/TextUI/TestRunner.php';
 
 // PHPEdit Inclusions -- dot not remove this comment
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vocabularyTest.php';
+// require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vocabularyTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'filecacheTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'remoterequestTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'aclTest.php';
