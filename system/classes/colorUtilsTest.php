@@ -14,7 +14,8 @@ class system_classes_ColorUtilsTest extends PHPUnit_Framework_TestCase
 		$this->orange= ColorUtils::hex_rgb( '#ed691f' );
 		$this->cyan= ColorUtils::hex_rgb( '8bc' );
 		$this->red= ColorUtils::hex_rgb( 'f0' );
-	}
+		$this->invalid = ColorUtils::hex_rgb( 'violet' );
+}
 	function test_RGB_to_Array()
 	{
 		$this->assertEquals($this->green, array ( 'r' => 127, 'g' => 255, 'b' => 64, ) );
@@ -42,6 +43,10 @@ class system_classes_ColorUtilsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($this->cyan, array ( 'r' => 136, 'g' => 187, 'b' => 204, ) );
 		$this->assertEquals($this->red, array ( 'r' => 240, 'g' => 0, 'b' => 0, ) );
 	}
-
+	function test_HEX_to_RGB_exception()
+	{
+	    $x=ColorUtils::hex_rgb( 'violet' );
+	    $this->assertEquals( 'Not a valid hex color.', $x->getMessage() );
+	}
 }
 ?>
