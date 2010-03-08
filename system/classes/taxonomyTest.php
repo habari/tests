@@ -62,7 +62,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			$v->delete();
 		}
 		catch (Exception $e) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
 
@@ -91,7 +91,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			$v->delete();
 		}
 		catch (Exception $e) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
 
@@ -121,7 +121,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			$v->delete();
 		}
 		catch (Exception $e) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
 
@@ -146,7 +146,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			$v->delete();
 		}
 		catch (Exception $e) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 
 		$this->assertEquals($vocab_count - 1, count(Vocabulary::names()), 'Number of vocabularies should decrease by one');
@@ -205,8 +205,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		) );
 		$v->insert();
 
-                $root = $v->add_term( 'Animal Kingdom' );
-                $backbone = $v->add_term( 'Backbone', $root );
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
 		$mammal = $v->add_term( 'Mammal', $backbone );
 		$lungs = $v->add_term( 'Lungs', $backbone );
 		$reptile = $v->add_term( 'Reptile', $backbone );
@@ -225,8 +225,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$spider = $v->add_term( 'Spider', $legs );
 		$crustacean  = $v->add_term( 'Crustacean', $legs );
 
-                $not_descendants = $backbone->not_descendants();
-                $s = array();
+		$not_descendants = $backbone->not_descendants();
+		$s = array();
 		foreach($not_descendants as $el ) {
 			$s[] = (string)$el;
 		}
@@ -264,7 +264,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$clam = $v->add_term( 'Clam', $mollusk );
 		$insect = $v->add_term( 'Insect', $legs );
 		$spider = $v->add_term( 'Spider', $legs );
-		$crustacean  = $v->add_term( 'Crustacean', $legs );
+		$crustacean= $v->add_term( 'Crustacean', $legs );
 
 		$not_ancestors = $snail->not_ancestors();
 		$s = array();
