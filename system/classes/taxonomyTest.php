@@ -75,8 +75,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			'description' => $this->vocab_desc,
 			'features' => array('hierarchical')
 		);
-		$v = new Vocabulary($params);
-		$v->insert();
+		$u = new Vocabulary($params);
+		$u->insert();
 
 		// Retrieve the vocabulary
 		$v = Vocabulary::get($this->vocab_name);
@@ -205,8 +205,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		) );
 		$v->insert();
 
-		$root = $v->add_term( 'Animal Kingdom' );
-		$backbone = $v->add_term( 'Backbone', $root );
+                $root = $v->add_term( 'Animal Kingdom' );
+                $backbone = $v->add_term( 'Backbone', $root );
 		$mammal = $v->add_term( 'Mammal', $backbone );
 		$lungs = $v->add_term( 'Lungs', $backbone );
 		$reptile = $v->add_term( 'Reptile', $backbone );
@@ -225,8 +225,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$spider = $v->add_term( 'Spider', $legs );
 		$crustacean  = $v->add_term( 'Crustacean', $legs );
 
-		$not_descendants = $backbone->not_descendants();
-		$s = array();
+                $not_descendants = $backbone->not_descendants();
+                $s = array();
 		foreach($not_descendants as $el ) {
 			$s[] = (string)$el;
 		}
