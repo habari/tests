@@ -189,9 +189,37 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$two = $v->add_term( 'two' );
 		$four = $v->add_term( 'four' );
 
-		$three = $v->add_term( 'three', $four, true );
+		$three = $v->add_term( $three, $four, true );
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
 	}
+
+		public function test_move_term()
+	{
+		if( Vocabulary::get( 'numbers') )
+		{
+			Vocabulary::get( 'numbers' )->delete();
+		}
+		$v = new Vocabulary( array(
+			'name' => 'numbers',
+			'description' => 'Some integers.',
+		));
+		$v->insert();
+		$this->assertType( 'Vocabulary', $v, 'Vocabulary without features should be flat');
+
+		$one = $v->add_term( 'one' );
+		$this->assertEquals( 1, $one->mptt_left, 'The first term should have mptt_left 1');
+		$this->assertEquals( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term');
+
+		$five = $v->add_term( 'five' );
+		$two = $v->add_term( 'two' );
+		$four = $v->add_term( 'four' );
+		$three = $v->add_term( 'three' );
+		$v->move_term( $three, $four, true );
+		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term');
+
+		$v->move_term( 'five' );
+		$this->assertEquals( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right');
+}
 
 	public function test_get_terms()
 	{
