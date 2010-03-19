@@ -177,6 +177,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			'name' => 'numbers',
 			'description' => 'Some integers.',
 		));
+		$v->insert();
 		$this->assertType( 'Vocabulary', $v, 'Vocabulary without features should be flat');
 
 		$one = $v->add_term( 'one' );
