@@ -189,7 +189,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$two = $v->add_term( 'two' );
 		$four = $v->add_term( 'four' );
 
-		$three = $v->add_term( $three, $four, true );
+		$three = $v->add_term( 'three', $four, true );
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
 	}
 
@@ -215,9 +215,15 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$four = $v->add_term( 'four' );
 		$three = $v->add_term( 'three' );
 		$v->move_term( $three, $four, true );
+		$three = $v->get_term( $three->id ); // not updated otherwise?
+		$four = $v->get_term( $four->id ); // not updated otherwise?
+
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term');
 
-		$v->move_term( 'five' );
+		$v->move_term( $five );
+
+		$four = $v->get_term( $four->id ); // not updated otherwise?otherwise
+		$five = $v->get_term( $five->id ); // not updated otherwise?
 		$this->assertEquals( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right');
 }
 
