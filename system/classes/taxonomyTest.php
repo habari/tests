@@ -190,6 +190,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$four = $v->add_term( 'four' );
 
 		$three = $v->add_term( 'three', $four, true );
+		$four = $v->get_term( $four->id );
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
 	}
 
