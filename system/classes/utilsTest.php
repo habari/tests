@@ -2,7 +2,7 @@
 
 require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
 
-class system_classes_UtilsTest extends PHPUnit_Framework_TestCase
+class UtilsTest extends PHPUnit_Framework_TestCase
 {
 	function setup()
 	{
@@ -93,7 +93,7 @@ class system_classes_UtilsTest extends PHPUnit_Framework_TestCase
 
 	public function testPlaceholder_string()
 	{
-		$this->markTestIncomplete('This test has not been implemented yet.');
+		$this->assertEquals( '?,?,?,?,?' , Utils::placeholder_string( 5 ), 'Should output as many question marks as requested' );
 	}
 
 	public function testArchive_pages()
@@ -249,5 +249,58 @@ class system_classes_UtilsTest extends PHPUnit_Framework_TestCase
 	{
 		$this->markTestIncomplete('This test has not been implemented yet.');
 	}
+
+	public function testCheck_request_method()
+	{
+		$this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
+	public function testGlob_to_regex()
+	{
+		$this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
+	public function testScheme_ports()
+	{
+		$this->assertEquals( 21, Utils::scheme_ports( 'ftp' ) );
+		$this->assertEquals( 22, Utils::scheme_ports( 'ssh' ) );
+		$this->assertEquals( 23, Utils::scheme_ports( 'telnet' ) );
+		$this->assertEquals( 80, Utils::scheme_ports( 'http' ) );
+		$this->assertEquals( 110, Utils::scheme_ports( 'pop3' ) );
+		$this->assertEquals( 119, Utils::scheme_ports( 'news' ) );
+		$this->assertEquals( 119, Utils::scheme_ports( 'nntp' ) );
+		$this->assertEquals( 194, Utils::scheme_ports( 'irc' ) );
+		$this->assertEquals( 220, Utils::scheme_ports( 'imap3' ) );
+		$this->assertEquals( 443, Utils::scheme_ports( 'https' ) );
+		$this->assertEquals( 563, Utils::scheme_ports( 'nntps' ) );
+		$this->assertEquals( 993, Utils::scheme_ports( 'imaps' ) );
+		$this->assertEquals( 995, Utils::scheme_ports( 'pop3s' ) );
+		$this->assertEquals( array(
+			'ftp' => 21,
+			'ssh' => 22,
+			'telnet' => 23,
+			'http' => 80,
+			'pop3' => 110,
+			'nntp' => 119,
+			'news' => 119,
+			'irc' => 194,
+			'imap3' => 220,
+			'https' => 443,
+			'nntps' => 563,
+			'imaps' => 993,
+			'pop3s' => 995,
+		), Utils::scheme_ports() );
+	}
+
+	public function testIs_traversable()
+	{
+		$this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
+	public function testGet_ip()
+	{
+		$this->markTestIncomplete('This test has not been implemented yet.');
+	}
+
 }
 ?>
