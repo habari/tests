@@ -206,6 +206,8 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		));
 		$v->insert();
 		$this->assertType( 'Vocabulary', $v, 'Vocabulary without features should be flat');
+		$fale = $v->move_term( 'new_term' );
+		$this->assertFalse( $fale, 'Return false for an empty vocabulary' );
 
 		$one = $v->add_term( 'one' );
 		$this->assertEquals( 1, $one->mptt_left, 'The first term should have mptt_left 1');
