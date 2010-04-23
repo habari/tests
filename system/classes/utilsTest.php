@@ -2,7 +2,7 @@
 
 require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
 
-class UtilsTest extends PHPUnit_Framework_TestCase
+class system_classes_UtilsTest extends PHPUnit_Framework_TestCase
 {
 	function setup()
 	{
