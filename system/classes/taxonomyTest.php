@@ -296,14 +296,18 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$spider = $v->add_term( 'Spider', $legs );
 		$crustacean  = $v->add_term( 'Crustacean', $legs );
 
-		$not_descendants = $backbone->not_descendants();
+		$not_descendants = Term::get( $v, $backbone->id )->not_descendants();
 		$s = array();
 		foreach($not_descendants as $el ) {
 			$s[] = (string)$el;
 		}
 		$expected = array( $root, $no_backbone, $starfish, $mollusk, $legs, $snail, $clam, $insect, $spider, $crustacean );
 		$this->assertTrue( 10 == count( $not_descendants ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
-		$this->assertTrue( $not_descendants == $expected );
+		$e = array();;
+		foreach($expected as $el ) {
+			$e[] = (string)$el;
+		}
+		$this->assertTrue( 0 == count( array_diff( $s, $e ) ) );
 
 		// clean up
 		$v->delete();
