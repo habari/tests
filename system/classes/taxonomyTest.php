@@ -169,15 +169,15 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_add_term()
 	{
-		if( Vocabulary::get( 'numbers') )
-		{
+		if( Vocabulary::get( 'numbers') ) {
 			Vocabulary::get( 'numbers' )->delete();
 		}
-		$v = new Vocabulary( array(
+
+		$v = Vocabulary::create( array(
 			'name' => 'numbers',
 			'description' => 'Some integers.',
 		));
-		$v->insert();
+
 		$this->assertType( 'Vocabulary', $v, 'Vocabulary without features should be flat');
 
 		$one = $v->add_term( 'one' );
@@ -192,19 +192,22 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$three = $v->add_term( 'three', $four, true );
 		$four = $v->get_term( $four->id );
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
+
+		// clean up
+		$v->delete();
 	}
 
 		public function test_move_term()
 	{
-		if( Vocabulary::get( 'numbers') )
-		{
+		if( Vocabulary::get( 'numbers') ) {
 			Vocabulary::get( 'numbers' )->delete();
 		}
-		$v = new Vocabulary( array(
+
+		$v = Vocabulary::create( array(
 			'name' => 'numbers',
 			'description' => 'Some integers.',
 		));
-		$v->insert();
+
 		$this->assertType( 'Vocabulary', $v, 'Vocabulary without features should be flat');
 		$fale = $v->move_term( 'new_term' );
 		$this->assertFalse( $fale, 'Return false for an empty vocabulary' );
@@ -228,45 +231,50 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$four = $v->get_term( $four->id ); // not updated otherwise?otherwise
 		$five = $v->get_term( $five->id ); // not updated otherwise?
 		$this->assertEquals( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right');
+
+		// clean up
+		$v->delete();
 }
 
 	public function test_get_terms()
 	{
-		$v = new Vocabulary(array(
+		$v = Vocabulary::create( array(
 			'name' => 'foods',
 			'description' => 'Types of foods you might eat.',
-			'features' => array('hierarchical')
-		));
+			'features' => array( 'hierarchical' )
+		) );
 
-		$fruit = $v->add_term('Fruit');
-		$red_apples = $v->add_term(new Term(array('term' => 'red_apples', 'term_display' => 'Red Apples')), $fruit);
-		$v->add_term('green_tomatoes', $fruit, $red_apples)->term_display = 'Green Tomatoes';
-		$v->add_term('Les oranges', $fruit);
+		$fruit = $v->add_term( 'Fruit' );
+		$red_apples = $v->add_term( new Term( array( 'term' => 'red_apples', 'term_display' => 'Red Apples' ) ), $fruit );
+		$v->add_term( 'green_tomatoes', $fruit, FALSE );
+		$v->add_term( 'Les oranges', $fruit );
 
 		$root = $v->get_term();
 
-		$this->assertType('Term', $root, 'A term should be of type Term');
-		$this->assertEquals('Fruit', $root->term_display, 'The first term entered should be the root');
+		$this->assertType( 'Term', $root, 'A term should be of type Term' );
+		$this->assertEquals( 'Fruit', $root->term_display, 'The first term entered should be the root' );
 
 		$descendants = $root->descendants();
-		$this->assertEquals(3, count($descendants), 'Number of descendants of the root should equal the number terms added after the root');
-		$this->assertType('Term', $descendants[0], 'Descendants should be of type Term');
+		$this->assertEquals( 3, count( $descendants ), 'Number of descendants of the root should equal the number terms added after the root' );
+		$this->assertType( 'Term', $descendants[0], 'Descendants should be of type Term' );
 
-		$term = $v->get_term(Utils::slugify('Les oranges'));
-		$this->assertType('Term', $term, 'Should be able to retrieve terms by term');
+		$term = $v->get_term( Utils::slugify( 'Les oranges' ) );
+		$this->assertType( 'Term', $term, 'Should be able to retrieve terms by term' );
 
 		$parent = $term->parent();
-		$this->assertEquals($root, $parent, 'Should be able to retrieve a term\'s parent');
+		$this->assertEquals( $root, $parent, 'Should be able to retrieve a term\'s parent' );
+
+		// clean up
+		$v->delete();
 	}
 
 	public function test_not_descendants()
 	{
-		$v = new Vocabulary( array(
+		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
 			'features' => array( 'hierarchical' )
 		) );
-		$v->insert();
 
 		$root = $v->add_term( 'Animal Kingdom' );
 		$backbone = $v->add_term( 'Backbone', $root );
@@ -297,17 +305,17 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue( 10 == count( $not_descendants ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
 		$this->assertTrue( $not_descendants == $expected );
 
+		// clean up
 		$v->delete();
 	}
 
 	public function test_not_ancestors()
 	{
-		$v = new Vocabulary( array(
+		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
 			'features' => array( 'hierarchical' )
 		) );
-		$v->insert();
 
 		$root = $v->add_term( 'Animal Kingdom' );
 		$backbone = $v->add_term( 'Backbone', $root );
@@ -341,6 +349,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue( 14 == count( $not_ancestors ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
 		$this->assertTrue( $not_ancestors == $expected );
 
+		// clean up
 		$v->delete();
 	}
 
