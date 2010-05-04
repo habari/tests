@@ -335,13 +335,13 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$starfish = $v->add_term( 'Starfish', $no_backbone );
 		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
 		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
-		$snail = $v->add_term( 'Snail', $mollusk );
-		$clam = $v->add_term( 'Clam', $mollusk );
-		$insect = $v->add_term( 'Insect', $legs );
-		$spider = $v->add_term( 'Spider', $legs );
-		$crustacean= $v->add_term( 'Crustacean', $legs );
+		$snail = $v->add_term( 'Snail', $v->get_term( $mollusk->id ) );
+		$clam = $v->add_term( 'Clam', $v->get_term( $mollusk->id ) );
+		$insect = $v->add_term( 'Insect', $v->get_term( $legs->id) );
+		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
+		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
 
-		$not_ancestors = $snail->not_ancestors();
+		$not_ancestors = $v->get_term( $snail->id )->not_ancestors();
 		$s = array();
 		foreach( $not_ancestors as $el ) {
 			$s[] = (string)$el;
@@ -351,7 +351,12 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 			$backbone, $mammal, $lungs, $reptile, $bird, $gills, $fish, $amphibian );
 
 		$this->assertTrue( 14 == count( $not_ancestors ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
-		$this->assertTrue( $not_ancestors == $expected );
+
+		$e = array();;
+		foreach($expected as $el ) {
+			$e[] = (string)$el;
+		}
+		$this->assertTrue( 0 == count( array_diff( $s, $e ) ), sprintf( 'Found: %s', implode( ', ', array_diff( $s, $e ) ) ) );
 
 		// clean up
 		$v->delete();
