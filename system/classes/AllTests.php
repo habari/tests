@@ -25,6 +25,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'colorUtilsTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'utilsTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uuidTest.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'tagTest.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'versionTest.php';
 // /PHPEdit Inclusions -- dot not remove this comment
 
 class system_classes_AllTests
@@ -39,14 +40,15 @@ class system_classes_AllTests
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit_Framework');
 
 		// PHPEdit Tests suites -- dot not remove this comment
-		$suite->addTestSuite('system_classes_FileCacheTest');
-		$suite->addTestSuite('system_classes_RemoteRequestTest');
-		$suite->addTestSuite('system_classes_FormatTest');
-		$suite->addTestSuite('system_classes_BitmaskTest');
-		$suite->addTestSuite('system_classes_ColorUtilsTest');
-		$suite->addTestSuite('system_classes_UtilsTest');
-		$suite->addTestSuite('system_classes_UUIDTest');
-		$suite->addTestSuite('system_classes_TagTest');
+		$suite->addTestSuite('FileCacheTest');
+		$suite->addTestSuite('RemoteRequestTest');
+		$suite->addTestSuite('FormatTest');
+		$suite->addTestSuite('BitmaskTest');
+		$suite->addTestSuite('ColorUtilsTest');
+		$suite->addTestSuite('UtilsTest');
+		$suite->addTestSuite('UUIDTest');
+		$suite->addTestSuite('TagTest');
+		$suite->addTestSuite('VersionTest');
 		// /PHPEdit Tests suites -- dot not remove this comment
 
         return $suite;
