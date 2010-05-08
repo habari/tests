@@ -95,6 +95,17 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	public function test_get_vocabularies()
+	{
+		 // Use SQL to get a count of rows in the Vocabularies table
+		 $sql_count = DB::get_value( "SELECT COUNT(*) FROM {vocabularies};");
+		// Retrieve the vocabularies
+		$vocabularies = Vocabulary::get_all();
+
+		$this->assertEquals( $sql_count, count( $vocabularies ) );
+
+	}
+
 	public function test_rename_vocabulary()
 	{
 		// Set up
@@ -192,6 +203,32 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$three = $v->add_term( 'three', $four, true );
 		$four = $v->get_term( $four->id );
 		$this->assertEquals( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
+
+		// clean up
+		$v->delete();
+	}
+
+	public function test_delete_term()
+	{
+		if( Vocabulary::get( 'numbers') ) {
+			Vocabulary::get( 'numbers' )->delete();
+		}
+
+		$v = Vocabulary::create( array(
+			'name' => 'numbers',
+			'description' => 'Some integers.',
+		));
+
+		$one = $v->add_term( 'one' );
+		$two = $v->add_term( 'two' );
+
+		$this->assertEquals( 2, count( $v->get_tree() ), 'The vocabulary should contain two terms' );
+		$v->delete_term( $one );
+		$this->assertEquals( 1, count( $v->get_tree() ), 'The vocabulary should contain one term' );
+
+		$this->assertEquals( 1, count( $v->get_tree() ), 'The vocabulary should contain one term' );
+		$v->delete_term( $two->term_display );
+		$this->assertEquals( 0, count( $v->get_tree() ), 'The vocabulary should contain zero terms' );
 
 		// clean up
 		$v->delete();
@@ -360,6 +397,16 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		// clean up
 		$v->delete();
+	}
+
+	public function test_object_type()
+	{
+		 $name = 'unit_test';
+		 Vocabulary::add_object_type( $name );
+		 $sql_id = DB::get_value( "SELECT id FROM {object_types} WHERE name = :vocab_name", array( 'vocab_name' => $name ) );
+		 $id = Vocabulary::object_type_id( $name );
+		 $this->assertEquals( $sql_id, $id, 'The sql id should equal the id returned.' );
+		 DB::delete( 'object_types', array( 'name' => $name ) );
 	}
 
 	public function teardown()
