@@ -305,6 +305,54 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$v->delete();
 	}
 
+	public function test_ancestors()
+	{
+		$v = Vocabulary::create( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
+		$mammal = $v->add_term( 'Mammal', $backbone );
+		$lungs = $v->add_term( 'Lungs', $backbone );
+		$reptile = $v->add_term( 'Reptile', $backbone );
+		$bird = $v->add_term( 'Bird', $backbone );
+		$gills = $v->add_term( 'Gills', $backbone );
+		$fish = $v->add_term( 'Fish', $gills );
+		$amphibian = $v->add_term( 'Amphibian', $gills );
+
+		$no_backbone = $v->add_term( 'No Backbone', $root );
+		$starfish = $v->add_term( 'Starfish', $no_backbone );
+		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
+		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
+		$snail = $v->add_term( 'Snail', $v->get_term( $mollusk->id ) );
+		$clam = $v->add_term( 'Clam', $v->get_term( $mollusk->id ) );
+		$insect = $v->add_term( 'Insect', $v->get_term( $legs->id) );
+		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
+		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
+
+		$ancestors = $v->get_term( $snail->id )->ancestors();
+		$s = array();
+		foreach( $ancestors as $el ) {
+			$s[] = (string)$el;
+		}
+
+		$expected = array( $mollusk, $no_backbone, $root );
+
+		$this->assertEquals( 3, count( $ancestors ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
+
+		$e = array();;
+		foreach($expected as $el ) {
+			$e[] = (string)$el;
+		}
+		$this->assertTrue( 0 == count( array_diff( $s, $e ) ), sprintf( 'Found: %s', implode( ', ', array_diff( $s, $e ) ) ) );
+
+		// clean up
+		$v->delete();
+	}
+
 	public function test_not_descendants()
 	{
 		$v = Vocabulary::create( array(
@@ -327,11 +375,11 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$starfish = $v->add_term( 'Starfish', $no_backbone );
 		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
 		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
-		$snail = $v->add_term( 'Snail', $mollusk );
-		$clam = $v->add_term( 'Clam', $mollusk );
-		$insect = $v->add_term( 'Insect', $legs );
-		$spider = $v->add_term( 'Spider', $legs );
-		$crustacean  = $v->add_term( 'Crustacean', $legs );
+		$snail = $v->add_term( 'Snail', $v->get_term( $mollusk->id ) );
+		$clam = $v->add_term( 'Clam', $v->get_term( $mollusk->id ) );
+		$insect = $v->add_term( 'Insect', $v->get_term( $legs->id) );
+		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
+		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
 
 		$not_descendants = Term::get( $v, $backbone->id )->not_descendants();
 		$s = array();
@@ -396,6 +444,24 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue( 0 == count( array_diff( $s, $e ) ), sprintf( 'Found: %s', implode( ', ', array_diff( $s, $e ) ) ) );
 
 		// clean up
+		$v->delete();
+	}
+
+	public function test_term__get()
+	{
+		$v = Vocabulary::create( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$vocabulary = $root->vocabulary;
+		$this->assertType( 'Vocabulary', $vocabulary );
+		$this->assertEquals( $v->name, $vocabulary->name );
+		$this->assertEquals( $v->description, $vocabulary->description );
+		$this->assertEquals( $v->id, $vocabulary->id );
+
 		$v->delete();
 	}
 
