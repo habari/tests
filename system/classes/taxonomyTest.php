@@ -179,6 +179,11 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertType('Term', $t);
 		$this->assertEquals($t->term, Utils::slugify($this->term_name));
 		$this->assertEquals($t->term_display, $this->term_name);
+
+		$t = new Term( $this->term_name );
+		$this->assertType('Term', $t);
+		$this->assertEquals($t->term, Utils::slugify($this->term_name));
+		$this->assertEquals($t->term_display, $this->term_name);
 	}
 
 	public function test_add_term()
