@@ -478,6 +478,34 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		 DB::delete( 'object_types', array( 'name' => $name ) );
 	}
 
+	public function test_object_terms()
+	{
+	 $post = Post::create( array(
+		  'title' => 'Unit Test Post',
+		  'content' => 'This is a unit test post to test setting and getting terms.',
+		  'user_id' => 1,
+		  'status' => Post::status( 'draft' ),
+		  'content_type' => Post::type( 'entry' ),
+		  'pubdate' => HabariDateTime::date_create(),
+	 ) );
+
+	 $v = Vocabulary::get( 'tags' );
+
+	 // Test setting terms with strings
+	 $new_terms = array( 'habari', 'unit test' );
+	 $v->set_object_terms( 'post', $post->id, $new_terms );
+	 $terms = $v->get_object_terms( 'post', $post->id );
+	 $t = array();
+	 foreach( $terms as $term ) {
+		  $t[] = (string)$term;
+	 }
+
+	 $this->assertEquals( 2, count( $terms ) );
+	 $this->assertEquals( 0, count( array_diff( $new_terms, $t ) ) );
+
+	 $post->delete();
+	}
+
 	public function teardown()
 	{
 	}
