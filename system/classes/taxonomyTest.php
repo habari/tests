@@ -48,7 +48,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'features' => array('hierarchical')
+			'features' => array( 'hierarchical' )
 		);
 		$v = new Vocabulary($params);
 		$v->insert();
@@ -56,8 +56,11 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($vocab_count + 1, count(Vocabulary::names()), 'Count of names should increase by one');
 		$this->assertTrue(in_array($this->vocab_name, Vocabulary::names()), 'Test vocabulary name should be in the list of names');
 
+		$new_v = new Vocabulary( $params );
+		$results = $new_v->insert();
+		$this->assertEquals( $results, FALSE );
+
 		// Clean up
-		// Delete the vocabulary
 		try {
 			$v->delete();
 		}
