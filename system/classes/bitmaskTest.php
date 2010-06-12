@@ -38,25 +38,25 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	public function test_write_by_name()
 	{
 		$this->bitmask->read = true;
-		$this->assertEquals($this->bitmask->value, 1);
+		$this->assertEquals(1, $this->bitmask->value);
 
 		$this->bitmask->edit = true;
-		$this->assertEquals($this->bitmask->value, 3);
+		$this->assertEquals(3, $this->bitmask->value);
 
 		$this->bitmask->delete = true;
-		$this->assertEquals($this->bitmask->value, 7);
+		$this->assertEquals(7, $this->bitmask->value);
 
 		$this->bitmask->create = true;
-		$this->assertEquals($this->bitmask->value, 15);
+		$this->assertEquals(15, $this->bitmask->value);
 
 		$this->bitmask->read = false;
-		$this->assertEquals($this->bitmask->value, 14);
+		$this->assertEquals(14, $this->bitmask->value);
 
 		$this->bitmask->edit = false;
-		$this->assertEquals($this->bitmask->value, 12);
+		$this->assertEquals(12, $this->bitmask->value);
 
 		$this->bitmask->delete = false;
-		$this->assertEquals($this->bitmask->value, 8);
+		$this->assertEquals(8, $this->bitmask->value);
 	}
 
 	public function test_write_by_value()
@@ -84,9 +84,9 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($this->bitmask->edit);
 
 		$this->bitmask->full = true;
-		$this->assertEquals( $this->bitmask->value, 15 );
+		$this->assertEquals( 15, $this->bitmask->value );
 		$this->bitmask->full = false;
-		$this->assertEquals( $this->bitmask->value, 0 );
+		$this->assertEquals( 0, $this->bitmask->value );
 	}
 
 	public function test_write_by_array()
@@ -95,7 +95,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$mask = array(true, false, false, true);
 		$this->bitmask->value = $mask;
 
-		$this->assertEquals($this->bitmask->value, 9);
+		$this->assertEquals(9, $this->bitmask->value);
 	}
 
 	public function test__tostring()
