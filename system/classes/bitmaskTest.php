@@ -17,22 +17,25 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $mask->dog );
 		$this->assertTrue( $mask->cat );
 
-		$mask = new Bitmask( array( 'dog', 'cat' ), 'blue' );
+		$mask = new Bitmask( array( 'dog', 'cat' ), 'dog' );
 		$this->assertTrue( $mask->dog );
 		$this->assertFalse( $mask->cat );
 	}
-
-	public function test_constructor_exception()
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_first_argument()
 	{
-		try {
 		$mask = new Bitmask( 'brute' );
-		}
-		catch( Exception $e ) {
-			$this->assertEquals( 'Bitmask constructor expects either no arguments or an array as a first argument', $e->getMessage() );
-			return;
-
-		}
-		$this->fail( 'Expected InvalidArgumentException in test_constructor()' );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument()
+	{
+		$mask = new Bitmask( array( 'dog', 'cat' ), 'giraffe' );
 	}
 
 	public function test_write_by_name()
@@ -97,6 +100,14 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(9, $this->bitmask->value);
 	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_nonexistent()
+	{
+		$this->bitmask->bogus = true;
+	}
 
 	public function test__tostring()
 	{
@@ -107,7 +118,8 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( 'none', (string)$this->bitmask );
 
 		$this->bitmask->value = 15;
-		$this->assertEquals( 'full', (string)$this->bitmask );	}
+		$this->assertEquals( 'full', (string)$this->bitmask );
+	}
 
 	/**
 	 * Ported from old test suite
