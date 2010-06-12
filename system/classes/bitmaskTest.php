@@ -20,6 +20,10 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'dog' );
 		$this->assertTrue( $mask->dog );
 		$this->assertFalse( $mask->cat );
+
+		$mask = new Bitmask( array( 'dog', 'cat' ), 'full' );
+		$this->assertTrue( $mask->dog );
+		$this->assertTrue( $mask->cat );
 	}
 	
 	/**
