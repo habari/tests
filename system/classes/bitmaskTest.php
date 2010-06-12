@@ -24,6 +24,12 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'full' );
 		$this->assertTrue( $mask->dog );
 		$this->assertTrue( $mask->cat );
+
+		$mask = new Bitmask( array( 'flags' ) );
+		$this->assertFalse( $mask->flags );
+
+		$mask = new Bitmask( array( 'flags' ), 'flags' );
+		$this->assertTrue( $mask->flags );
 	}
 	
 	/**
@@ -37,9 +43,73 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
-	public function test_constructor_invalid_second_argument()
+	public function test_constructor_invalid_flag_name_full()
+	{
+		$mask = new Bitmask( array( 'full' ) );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_flag_name_value()
+	{
+		$mask = new Bitmask( array( 'value' ) );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_duplicate_flag_name()
+	{
+		$mask = new Bitmask( array( 'foo', 'foo' ) );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_non_string_flag_name()
+	{
+		$mask = new Bitmask( array( 1 ) );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument_nonexistent_flag_name()
 	{
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'giraffe' );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument_flags()
+	{
+		$mask = new Bitmask( array( 'dog', 'cat' ), 'flags' );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument_float()
+	{
+		$mask = new Bitmask( array( 'dog', 'cat' ), 1.0 );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument_int_too_small()
+	{
+		$mask = new Bitmask( array( 'dog', 'cat' ), -1 );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_constructor_invalid_second_argument_int_too_large()
+	{
+		$mask = new Bitmask( array( 'dog', 'cat' ), 4 );
 	}
 
 	public function test_write_by_name()
@@ -64,6 +134,14 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 
 		$this->bitmask->delete = false;
 		$this->assertEquals(8, $this->bitmask->value);
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_name_non_bool()
+	{
+		$this->bitmask->read = 1;
 	}
 
 	public function test_write_by_value()
@@ -95,14 +173,62 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->full = false;
 		$this->assertEquals( 0, $this->bitmask->value );
 	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_value_non_int()
+	{
+		$this->bitmask->value = 1.0;
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_value_int_too_small()
+	{
+		$this->bitmask->value = -1;
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_value_int_too_big()
+	{
+		$this->bitmask->value = 16;
+	}
+
+	public function test_write_by_full()
+	{
+		$this->bitmask->full = true;
+		$this->assertEquals( 15, $this->bitmask->value );
+		$this->bitmask->full = false;
+		$this->assertEquals( 0, $this->bitmask->value );
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_full_non_boolean()
+	{
+		$this->bitmask->full = 1;
+	}
 
 	public function test_write_by_array()
 	{
-		// TODO Bitmask should support this but the current implementation uses a public variable called value rather than the value setter.
 		$mask = array(true, false, false, true);
 		$this->bitmask->value = $mask;
 
 		$this->assertEquals(9, $this->bitmask->value);
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_array_non_bool()
+	{
+		$mask = array(1, 0, 0, 1);
+		$this->bitmask->value = $mask;
 	}
 	
 	/**
