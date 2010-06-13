@@ -227,7 +227,25 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	 */
 	public function test_write_by_array_non_bool()
 	{
-		$mask = array(1, 0, 0, 1);
+		$mask = array( 1, 0, 0, 1 );
+		$this->bitmask->value = $mask;
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_array_too_short()
+	{
+		$mask = array( 1 );
+		$this->bitmask->value = $mask;
+	}
+	
+    /**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_write_by_array_too_long()
+	{
+		$mask = array( 1, 0, 0, 1, 1 );
 		$this->bitmask->value = $mask;
 	}
 	
@@ -237,6 +255,27 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	public function test_write_nonexistent()
 	{
 		$this->bitmask->bogus = true;
+	}
+
+	public function test_get()
+	{
+		$this->assertEquals( $this->bitmask->full, 15 );
+	}
+	
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function test_get_nonexistent()
+	{
+		$foo = $this->bitmask->bogus;
+	}
+
+	public function test_isset()
+	{
+		$this->assertTrue( isset( $this->bitmask->full ) );
+		$this->assertTrue( isset( $this->bitmask->value ) );
+		$this->assertTrue( isset( $this->bitmask->read ) );
+		$this->assertFalse( isset( $this->bitmask->bogus ) );
 	}
 
 	public function test__tostring()
