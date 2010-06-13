@@ -25,54 +25,54 @@ class system_classes_InputFilterTest extends PHPUnit_Framework_TestCase {
 
 	public function testFilter()
 	{
-		$this->assertEquals( InputFilter::filter( '<p>I am <div><script src=\"ohnoes\" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>' ), '<p>I am <div><a>not a paragraph.</a><p><span> Or am I?</span>' );
-		$this->assertEquals( InputFilter::filter( '<p onClick=\"window.alert(\'stole yer cookies!\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ), '<p>Do not click here.</p>\n' );
+		$this->assertEquals( '<p>I am <div><a>not a paragraph.</a><p><span> Or am I?</span>', InputFilter::filter( '<p>I am <div><script src=\"ohnoes\" /><a>not a paragraph.</a><p CLASS=old><span> Or am I?</span>' ) );
+		$this->assertEquals( '<p>Do not click here.</p>\n', InputFilter::filter( '<p onClick=\"window.alert(\'stole yer cookies!\');\">Do not click here.</p>\n<script>alert(\"See this?\")</script>' ) );
 		// http://ha.ckers.org/blog/20070124/stopping-xss-but-allowing-html-is-hard/
-		$this->assertEquals( InputFilter::filter( '<IMG src=\"http://ha.ckers.org/\" style\"=\"style=\"a/onerror=alert(String.fromCharCode(88,83,83))//\" &ampgt;`&gt' ), 'onerror=alert(String.fromCharCode(88,83,83))//\" &`&gt' );
-		$this->assertEquals( InputFilter::filter( '<b>Hello world</b>\n\nThis is a <test>test</test> post.\n\nHere\'s a first XSS attack. <<SCRIPT>alert(\'XSS\');//<</SCRIPT>\n\nHere\'s a second try at a <a href=\"#\">second link</a>.\n\nHere\'s a second XSS attack. <IMG SRC=\" &#14;  javascript:alert(\'XSS\');\">\n\nHere\'s a third link hopefully <a href=\"#\">it won\'t get removed</a>.\n\n<em>Thanks!</em>' ), '<b>Hello world</b>\n\nThis is a  post.\n\nHere\'s a first XSS attack. ' );
-		$this->assertEquals( InputFilter::filter( '<<test>script>alert(\'boom\');</test>' ), '' );
-		$this->assertEquals( InputFilter::filter( '<<test></test>script>alert(\'boom\');' ), '' );
-		$this->assertEquals( InputFilter::filter( '<<test><</test>script>alert(\'boom\');' ), '' );
-		$this->assertEquals( InputFilter::filter( '<ScRIpT>alert(\'whee\');</SCRiPT>' ), '' );
+		$this->assertEquals( 'onerror=alert(String.fromCharCode(88,83,83))//\" &`&gt', InputFilter::filter( '<IMG src=\"http://ha.ckers.org/\" style\"=\"style=\"a/onerror=alert(String.fromCharCode(88,83,83))//\" &ampgt;`&gt' ) );
+		$this->assertEquals( '<b>Hello world</b>\n\nThis is a  post.\n\nHere\'s a first XSS attack. ', InputFilter::filter( '<b>Hello world</b>\n\nThis is a <test>test</test> post.\n\nHere\'s a first XSS attack. <<SCRIPT>alert(\'XSS\');//<</SCRIPT>\n\nHere\'s a second try at a <a href=\"#\">second link</a>.\n\nHere\'s a second XSS attack. <IMG SRC=\" &#14;  javascript:alert(\'XSS\');\">\n\nHere\'s a third link hopefully <a href=\"#\">it won\'t get removed</a>.\n\n<em>Thanks!</em>' ) );
+		$this->assertEquals( '', InputFilter::filter( '<<test>script>alert(\'boom\');</test>' ) );
+		$this->assertEquals( '', InputFilter::filter( '<<test></test>script>alert(\'boom\');' ) );
+		$this->assertEquals( '', InputFilter::filter( '<<test><</test>script>alert(\'boom\');' ) );
+		$this->assertEquals( '', InputFilter::filter( '<ScRIpT>alert(\'whee\');</SCRiPT>' ) );
 	}
 
 	public function testStrip_nulls()
 	{
-		$this->assertEquals( InputFilter::strip_nulls( 'This string has NULL char\0act\0ers!' ), 'This string has NULL characters!' );
+		$this->assertEquals( 'This string has NULL characters!', InputFilter::strip_nulls( 'This string has NULL char\0act\0ers!' ) );
 	}
 
 	public function testStrip_illegal_entities()
 	{
 		// test valid entities
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'Valid: &#160;' ), 'Valid: &#160;' );
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'Valid: &#x0A;' ), 'Valid: &#10;' );
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'Valid: &reg;' ), 'Valid: &reg;' );
+		$this->assertEquals( 'Valid: &#160;', InputFilter::strip_illegal_entities( 'Valid: &#160;' ) );
+		$this->assertEquals( 'Valid: &#10;', InputFilter::strip_illegal_entities( 'Valid: &#x0A;' ) );
+		$this->assertEquals( 'Valid: &reg;', InputFilter::strip_illegal_entities( 'Valid: &reg;' ) );
 
 		// test valid entity corner cases
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'This is valid: &reg;.' ), 'This is valid: &reg;.' );
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'This is valid: &reg<br />.' ), 'This is valid: &reg;<br />.' );
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'This is valid: &reg\nDee-dum.' ), 'This is valid: &reg;\nDee-dum.' );
+		$this->assertEquals( 'This is valid: &reg;.', InputFilter::strip_illegal_entities( 'This is valid: &reg;.' ) );
+		$this->assertEquals( 'This is valid: &reg;<br />.', InputFilter::strip_illegal_entities( 'This is valid: &reg<br />.' ) );
+		$this->assertEquals( 'This is valid: &reg;\nDee-dum.', InputFilter::strip_illegal_entities( 'This is valid: &reg\nDee-dum.' ) );
 
 		// test invalid named entity
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'This entity does not exist: &zomg;.' ), 'This entity does not exist: .' );
+		$this->assertEquals( 'This entity does not exist: .', InputFilter::strip_illegal_entities( 'This entity does not exist: &zomg;.' ) );
 
 		// test invalid numeric entity
-		$this->assertEquals( InputFilter::strip_illegal_entities( 'This entity is invalid: &#XfFdE9;.' ), 'This entity is invalid: .' );
+		$this->assertEquals( 'This entity is invalid: .', InputFilter::strip_illegal_entities( 'This entity is invalid: &#XfFdE9;.' ) );
 	}
 
 	public function testParse_url()
 	{
-		$this->assertEquals( InputFilter::parse_url( 'http://hey:there@moeffju.net:8137/foo/bar?baz=quux#blah' ), array ( 'scheme' => 'http', 'host' => 'moeffju.net', 'port' => '8137', 'user' => 'hey', 'pass' => 'there', 'path' => '/foo/bar', 'query' => 'baz=quux', 'fragment' => 'blah', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( 'http://localhost/blog/' ), array ( 'scheme' => 'http', 'host' => 'localhost', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/blog/', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( 'http:moeffju.net/blog/' ), array ( 'scheme' => 'http', 'host' => 'moeffju.net', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/blog/', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		//$this->assertEquals( InputFilter::parse_url( 'file://Z:/Habari/User Manual/index.html' ), array ( 'scheme' => 'file', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => 'Z:/Habari/User Manual/index.html', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( 'blog/' ), array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => 'blog/', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( '/furanzen/bla' ), array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/furanzen/bla', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( '?bla=barbaz&foo' ), array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => 'bla=barbaz&foo', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( '#' ), array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ) );
-		$this->assertEquals( InputFilter::parse_url( 'about:blank' ), array ( 'scheme' => 'about', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'blank', ) );
-		$this->assertEquals( InputFilter::parse_url( 'javascript:alert(document.cookie)' ), array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'alert(document.cookie)', ) );
-		$this->assertEquals( InputFilter::parse_url( 'javascript:alert(\'/hey/there/foo?how=about#bar\')' ), array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'alert(\'/hey/there/foo?how=about#bar\')', ) );
+		$this->assertEquals( array ( 'scheme' => 'http', 'host' => 'moeffju.net', 'port' => '8137', 'user' => 'hey', 'pass' => 'there', 'path' => '/foo/bar', 'query' => 'baz=quux', 'fragment' => 'blah', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( 'http://hey:there@moeffju.net:8137/foo/bar?baz=quux#blah' ) );
+		$this->assertEquals( array ( 'scheme' => 'http', 'host' => 'localhost', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/blog/', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( 'http://localhost/blog/' ) );
+		$this->assertEquals( array ( 'scheme' => 'http', 'host' => 'moeffju.net', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/blog/', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( 'http:moeffju.net/blog/' ) );
+		//$this->assertEquals( array ( 'scheme' => 'file', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => 'Z:/Habari/User Manual/index.html', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( 'file://Z:/Habari/User Manual/index.html' ) );
+		$this->assertEquals( array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => 'blog/', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( 'blog/' ) );
+		$this->assertEquals( array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '/furanzen/bla', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( '/furanzen/bla' ) );
+		$this->assertEquals( array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => 'bla=barbaz&foo', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( '?bla=barbaz&foo' ) );
+		$this->assertEquals( array ( 'scheme' => '', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => true, 'is_pseudo' => false, 'is_error' => false, 'pseudo_args' => '', ), InputFilter::parse_url( '#' ) );
+		$this->assertEquals( array ( 'scheme' => 'about', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'blank', ), InputFilter::parse_url( 'about:blank' ) );
+		$this->assertEquals( array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'alert(document.cookie)', ), InputFilter::parse_url( 'javascript:alert(document.cookie)' ) );
+		$this->assertEquals( array ( 'scheme' => 'javascript', 'host' => '', 'port' => '', 'user' => '', 'pass' => '', 'path' => '', 'query' => '', 'fragment' => '', 'is_relative' => false, 'is_pseudo' => true, 'is_error' => false, 'pseudo_args' => 'alert(\'/hey/there/foo?how=about#bar\')', ), InputFilter::parse_url( 'javascript:alert(\'/hey/there/foo?how=about#bar\')' ) );
 	}
 
 	/**
@@ -89,8 +89,8 @@ class system_classes_InputFilterTest extends PHPUnit_Framework_TestCase {
 	public function testFilter_html_elements()
 	{
 		// test stripping malicious code
-		$this->assertEquals( InputFilter::filter_html_elements( '<p onclick=\"window.alert(\'boo\')\">Hey.</p><a href=\"#\" style=\"position: absolute; left: 1px; top: 3px;\">Whee!</a>' ), '<p>Hey.</p><a href=\"#\">Whee!</a>' );
-		$this->assertEquals( InputFilter::filter_html_elements( '<a href=\"javascript:alert(\'yay\')\" style=\"text-decoration: none;\">Whee!</a>' ), '<a>Whee!</a>' );
+		$this->assertEquals( '<p>Hey.</p><a href=\"#\">Whee!</a>', InputFilter::filter_html_elements( '<p onclick=\"window.alert(\'boo\')\">Hey.</p><a href=\"#\" style=\"position: absolute; left: 1px; top: 3px;\">Whee!</a>' ) );
+		$this->assertEquals( '<a>Whee!</a>', InputFilter::filter_html_elements( '<a href=\"javascript:alert(\'yay\')\" style=\"text-decoration: none;\">Whee!</a>' ) );
 	}
 }
 ?>
