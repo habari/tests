@@ -136,7 +136,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(8, $this->bitmask->value);
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_name_non_bool()
@@ -174,7 +174,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( 0, $this->bitmask->value );
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_value_non_int()
@@ -182,7 +182,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->value = 1.0;
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_value_int_too_small()
@@ -190,7 +190,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->value = -1;
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_value_int_too_big()
@@ -206,7 +206,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( 0, $this->bitmask->value );
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_full_non_boolean()
@@ -222,7 +222,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(9, $this->bitmask->value);
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_array_non_bool()
@@ -231,7 +231,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->value = $mask;
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_array_too_short()
@@ -240,7 +240,7 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->value = $mask;
 	}
 	
-    /**
+	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function test_write_by_array_too_long()
