@@ -289,36 +289,5 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->bitmask->value = 15;
 		$this->assertEquals( 'full', (string)$this->bitmask );
 	}
-
-	/**
-	 * Ported from old test suite
-	 */
-	function test_bitmask()
-	{
-		define('POST_FLAG_ALLOWS_COMMENTS'  ,1);
-		define('POST_FLAG_ALLOWS_TRACKBACKS',1 << 1);
-		define('POST_FLAG_ALLOWS_PINGBACKS' ,1 << 2);
-
-//		$flags= array(
-//			'allows_comments'=>POST_FLAG_ALLOWS_COMMENTS,
-//			'allows_trackbacks'=>POST_FLAG_ALLOWS_TRACKBACKS,
-//			'allows_pingbacks'=>POST_FLAG_ALLOWS_PINGBACKS
-//		);
-		$flags= array(
-			'allows_comments',
-			'allows_trackbacks',
-			'allows_pingbacks'
-		);
-
-		$bitmask= new Bitmask($flags);
-
-		$bitmask->allows_comments   = true;
-		$bitmask->allows_trackbacks = false;
-		$bitmask->allows_pingbacks  = true;
-
-		$this->assertTrue($bitmask->allows_comments);
-		$this->assertFalse($bitmask->allows_trackbacks);
-		$this->assertTrue($bitmask->allows_pingbacks);
-	}
 }
 ?>
