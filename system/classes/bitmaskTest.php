@@ -183,11 +183,6 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($this->bitmask->read);
 		$this->assertFalse($this->bitmask->delete);
 		$this->assertFalse($this->bitmask->edit);
-
-		$this->bitmask->full = true;
-		$this->assertEquals( 15, $this->bitmask->value );
-		$this->bitmask->full = false;
-		$this->assertEquals( 0, $this->bitmask->value );
 	}
 	
 	/**
