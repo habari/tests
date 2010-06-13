@@ -16,6 +16,10 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$mask = new Bitmask( array( 'dog', 'cat' ), 3 );
 		$this->assertTrue( $mask->dog );
 		$this->assertTrue( $mask->cat );
+		
+		$mask = new Bitmask( array( 'dog', 'cat' ), '3' );
+		$this->assertTrue( $mask->dog );
+		$this->assertTrue( $mask->cat );
 
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'dog' );
 		$this->assertTrue( $mask->dog );
@@ -91,9 +95,9 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
-	public function test_constructor_invalid_second_argument_float()
+	public function test_constructor_invalid_second_argument_array()
 	{
-		$mask = new Bitmask( array( 'dog', 'cat' ), 1.0 );
+		$mask = new Bitmask( array( 'dog', 'cat' ), array() );
 	}
 	
 	/**
@@ -167,6 +171,18 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($this->bitmask->read);
 		$this->assertTrue($this->bitmask->delete);
 		$this->assertTrue($this->bitmask->edit);
+		
+		$this->bitmask->value = 0;
+		$this->assertFalse($this->bitmask->create);
+		$this->assertFalse($this->bitmask->read);
+		$this->assertFalse($this->bitmask->delete);
+		$this->assertFalse($this->bitmask->edit);
+		
+		$this->bitmask->value = '8';
+		$this->assertTrue($this->bitmask->create);
+		$this->assertFalse($this->bitmask->read);
+		$this->assertFalse($this->bitmask->delete);
+		$this->assertFalse($this->bitmask->edit);
 
 		$this->bitmask->full = true;
 		$this->assertEquals( 15, $this->bitmask->value );
@@ -177,9 +193,9 @@ class system_classes_BitmaskTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
-	public function test_write_by_value_non_int()
+	public function test_write_by_value_array()
 	{
-		$this->bitmask->value = 1.0;
+		$this->bitmask->value = array();
 	}
 	
 	/**
