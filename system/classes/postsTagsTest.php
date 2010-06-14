@@ -41,7 +41,7 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 
 		foreach ( $this->tag_sets as $tags ) {
 			$time = $time - rand(3600, 3600*36);
-			$post = Post::create(array(
+			$this->posts[] = Post::create(array(
 				'title' => $this->get_title(),
 				'content' => $this->get_content(1, 3, 'some', array('ol'=>1, 'ul'=>1), 'cat'),
 				'user_id' => $user->id,
@@ -50,8 +50,6 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 				'tags' => $tags,
 				'pubdate' => HabariDateTime::date_create( $time ),
 			));
-			// Need to retrieve the post from the database to properly set tags. See #1235
-			$this->posts[] = Post::get(array('id' => $post->id));
 		}
 
 	}
@@ -76,17 +74,21 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 		$want_count = 0;
 
 		foreach ( $this->tag_sets as $tags ) {
-			$want_count += in_array($want_tag, $tags) ? 1 : 0;
+			$want_count += in_array( $want_tag, $tags ) ? 1 : 0;
 		}
 
-		$got = Posts::get(array('tag' => $want_tag));
+		$got = Posts::get( array( 'tag' => $want_tag ) );
 
-		$this->assertType('Posts', $got, 'Result should be of type Posts');
-		$this->assertEquals(count($got), $want_count, 'The correct number of posts with the requested tag should be returned');
+		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
+		$this->assertEquals( $want_count, count( $got ), 'The correct number of posts with the requested tag should be returned' );
 
 		foreach ( $got as $g ) {
-			$this->assertType('Post', $g, 'Items should be of type Post');
-			$this->assertTrue(in_array($want_tag, $g->tags), 'The post should have the requested tag' );
+			$this->assertType( 'Post', $g, 'Items should be of type Post' );
+			$values = array();
+			foreach( $g->tags as $key => $tag ) {
+				$values[] = $tag->tag_text;
+			}
+			$this->assertTrue( in_array( $want_tag, $values ), 'The post should have the requested tag' );
 		}
 	}
 
@@ -96,12 +98,12 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 	public function test_get_posts_by_multiple_tags()
 	{
 		// Get posts via multiple OR'd tags
-		$want_tags = array('one', 'two');
+		$want_tags = array( 'one', 'two' );
 		$want_count = 0;
 
 		foreach ( $this->tag_sets as $tags ) {
 			foreach ( $want_tags as $want_tag ) {
-				if ( in_array($want_tag, $tags) ) {
+				if ( in_array( $want_tag, $tags ) ) {
 					// This is a post with this tag
 					$want_count++;
 					// We don't want to count it twice if it matches more than one tag
@@ -110,35 +112,43 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 			}
 		}
 
-		$got = Posts::get(array('tag' => $want_tags));
+		$got = Posts::get( array( 'tag' => $want_tags ) );
 
-		$this->assertType('Posts', $got, 'Result should be of type Posts');
-		$this->assertEquals(count($got), $want_count, 'The correct number of posts with the requested tags should be returned');
+		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
+		$this->assertEquals( $want_count, count( $got ), 'The correct number of posts with the requested tags should be returned' );
 
 		foreach ( $got as $g ) {
-			$this->assertType('Post', $g, 'Items should be of type Post');
-			$this->assertGreaterThan(0, count(array_intersect($want_tags, $g->tags)), 'The post should have one of the requested tags' );
+			$this->assertType( 'Post', $g, 'Items should be of type Post' );
+			$values = array();
+			foreach( $g->tags as $tag ) {
+				$values[] = $tag->tag_text;
+			}
+			$this->assertGreaterThan( 0, count(array_intersect($want_tags, $values ) ), 'The post should have one of the requested tags' );
 		}
 
 		// Get posts via multiple AND'd tags
-		$want_tags = array('one', 'two');
+		$want_tags = array( 'one', 'two' );
 		$want_count = 0;
 
 		foreach ( $this->tag_sets as $tags ) {
-			if ( count($want_tags) == count(array_intersect($want_tags, $tags)) ) {
+			if ( count( $want_tags ) == count( array_intersect( $want_tags, $tags ) ) ) {
 				// This is a post with all these tag
 				$want_count++;
 			}
 		}
 
-		$got = Posts::get(array('all:tag' => $want_tags));
+		$got = Posts::get( array( 'all:tag' => $want_tags ) );
 
-		$this->assertType('Posts', $got, 'Result should be of type Posts');
-		$this->assertEquals(count($got), $want_count, 'The correct number of posts with the requested tags should be returned');
+		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
+		$this->assertEquals( count( $got ), $want_count, 'The correct number of posts with the requested tags should be returned' );
 
 		foreach ( $got as $g ) {
-			$this->assertType('Post', $g, 'Items should be of type Post');
-			$this->assertEquals(count($want_tags), count(array_intersect($want_tags, $g->tags)), 'The post should have all of the requested tags' );
+			$this->assertType( 'Post', $g, 'Items should be of type Post' );
+			$values = array();
+			foreach( $g->tags as $tag ) {
+				$values[] = $tag->tag_text;
+			}
+			$this->assertEquals( count( $want_tags ), count( array_intersect( $want_tags, $values ) ), 'The post should have all of the requested tags' );
 		}
 	}
 
