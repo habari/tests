@@ -1,0 +1,3 @@
+<p>start</p><p><b>foo
+
+bar</b></p><p>end</p>
