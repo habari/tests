@@ -7,7 +7,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATO
  * Functionality tests must not require a full bootstrap of a Habari setup, but
  * can only be ran on running and working Habari setups. When the habari setup
  * is the local instance, it might have been bootstrapped if it is not installed
- * yet, but this test can also be use to verify some functionality in a remote
+ * yet, but this test can also be used to verify some functionality in a remote
  * server.
  */
 class samples_loginadduserTest extends Habari_Functionality_TestCase
@@ -35,7 +35,7 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
     * where the testing framework is located. Uncomment the following block
     * if you want to make this tests passing into another instance of habari.
     $options = array(
-      'base_url' => 'http://192.168.1.1',
+      'endpoint' => 'http://192.168.1.1',
       'username' => 'admin',
       'password' => 'habari'
     );
@@ -90,6 +90,7 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
       array(
         'username' => 'admin',
         'password' => 'habari',
+        'endpoint' => 'http://localhost/habari-test/htdocs/'
       )
     );
 
@@ -105,10 +106,10 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
      */
     // Now define a new user
     $newuser = array(
-      'username'  => $this->randomName(),
-      'new_email' => $this->randomName() . '@' . $this->randomName() . '.com',
-      'new_pass1' => '1234',
-      'new_pass2' => '1234',
+      'new_username'  => $this->randomName(),
+      'new_email'     => $this->randomName() . '@' . $this->randomName() . '.com',
+      'new_pass1'     => '1234',
+      'new_pass2'     => '1234',
     );
 
     /**
@@ -124,7 +125,7 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
      * indicated in the third argument, as there might be more than one submit
      * button, and submit the form using this method.
      */
-    $this->http_submit_form(
+    $this->http_form_submit(
        'admin/users',
        $newuser ,
        'Add User'
@@ -141,8 +142,8 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
      * created, by searching its name in the html returned by the server.
      */
     $this->assertContains( 
-      $newuser->username,
-      $this->get_http_content(),
+      $newuser['new_username'],
+      $this->http_content_get(),
       'Username has been created successfully'
     );
 
@@ -156,7 +157,7 @@ class samples_loginadduserTest extends Habari_Functionality_TestCase
     // Try to login in the site using the new created user..
     $this->http_login(
       array(
-        'username' => $newuser->username,
+        'username' => $newuser['new_username'],
         'password' => '1234',
       )
     );
