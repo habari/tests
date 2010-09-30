@@ -1,1 +1,1 @@
-<p>Foo</p><!-- comment goes here --><p>Bar</p>
+<p>Foo</p><!-- comment goes here --><p>Bar <!-- another comment -->.</p>

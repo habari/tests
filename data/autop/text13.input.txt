@@ -1,5 +1,5 @@
 Foo
 
-<!-- comment 1 here -->
+<!-- comment goes here -->
 
-Bar
+Bar <!-- another comment -->.
