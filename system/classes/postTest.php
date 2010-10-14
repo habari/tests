@@ -52,9 +52,10 @@ class system_classes_PostTest extends PHPUnit_Framework_TestCase
 		$this->assertGreaterThan(0, (int)$post->id, 'The Post id should be greater than zero');
 
 		// Check the post's tags are usable.
+		$this->assertType('Tags', $post->tags, 'The Post\'s tags should be of type Tags');
 		$this->assertEquals(count($post->tags), count($tags), 'All tags should have been created.');
-		foreach ( $post->tags as $tag_slug => $tag_text ) {
-			$this->assertEquals($tag_slug, Utils::slugify($tag_text), 'Tags key should be slugified tag.');
+		foreach ( $post->tags as $tag ) {
+			$this->assertType('Tag', $tag, 'All the tags should be of type Tag');
 		}
 
 	}
