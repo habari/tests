@@ -480,7 +480,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		 $sql_id = DB::get_value( "SELECT id FROM {object_types} WHERE name = :vocab_name", array( 'vocab_name' => $name ) );
 		 $id = Vocabulary::object_type_id( $name );
 		 $this->assertEquals( $sql_id, $id, 'The sql id should equal the id returned.' );
-		 DB::delete( 'object_types', array( 'name' => $name ) );
+		 DB::delete( '{object_types}', array( 'name' => $name ) );
 	}
 
 	public function test_object_terms()

@@ -77,7 +77,7 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 			$want_count += in_array( $want_tag, $tags ) ? 1 : 0;
 		}
 
-		$got = Posts::get( array( 'tag' => $want_tag ) );
+		$got = Posts::get( array( 'vocabulary' => array( 'tags:term' => $want_tag ) ) );
 
 		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
 		$this->assertEquals( $want_count, count( $got ), 'The correct number of posts with the requested tag should be returned' );
@@ -112,7 +112,7 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 			}
 		}
 
-		$got = Posts::get( array( 'tag' => $want_tags ) );
+		$got = Posts::get( array( 'vocabulary' => array( 'tags:term' => $want_tags ) ) );
 
 		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
 		$this->assertEquals( $want_count, count( $got ), 'The correct number of posts with the requested tags should be returned' );
@@ -132,12 +132,12 @@ class system_classes_PostsTagsTest extends PHPUnit_Framework_TestCase
 
 		foreach ( $this->tag_sets as $tags ) {
 			if ( count( $want_tags ) == count( array_intersect( $want_tags, $tags ) ) ) {
-				// This is a post with all these tag
+				// This is a post with all these tags
 				$want_count++;
 			}
 		}
 
-		$got = Posts::get( array( 'all:tag' => $want_tags ) );
+		$got = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => $want_tags ) ) );
 
 		$this->assertType( 'Posts', $got, 'Result should be of type Posts' );
 		$this->assertEquals( count( $got ), $want_count, 'The correct number of posts with the requested tags should be returned' );
