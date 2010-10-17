@@ -52,11 +52,32 @@ class system_classes_PostTest extends PHPUnit_Framework_TestCase
 		$this->assertGreaterThan(0, (int)$post->id, 'The Post id should be greater than zero');
 
 		// Check the post's tags are usable.
-		$this->assertType('Tags', $post->tags, 'The Post\'s tags should be of type Tags');
 		$this->assertEquals(count($post->tags), count($tags), 'All tags should have been created.');
 		foreach ( $post->tags as $tag ) {
-			$this->assertType('Tag', $tag, 'All the tags should be of type Tag');
+			$this->assertEquals($tag->tag_slug, Utils::slugify($tag->tag_text), 'Tags key should be slugified tag.');
 		}
+
+	}
+
+	public function test_delete_content_type()
+	{
+		Post::add_new_type( 'test_type' );
+
+		$params = array(
+			'title' => 'A post title',
+			'content' => 'Some great content. Really.',
+			'user_id' => $this->user->id,
+			'status' => Post::status('published'),
+			'content_type' => Post::type('test_type'),
+			'pubdate' => HabariDateTime::date_create( time() ),
+		);
+		$post = Post::create($params);
+
+		$this->assertTrue( 'test_type' == $post->typename, "Post content type should be 'test_type'." );
+		$this->assertFalse( Post::delete_post_type( 'test_type' ), "Post still exists with the content type 'test_type'" );
+
+		$post->delete();
+		$this->assertTrue( Post::delete_post_type( 'test_type' ), "No posts exist with the content type 'test_type'" );
 
 	}
 
