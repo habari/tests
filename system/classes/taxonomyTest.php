@@ -35,6 +35,14 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($v->description, $this->vocab_desc);
 		$this->assertEquals(true, $v->hierarchical);
 		$this->assertEquals(false, $v->free);
+
+		// Clean up
+		try {
+			$v->delete();
+		}
+		catch (Exception $e) {
+			echo 'Caught exception: ',$e->getMessage(), "\n";
+		}
 	}
 
 	public function test_get_names()
@@ -283,6 +291,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_get_terms()
 	{
+		if( Vocabulary::get( 'foods') ) {
+			Vocabulary::get( 'foods' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'foods',
 			'description' => 'Types of foods you might eat.',
@@ -315,6 +327,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_ancestors()
 	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
@@ -363,6 +379,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_not_descendants()
 	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
@@ -408,6 +428,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_not_ancestors()
 	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
@@ -456,6 +480,13 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 	}
 	public function test_is_descendant_of()
 	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+		if( Vocabulary::get( 'plants') ) {
+			Vocabulary::get( 'plants' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
@@ -506,6 +537,10 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 	public function test_term__get()
 	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+
 		$v = Vocabulary::create( array(
 			'name' => 'animals',
 			'description' => 'Types of animals.',
