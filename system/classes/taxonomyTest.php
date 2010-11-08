@@ -470,6 +470,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		// clean up
 		$v->delete();
 	}
+
 	public function test_is_descendant_of()
 	{
 		if( Vocabulary::get( 'animals') ) {
@@ -533,6 +534,75 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse( $zebra->is_descendant_of( $zorse ), 'Zebra does not descend from Zorse, but vice-versa' );
 		$this->assertTrue( $zorse->is_descendant_of( $zebra ), 'Zorse does descend from Zebra (Mate a Horse and a Zebra and you get a Zorse)' );
 		$this->assertFalse( $spider->is_descendant_of( $backbone ), 'Spider does not descend from Backbone' );
+
+		// clean up
+		$v->delete();
+		$v2->delete();
+	}
+
+	public function test_is_ancestor_of()
+	{
+		if( Vocabulary::get( 'animals') ) {
+			Vocabulary::get( 'animals' )->delete();
+		}
+		if( Vocabulary::get( 'plants') ) {
+			Vocabulary::get( 'plants' )->delete();
+		}
+
+		$v = Vocabulary::create( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
+		$mammal = $v->add_term( 'Mammal', $backbone );
+		$zebra = $v->add_term( 'Zebra', $mammal );
+		$zorse = $v->add_term( 'Zorse', $zebra );
+		$lungs = $v->add_term( 'Lungs', $backbone );
+		$reptile = $v->add_term( 'Reptile', $backbone );
+		$bird = $v->add_term( 'Bird', $backbone );
+		$gills = $v->add_term( 'Gills', $backbone );
+		$fish = $v->add_term( 'Fish', $gills );
+		$amphibian = $v->add_term( 'Amphibian', $gills );
+
+		$no_backbone = $v->add_term( 'No Backbone', $root );
+		$starfish = $v->add_term( 'Starfish', $no_backbone );
+		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
+		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
+		$snail = $v->add_term( 'Snail', $v->get_term( $mollusk->id ) );
+		$clam = $v->add_term( 'Clam', $v->get_term( $mollusk->id ) );
+		$insect = $v->add_term( 'Insect', $v->get_term( $legs->id) );
+		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
+		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
+
+		$v2 = Vocabulary::create( array(
+			'name' => 'plants',
+			'description' => 'Types of plants.',
+			'features' => array( 'hierarchical' )
+		) );
+		$plant_root = $v2->add_term( 'Flowering Plants' );
+		$zebra_plant = $v2->add_term( 'Zebra Plant', $plant_root );
+
+		$zebra_plant = $v2->get_term( $zebra_plant->id );
+		$mammal = $v->get_term( $mammal->id );
+		// must get these again since mptt_left and mptt_right values have changed since insertion
+		$zebra_plant = $v2->get_term( $zebra_plant->id );
+		$mammal = $v->get_term( $mammal->id );
+		$zebra = $v->get_term( $zebra->id );
+		$root = $v->get_term( $root->id );
+		$zorse = $v->get_term( $zorse->id );
+		$spider = $v->get_term( $spider->id );
+		$backbone = $v->get_term( $backbone->id );
+
+		$this->assertFalse( $root->is_ancestor_of( $zebra_plant ), 'Should fail for different vocabularies' );
+		$this->assertTrue( $mammal->is_ancestor_of( $zebra ), 'Zebra is a child of Mammal' );
+		$this->assertTrue( $backbone->is_ancestor_of( $zebra ), 'Zebra is a grandchild of Backbone' );
+		$this->assertTrue( $root->is_ancestor_of( $zebra ), 'Zebra is a great-grandchild of Animal Kingdom' );
+		$this->assertFalse( $zorse->is_ancestor_of( $zebra ), 'Zebra does not descend from Zorse, but vice-versa' );
+		$this->assertTrue( $zebra->is_ancestor_of( $zorse ), 'Zorse does descend from Zebra (Mate a Horse and a Zebra and you get a Zorse)' );
+		$this->assertFalse( $backbone->is_ancestor_of( $spider ), 'Spider does not descend from Backbone' );
 
 		// clean up
 		$v->delete();
