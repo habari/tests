@@ -35,14 +35,6 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($v->description, $this->vocab_desc);
 		$this->assertEquals(true, $v->hierarchical);
 		$this->assertEquals(false, $v->free);
-
-		// Clean up
-		try {
-			$v->delete();
-		}
-		catch (Exception $e) {
-			echo 'Caught exception: ',$e->getMessage(), "\n";
-		}
 	}
 
 	public function test_get_names()
@@ -523,11 +515,23 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$plant_root = $v2->add_term( 'Flowering Plants' );
 		$zebra_plant = $v2->add_term( 'Zebra Plant', $plant_root );
 
+		$zebra_plant = $v2->get_term( $zebra_plant->id );
+		$mammal = $v->get_term( $mammal->id );
+		// must get these again since mptt_left and mptt_right values have changed since insertion
+		$zebra_plant = $v2->get_term( $zebra_plant->id );
+		$mammal = $v->get_term( $mammal->id );
+		$zebra = $v->get_term( $zebra->id );
+		$root = $v->get_term( $root->id );
+		$zorse = $v->get_term( $zorse->id );
+		$spider = $v->get_term( $spider->id );
+		$backbone = $v->get_term( $backbone->id );
+
 		$this->assertFalse( $zebra_plant->is_descendant_of( $mammal ), 'Should fail for different vocabularies' );
 		$this->assertTrue( $zebra->is_descendant_of( $mammal ), 'Zebra is a child of Mammal' );
 		$this->assertTrue( $zebra->is_descendant_of( $backbone ), 'Zebra is a grandchild of Backbone' );
 		$this->assertTrue( $zebra->is_descendant_of( $root ), 'Zebra is a great-grandchild of Animal Kingdom' );
-		$this->assertTrue( $zebra->is_descendant_of( $zorse ), 'Zebra does not descend from Zorse, but vice-versa' );
+		$this->assertFalse( $zebra->is_descendant_of( $zorse ), 'Zebra does not descend from Zorse, but vice-versa' );
+		$this->assertTrue( $zorse->is_descendant_of( $zebra ), 'Zorse does descend from Zebra (Mate a Horse and a Zebra and you get a Zorse)' );
 		$this->assertFalse( $spider->is_descendant_of( $backbone ), 'Spider does not descend from Backbone' );
 
 		// clean up
