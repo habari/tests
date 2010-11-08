@@ -454,6 +454,55 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		// clean up
 		$v->delete();
 	}
+	public function test_is_descendant_of()
+	{
+		$v = Vocabulary::create( array(
+			'name' => 'animals',
+			'description' => 'Types of animals.',
+			'features' => array( 'hierarchical' )
+		) );
+
+		$root = $v->add_term( 'Animal Kingdom' );
+		$backbone = $v->add_term( 'Backbone', $root );
+		$mammal = $v->add_term( 'Mammal', $backbone );
+		$zebra = $v->add_term( 'Zebra', $mammal );
+		$zorse = $v->add_term( 'Zorse', $zebra );
+		$lungs = $v->add_term( 'Lungs', $backbone );
+		$reptile = $v->add_term( 'Reptile', $backbone );
+		$bird = $v->add_term( 'Bird', $backbone );
+		$gills = $v->add_term( 'Gills', $backbone );
+		$fish = $v->add_term( 'Fish', $gills );
+		$amphibian = $v->add_term( 'Amphibian', $gills );
+
+		$no_backbone = $v->add_term( 'No Backbone', $root );
+		$starfish = $v->add_term( 'Starfish', $no_backbone );
+		$mollusk = $v->add_term( 'Mollusk', $no_backbone );
+		$legs = $v->add_term( 'Jointed Legs', $no_backbone );
+		$snail = $v->add_term( 'Snail', $v->get_term( $mollusk->id ) );
+		$clam = $v->add_term( 'Clam', $v->get_term( $mollusk->id ) );
+		$insect = $v->add_term( 'Insect', $v->get_term( $legs->id) );
+		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
+		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
+
+		$v2 = Vocabulary::create( array(
+			'name' => 'plants',
+			'description' => 'Types of plants.',
+			'features' => array( 'hierarchical' )
+		) );
+		$plant_root = $v2->add_term( 'Flowering Plants' );
+		$zebra_plant = $v2->add_term( 'Zebra Plant', $plant_root );
+
+		$this->assertFalse( $zebra_plant->is_descendant_of( $mammal ), 'Should fail for different vocabularies' );
+		$this->assertTrue( $zebra->is_descendant_of( $mammal ), 'Zebra is a child of Mammal' );
+		$this->assertTrue( $zebra->is_descendant_of( $backbone ), 'Zebra is a grandchild of Backbone' );
+		$this->assertTrue( $zebra->is_descendant_of( $root ), 'Zebra is a great-grandchild of Animal Kingdom' );
+		$this->assertTrue( $zebra->is_descendant_of( $zorse ), 'Zebra does not descend from Zorse, but vice-versa' );
+		$this->assertFalse( $spider->is_descendant_of( $backbone ), 'Spider does not descend from Backbone' );
+
+		// clean up
+		$v->delete();
+		$v2->delete();
+	}
 
 	public function test_term__get()
 	{
