@@ -23,11 +23,19 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$users = Users::get();
+		$user = User::get_by_name( 'posts_test' );
+		if ( !$user ) {
+			$user = User::create(array (
+				'username'=>'posts_test',
+				'email'=>'posts_test@example.com',
+				'password'=>md5('q' . rand(0,65535)),
+			));
+		}
+		$this->user = $user;
 		Post::create(array(
 			'title' => 'Test Post',
 			'content' => 'These tests expect there to be at least one post.',
-			'user_id' => $users[0]->id,
+			'user_id' => $user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
 			'tags' => 'phpunit_test',
@@ -63,7 +71,13 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 		}
 		unset( $this->comment );
 
-		// should remove the post tagged 'phpunit_test'
+		$posts = Posts::get( array('user_id' => $this->user->id ));
+		foreach ( $posts as $post ) {
+			$post->delete();
+		}
+		$this->user->delete();
+		unset($this->user);
+
 	}
 
 	/**
