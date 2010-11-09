@@ -401,7 +401,7 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 		$spider = $v->add_term( 'Spider', $v->get_term( $legs->id) );
 		$crustacean= $v->add_term( 'Crustacean', $v->get_term( $legs->id) );
 
-		$not_descendants = Term::get( $v, $backbone->id )->not_descendants();
+		$not_descendants = $v->get_term( $backbone->id )->not_descendants();
 		$s = array();
 		foreach($not_descendants as $el ) {
 			$s[] = (string)$el;
