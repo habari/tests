@@ -23,6 +23,16 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
+		$users = Users::get();
+		Post::create(array(
+			'title' => 'Test Post',
+			'content' => 'These tests expect there to be at least one post.',
+			'user_id' => $users[0]->id,
+			'status' => Post::status('published'),
+			'content_type' => Post::type('entry'),
+			'tags' => 'phpunit_test',
+		));
+
 		$this->post_id = Post::get()->id;
 		$this->paramarray = array(
 			'id' => 'foofoo',
@@ -52,6 +62,8 @@ class system_classes_CommentTest extends PHPUnit_Framework_TestCase
 			$this->comment->delete();
 		}
 		unset( $this->comment );
+
+		// should remove the post tagged 'phpunit_test'
 	}
 
 	/**
