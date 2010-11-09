@@ -123,7 +123,9 @@ class system_classes_TaxonomyTest extends PHPUnit_Framework_TestCase
 
 		// Rename vocabulary
 		$vocab_count = count(Vocabulary::names());
-		Vocabulary::rename($this->vocab_name, $this->vocab_rename);
+
+		$v = Vocabulary::get( $this->vocab_name );
+		$v->rename( $this->vocab_rename );
 
 		$this->assertTrue(in_array($this->vocab_rename, Vocabulary::names()), 'New vocabulary name should be in list of vocabulary names');
 		$this->assertFalse(in_array($this->vocab_name, Vocabulary::names()), 'Old vocabulary name should not be in list of vocabulary names');
