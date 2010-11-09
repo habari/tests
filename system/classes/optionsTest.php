@@ -20,7 +20,7 @@ class system_classes_OptionsTest extends PHPUnit_Framework_TestCase
 	public function testGetMultiple()
 	{
 		// The installed and db_version options are guaranteed to exist, so we try to get them
-		$options = Options::get('installed', 'db_version');
+		$options = Options::get( array('installed', 'db_version') );
 
 		$this->assertType('array', $options, 'Retrieving multiple options should return an array.');
 		$this->assertArrayHasKey('installed', $options, 'Returned array should contain named option.');
