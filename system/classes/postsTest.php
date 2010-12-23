@@ -170,6 +170,14 @@ class system_classes_PostsTest extends PHPUnit_Framework_TestCase
 		// not:any:info
 	}
 
+	/*
+	 * @todo Make this test do something useful. It currently illustrates #1220 by failing on postgres, but it should actually assert things.
+	 */
+	public function test_get_posts_by_tag_and_info()
+	{
+		$got = Posts::get( array( 'tag' => 'one', 'has:info' => 'test', 'orderby' => 'ABS(info_test_value) DESC' ) );
+	}
+
 	public function test_get_posts_by_where()
 	{
 		$this->markTestIncomplete('This test has not been implemented yet.');
