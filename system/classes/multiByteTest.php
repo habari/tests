@@ -15,6 +15,20 @@ class system_classes_MultiByteTest extends PHPUnit_Framework_TestCase {
 //	static $test_str = '汉字测试';
 //	static $test_str = 'بما في ذلك الكلمات المستخدمة في صفحات التيكت والويكي';
 
+	// our test strings, in numeric entities to prevent editor or os butchering
+	private $test_strings = array(
+		'lowercase' => '&#1087;&#1088;&#1080;&#1074;&#1077;&#1090;',	// привет
+		'ucfirst' => '&#1055;&#1088;&#1080;&#1074;&#1077;&#1090;',		// Привет
+		'uppercase' => '&#1055;&#1056;&#1048;&#1042;&#1045;&#1058;',	// ПРИВЕТ
+		'international' => 'n2&#226;7t I&#241;t&#235;rn&#226;ti&#244;n&#224;liz&#230;ti&#248;n l13iz&#230;42ti&#248;n',	// n2â7t Iñtërnâtiônàlizætiøn l13izæ42tiøn
+		'international_substr_1_3' => '2&#226;7',	// 2â7
+		'international_substr_5' => ' I&#241;t&#235;rn&#226;ti&#244;n&#224;liz&#230;ti&#248;n l13iz&#230;42ti&#248;n',	// note the leading space -  Iñtërnâtiônàlizætiøn l13izæ42tiøn
+		'strpos' => '&#1080;',	// и
+		'strpos2' => '&#226;', // â
+		'lowercase_sentence' => '&#1082;&#1086;&#1088;&#1086;&#1074;&#1099; &#1080;&#1076;&#1091;&#1090; &#1084;&#1091;',	// коровы идут му
+		'ucwords_sentence' => '&#1050;&#1086;&#1088;&#1086;&#1074;&#1099; &#1048;&#1076;&#1091;&#1090; &#1052;&#1091;',	// Коровы Идут Му
+	);
+
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
@@ -23,6 +37,15 @@ class system_classes_MultiByteTest extends PHPUnit_Framework_TestCase {
 	 */
 	protected function setUp()
 	{
+		
+		$convmap = array( 0x0080, 0xffff, 0, 0xffff );
+		
+		foreach ( $this->test_strings as $key => $value ) {
+			
+			$this->test_strings[ $key ] = mb_decode_numericentity( $value, $convmap, 'utf-8' );
+			
+		}
+		
 	}
 
 	/**
@@ -45,10 +68,29 @@ class system_classes_MultiByteTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testLibrary()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+		
+		// test an invalid value
+		$this->assertEquals( MultiByte::library( 'foo' ), false );
+		
+		// get the current library so we can restore it after we screw with things
+		$old_library = MultiByte::library();
+		
+		// set a new value and make sure we get back the same $old_library
+		$old_library2 = MultiByte::library( MultiByte::USE_MBSTRING );
+		
+		$this->assertEquals( $old_library, $old_library2 );
+		
+		// make sure we get back multibyte now that we set it
+		$this->assertEquals( MultiByte::library(), MultiByte::USE_MBSTRING );
+		
+		// make sure we can turn it off
+		MultiByte::library(false);
+		
+		$this->assertEquals( MultiByte::library(), false );
+		
+		// restore the library now that we've tested some other things
+		MultiByte::library( $old_library );
+		
 	}
 
 	public function testConvert_encoding()
@@ -65,24 +107,39 @@ class system_classes_MultiByteTest extends PHPUnit_Framework_TestCase {
 
 	public function testSubstr()
 	{
-		$this->assertEquals( MultiByte::substr( self::$test_str, 1, 3 ), mb_substr( self::$test_str, 1, 3 ) );
-		$this->assertEquals( MultiByte::substr( self::$test_str, 1, 3 ), mb_substr( self::$test_str, 1, 3, mb_detect_encoding( self::$test_str ) ) );
-		$this->assertEquals( MultiByte::substr( self::$test_str, 5 ), mb_substr( self::$test_str, 5 ) );
+		
+		// test that a substring with a starting and ending value works correctly
+		$this->assertEquals( MultiByte::substr( $this->test_strings['international'], 1, 3 ), $this->test_strings['international_substr_1_3'] );
+		
+		// test that a substring with only a starting value works correctly
+		$this->assertEquals( MultiByte::substr( $this->test_strings['international'], 5 ), $this->test_strings['international_substr_5'] );
+		
 	}
 
 	public function testStrlen()
 	{
-		$this->assertEquals( MultiByte::strlen( self::$test_str ), mb_strlen( self::$test_str, mb_detect_encoding( self::$test_str ) ) );
+		
+		$this->assertEquals( MultiByte::strlen( $this->test_strings['lowercase'] ), 6 );
+		$this->assertEquals( MultiByte::strlen( $this->test_strings['ucfirst'] ), 6 );
+		$this->assertEquals( MultiByte::strlen( $this->test_strings['international'] ), 39 );
+		
+		// and perform a single test with an ascii string for code coverage
+		$this->assertEquals( MultiByte::strlen( 'abcd', 'ascii' ), 4 );
+		
 	}
 
 	public function testStrtolower()
 	{
-		$this->assertEquals( MultiByte::strtolower( self::$test_str ), mb_strtolower( mb_convert_encoding(self::$test_str, 'UTF-8', mb_detect_encoding( self::$test_str ) ), 'UTF-8' ) );
+		
+		$this->assertEquals( MultiByte::strtolower( $this->test_strings['ucfirst'] ), $this->test_strings['lowercase'] );
+		
 	}
 
 	public function testStrtoupper()
 	{
-		$this->assertEquals( MultiByte::strtoupper( self::$test_str ), mb_strtoupper( mb_convert_encoding(self::$test_str, 'UTF-8', mb_detect_encoding( self::$test_str ) ), 'UTF-8' ) );
+		
+		$this->assertEquals( MultiByte::strtoupper( $this->test_strings['lowercase'] ), $this->test_strings['uppercase'] );
+		
 	}
 
 	/**
@@ -94,6 +151,52 @@ class system_classes_MultiByteTest extends PHPUnit_Framework_TestCase {
 		$this->markTestIncomplete(
 				'This test has not been implemented yet.'
 		);
+	}
+	
+	public function testUcfirst ( ) {
+		
+		$this->assertEquals( MultiByte::ucfirst( $this->test_strings['lowercase'] ), $this->test_strings['ucfirst'] );
+		
+		// perform a single test with an ascii string for code coverage
+		$this->assertEquals( MultiByte::ucfirst( 'abcd', 'ascii' ), 'Abcd' );
+		
+	}
+	
+	public function testLcfirst ( ) {
+		
+		$this->assertEquals( MultiByte::lcfirst( $this->test_strings['ucfirst'] ), $this->test_strings['lowercase'] );
+		
+		// perform a single test with an ascii string for code coverage
+		$this->assertEquals( MultiByte::lcfirst( 'Abcd', 'ascii' ), 'abcd' );
+		
+	}
+	
+	public function testStrpos ( ) {
+		
+		// make sure a simple strpos works
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['lowercase'], $this->test_strings['strpos'] ), 2 );
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['international'], $this->test_strings['strpos2'] ), 2 );
+		
+		// make sure a strpos with an offset works
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['lowercase'], $this->test_strings['strpos'], 1 ), 2 );
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['international'], $this->test_strings['strpos2'], 4 ), 12 );
+		
+		// make sure a non-esistant strpos works - the character does not exist after the offset
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['lowercase'], $this->test_strings['strpos'], 3 ), false );
+		$this->assertEquals( MultiByte::strpos( $this->test_strings['international'], $this->test_strings['strpos2'], 14 ), false );
+		
+		// and perform a single test with an ascii string for code coverage
+		$this->assertEquals( MultiByte::strpos( 'abcd', 'c', null, 'ascii' ), 2 );
+		
+	}
+	
+	public function testUcwords ( ) {
+		
+		$this->assertEquals( MultiByte::ucwords( $this->test_strings['lowercase_sentence'] ), $this->test_strings['ucwords_sentence'] );
+		
+		// perform a single test with an ascii string for code coverage
+		$this->assertEquals( MultiByte::ucwords( 'cows go moo', 'ascii' ), 'Cows Go Moo' );
+		
 	}
 }
 ?>
