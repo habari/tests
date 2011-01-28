@@ -8,7 +8,6 @@
 		$required_extensions = array(
 			'pdo' => 'http://php.net/pdo',
 			'hash' => 'http://php.net/hash',
-			'iconv' => 'http://php.net/iconv',
 			'tokenizer' => 'http://php.net/tokenizer',
 			'simplexml' => 'http://php.net/simplexml',
 			'mbstring' => 'http://php.net/mbstring',
