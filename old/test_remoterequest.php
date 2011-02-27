@@ -1,7 +1,7 @@
 <?php
 return;
 /**
- * Test for the ColorUtils class.
+ * Test for the RemoteRequest class.
  */
 include('../htdocs/system/classes/remoterequest.php');
 include('../htdocs/system/classes/curlrequestprocessor.php');

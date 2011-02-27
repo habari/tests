@@ -89,7 +89,7 @@ class FormUITest extends UnitTestCase
 		$form = new FormUI('test8');
 		$form->append('text', 'firstname', 'username', 'Firstname:');
 		$form->append('submit', 'save', 'Save');
-		$form->on_success(array($this, 'my_callback1'), 'Bob');
+		$form->on_success( array ( $this, 'my_callback1' ), 'Bob' );
 		$form->out();
 	}
 
@@ -175,9 +175,9 @@ class FormUITest extends UnitTestCase
 if(class_exists('FormUI')):
 
 class FormControlCustom extends FormControl {
-  function get($forvalidation) {
+  function get( $forvalidation = true ) {
     // Get the theme object to use to render this control
-    $theme= $this->get_theme($forvalidation);
+    $theme = $this->get_theme( $forvalidation );
     // Tell the theme what template to render for this control
     return $theme->fetch( 'my_special_control_template' );
   }

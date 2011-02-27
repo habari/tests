@@ -7,59 +7,59 @@ class UserGroupTest extends UnitTestCase
 
 	function test_creategroup()
 	{
-		$user = User::create('username=testcaseuser&email=test@example.com&password=test');
+		$user = User::create( array( 'username' => 'testcaseuser', 'email' => 'test@example.com', 'password' => 'test') );
 		$this->assert_true(
 			$user instanceof User,
 			'Could not create test user.'
 		);
 
-		$group = UserGroup::create('name=new test group');
+		$group = UserGroup::create( array( 'name' => 'new test group' ) );
 		$this->assert_true(
 			$group instanceof UserGroup,
 			'Could not create a new group named "new test group".'
 		);
 
-		ACL::create_permission('test permission', 'A permission for test cases');
-		ACL::create_permission('test deny permission', 'A permission for test cases');
+		ACL::create_token( 'test permission', 'A permission for test cases', 'Administration' );
+		ACL::create_token( 'test deny permission', 'A permission for test cases', 'Administration' );
 
 		$this->assert_true(
-			ACL::permission_exists('test permission'),
+			ACL::token_exists('test permission'),
 			'The test permission was not created.'
 		);
 		$this->assert_true(
-			ACL::permission_exists(' test  PeRmission '),
+			ACL::token_exists(' test  PeRmission '),
 			'Permission names are not normalized.'
 		);
 
-		$group->add('testcaseuser');
-		$group->grant('test permission');
-		$group->deny('test  deny permisSion');
+		$group->add( 'testcaseuser' );
+		$group->grant( 'test permission' );
+		$group->deny( 'test  deny permisSion' );
 		$group->update();
 
-		$newgroup = UserGroup::get('new test group');
+		$newgroup = UserGroup::get( 'new test group' );
 
 		$this->assert_true(
-			in_array($user->id, $newgroup->members),
+			in_array( $user->id, $newgroup->members ),
 			'The created user is not a member of the new group.'
 		);
 
 		$this->assert_true(
-			in_array(ACL::permission_id('test permission'), $newgroup->granted),
+			in_array( ACL::token_id( 'test permission' ), array_keys( $newgroup->permissions ) ),
 			'The group does not have the new permission.'
 		);
 
 		$this->assert_true(
-			ACL::group_can('new test group', 'test permission'),
+			ACL::group_can( 'new test group', 'test permission' ),
 			'The group does not have the new permission.'
 		);
 
 		$this->assert_false(
-			ACL::group_can('new test group', 'test deny permission'),
+			ACL::group_can( 'new test group', 'test deny permission' ),
 			'The group has a denied permission.'
 		);
 
 		$this->assert_true(
-			$user->can('test permission'),
+			$user->can( 'test permission' ),
 			'The user does not have a permission his group has been granted.'
 		);
 
@@ -86,9 +86,9 @@ class UserGroupTest extends UnitTestCase
 	function test_createduplicategroup()
 	{
 		// Can I create two groups with the same name?
-		$group = UserGroup::create('name=new dupe group');
-		$group2 = UserGroup::create('name=new dupe group');
-		assert($group2 instanceof UserGroup);
+		$group = UserGroup::create( array( 'name' => 'new dupe group' ) );
+		$group2 = UserGroup::create( array( 'name' => 'new dupe group' ) );
+		assert( $group2 instanceof UserGroup );
 
 		$this->assert_true(
 			DB::get_value('SELECT count(*) FROM {groups} WHERE name = ?', array('new dupe group')) == 1,
