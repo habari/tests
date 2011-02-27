@@ -57,6 +57,17 @@ class UnitTestCase
 
 	public function assert_equal($value1, $value2, $message = 'Assertion failed')
 	{
+		if($value1 != $value2) {
+			$this->messages[] = array($message, debug_backtrace());
+			$this->fail_count++;
+		}
+		else {
+			$this->pass_count++;
+		}
+	}
+
+	public function assert_identical($value1, $value2, $message = 'Assertion failed')
+	{
 		if($value1 !== $value2) {
 			$this->messages[] = array($message, debug_backtrace());
 			$this->fail_count++;
