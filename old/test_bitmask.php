@@ -42,11 +42,8 @@ class BitmaskTest extends UnitTestCase
 	 */
 	public function test_constructor_invalid_first_argument()
 	{
-		try {
-			$mask = new Bitmask( 'brute' );
-		} catch ( Exception $e ) {
-Utils::debug( $e);
-		}
+		$this->assert_exception('InvalidArgumentException');
+		$mask = new Bitmask( 'brute' );
 	}
 	
 	/**
@@ -86,6 +83,7 @@ Utils::debug( $e);
 	 */
 	public function test_constructor_invalid_second_argument_nonexistent_flag_name()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'giraffe' );
 	}
 	
@@ -94,6 +92,7 @@ Utils::debug( $e);
 	 */
 	public function test_constructor_invalid_second_argument_flags()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'flags' );
 	}
 	
@@ -102,6 +101,7 @@ Utils::debug( $e);
 	 */
 	public function test_constructor_invalid_second_argument_array()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), array() );
 	}
 	
@@ -110,6 +110,7 @@ Utils::debug( $e);
 	 */
 	public function test_constructor_invalid_second_argument_int_too_small()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), -1 );
 	}
 	
@@ -118,6 +119,7 @@ Utils::debug( $e);
 	 */
 	public function test_constructor_invalid_second_argument_int_too_large()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), 4 );
 	}
 
@@ -150,6 +152,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_name_non_bool()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->read = 1;
 	}
 
@@ -195,6 +198,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_value_array()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->value = array();
 	}
 	
@@ -203,6 +207,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_value_int_too_small()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->value = -1;
 	}
 	
@@ -211,6 +216,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_value_int_too_big()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->value = 16;
 	}
 
@@ -227,6 +233,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_full_non_boolean()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->full = 1;
 	}
 
@@ -243,6 +250,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_array_non_bool()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = array( 1, 0, 0, 1 );
 		$this->bitmask->value = $mask;
 	}
@@ -252,6 +260,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_array_too_short()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = array( 1 );
 		$this->bitmask->value = $mask;
 	}
@@ -261,6 +270,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_by_array_too_long()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$mask = array( 1, 0, 0, 1, 1 );
 		$this->bitmask->value = $mask;
 	}
@@ -270,6 +280,7 @@ Utils::debug( $e);
 	 */
 	public function test_write_nonexistent()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->bogus = true;
 	}
 
@@ -283,6 +294,7 @@ Utils::debug( $e);
 	 */
 	public function test_get_nonexistent()
 	{
+		$this->assert_exception('InvalidArgumentException');
 		$foo = $this->bitmask->bogus;
 	}
 

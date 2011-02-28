@@ -137,7 +137,7 @@ class UnitTestCase
 				$this->$method();
 			}
 			catch(Exception $e) {
-				if(strpos($e->getMessage(), $this->asserted_exception) !== false || get_class($e) == $this->asserted_exception) {
+				if(strpos($e->getMessage(), $this->asserted_exception) !== false || get_class($e) == $this->asserted_exception[0]) {
 					$this->pass_count++;
 					$this->asserted_exception = null;
 				}
@@ -149,7 +149,7 @@ class UnitTestCase
 						$ary = next($trace);
 					}
 					$ary = current($trace);
-					echo '<div><em>Exception:</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
+					echo '<div><em>Exception '. get_class($e) .':</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
 					echo '<pre>' . print_r($trace, 1) . '</pre>';
 				}
 			}
