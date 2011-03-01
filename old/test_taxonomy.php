@@ -209,6 +209,39 @@ class TaxonomyTest extends UnitTestCase
 		$v->delete();
 	}
 
+	public function test_term_info()
+	{
+		if( Vocabulary::get( 'numbers') ) {
+			Vocabulary::get( 'numbers' )->delete();
+		}
+
+		$v = Vocabulary::create( array(
+			'name' => 'numbers',
+			'description' => 'Some integers.',
+		));
+
+		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat');
+
+		$sample_ary = array('1', 2, 'a'=>'b');
+		
+		$one = $v->add_term( 'one' );
+		$one->info->value = 1;
+		$one->info->url = 'http://google.com/';
+		$one->info->ary = $sample_ary;
+		$one->info->commit();
+		
+		$one = null;
+		
+		$one = $v->get_term('one');
+		$this->assert_true($one instanceof Term, 'The added term was not returned.');
+		$this->assert_equal($one->info->value, 1, 'The integer term info value is not identical');
+		$this->assert_identical($one->info->url, 'http://google.com/', 'The string term info value is not identical');
+		$this->assert_identical($one->info->ary, $sample_ary, 'The array term info value is not identical');
+		
+		// clean up
+		$v->delete();
+	}
+
 	public function test_delete_term()
 	{
 		if( Vocabulary::get( 'numbers') ) {
@@ -235,7 +268,7 @@ class TaxonomyTest extends UnitTestCase
 		$v->delete();
 	}
 
-		public function test_move_term()
+	public function test_move_term()
 	{
 		if( Vocabulary::get( 'numbers') ) {
 			Vocabulary::get( 'numbers' )->delete();
