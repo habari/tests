@@ -71,6 +71,44 @@ class InputFilterTest extends UnitTestCase
 		$this->assert_equal(InputFilter::filter( '<ScRIpT>alert(\'whee\');</SCRiPT>' ), '');
 
 	}
+	
+	public function test_parse_url_sanitization_idn ( ) {
+		
+		// http://пример.испытание
+		$url = '&#104;&#116;&#116;&#112;&#58;&#47;&#47;&#1087;&#1088;&#1080;&#1084;&#1077;&#1088;&#46;&#1080;&#1089;&#1087;&#1099;&#1090;&#1072;&#1085;&#1080;&#1077;';
+		$url = html_entity_decode( $url, null, 'UTF-8' );
+		
+		$parsed = InputFilter::parse_url( $url );
+		$glued = InputFilter::glue_url( $parsed );
+		
+		// note that glue_url always appends a trailing /
+		$this->assert_identical( $glued, $url . '/' );
+		
+	}
+	
+	public function test_parse_url_sanitization_javascript ( ) {
+		
+		$urls = array(
+			'java&#8;script:alert(0);',
+			'&#8;javascript:alert(0);',
+			'java&#9;script:alert(0);',
+			'&#9;javascript:alert(0);',
+			'java&#xa;script:alert(0);',
+			'&#xa;javascript:alert(0);',
+			'java&#xd;script:alert(0);',
+			'&#xd;javascript:alert(0);',
+		);
+		
+		foreach ( $urls as $url ) {
+			
+			$url = html_entity_decode( $url, null, 'UTF-8' );
+			
+			$parsed = InputFilter::parse_url( $url );
+			
+			$this->assert_equal( $parsed['scheme'], 'javascript', $url . ' != ' . $parsed['scheme'] );
+			
+		}
+	}
 
 }
 
