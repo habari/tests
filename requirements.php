@@ -6,14 +6,16 @@
 		// Even if they are enabled by default, it seems some install turn them off
 		// We use the URL in the Installer template to link to the installation page
 		$required_extensions = array(
+			'date' => 'http://php.net/datetime',
 			'pdo' => 'http://php.net/pdo',
 			'hash' => 'http://php.net/hash',
-			'tokenizer' => 'http://php.net/tokenizer',
-			'simplexml' => 'http://php.net/simplexml',
-			'mbstring' => 'http://php.net/mbstring',
 			'json' => 'http://php.net/json',
+			'mbstring' => 'http://php.net/mbstring',
 			'pcre' => 'http://php.net/pcre',
+			'session' => 'http://php.net/session',
+			'simplexml' => 'http://php.net/simplexml',
 			'spl' => 'http://php.net/spl',
+			'tokenizer' => 'http://php.net/tokenizer',
 			);
 		$requirements_met = true;
 
