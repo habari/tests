@@ -2,6 +2,11 @@ Given /^Habari is not installed$/ do
 	empty_db('test')
 end
 
+Given /^the installation requirements are met$/ do
+	# For now, this doesn't really do much. At some point this should be a test in itself.
+	true
+end
+
 When /^I visit the (.+)$/ do |page_name|
 	visit path_to(page_name)
 end
