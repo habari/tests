@@ -13,17 +13,16 @@ apt-get install ruby rubygems ruby-full build-essential libxml2-dev libmysqlclie
 ```
 
 
-Git, Apache, MySQL and PHP were already installed, so if you're putting this together elsewhere you'd need to grab those as well.
+Git, Apache, MySQL and PHP were already installed, so if you're putting this together elsewhere you'd need to grab those as well (apt-get install git lamp-server^)
 
 
-There are several ruby gems needed. This part seems to take the longest. Someone more well versed in gem commands can probably make sure only the correct capybara (0.4.x) is initially installed instead of needing to remove it afterward.
+There are several ruby gems needed. This part seems to take the longest.
 
 ```bash
-gem install gherkin rspec mechanize capybara capybara-mechanize mysql cucumber 
-gem uninstall capybara -v 1.0.0
+gem install gherkin rspec mechanize capybara-mechanize mysql cucumber 
 ```
 
-By default these are not added to the path. Add it to the end of the **~/.bashrc** PATH line:
+By default these are not added to the path. Add it to the end of the **~/.bashrc** PATH line (or put it in /etc/environment for all users of Ubuntu):
 
 ```bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/var/lib/gems/1.8/bin
