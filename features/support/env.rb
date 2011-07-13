@@ -19,9 +19,7 @@ Capybara.app = 'test'
 Capybara.javascript_driver = :selenium
 Capybara.register_driver :selenium do |app|
   Capybara::Driver::Selenium.new(app,
-    :browser => :remote,
-    :url => "http://127.0.0.1:4001/wd/hub",
-    :desired_capabilities => :firefox)
+    :browser => :firefox)
 end
 
 @@database_hostname = '127.0.0.1'

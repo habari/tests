@@ -30,19 +30,10 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/var/lib/gems/
 ```
 
 
-Download the latest **selenium-standalone-server** jar file from [Selenium @ Google Code](http://code.google.com/p/selenium/downloads/list) and place it in /root. I symlinked it without the version number since they tend to release somewhat frequently.
-
-```bash
-root@lamp ~# wget http://selenium.googlecode.com/files/selenium-server-standalone-2.0rc3.jar
-root@lamp ~# ln selenium-server-standalone-2.0rc3.jar selenium-server-standalone.jar -s
-```
-
-
-At this point **Xvfb** and **Selenium** can be started to provide a headless Firefox for tests needing javascript. I typically start up **gnu screen** and run these in display 0:
+At this point **Xvfb** can be started to provide a headless display to run Firefox for tests needing javascript. I typically start up **gnu screen** and run these in display 0:
 
 ```bash
 root@lamp ~# Xvfb -ac :99 &
-root@lamp ~# DISPLAY=:99 java -jar /root/selenium-server-standalone.jar -port 4001
 ```
 
 Start up mysql (using the root password you set at installation) and create a test user with necessary permissions:
@@ -82,7 +73,7 @@ Add the **habari-test** hostname to the VM's hosts file (/etc/hosts):
 
 ```127.0.0.1     habari-test```
 
-There are not files currently in **/var/www/habari**. You'll use Git to get them there, but first it needs to be configured. Set up your Git credentials and copy the public key to [your github account](https://github.com/account/ssh).
+There are not files currently in **/var/www/habari**. You'll use Git to get them there, but first it needs to be configured. Set up your Git credentials (if you haven't already) and copy the public key to [your github account](https://github.com/account/ssh).
 
 ```bash
 root@lamp ~# git config --global user.name "Firstname Lastname"
@@ -114,9 +105,9 @@ Change the ownership so Habari can install:
 root@lamp ~# chown -R www-data:www-data /var/www/habari
 ```
 
-You should now be able to run **cucumber** and test the installer.
+You should now be able to run **cucumber** (in the Xvfb display) and test the installer.
 
 ```bash
 root@lamp ~# cd /var/www/habari/tests/
-root@lamp habari/tests# cucumber features/installer.feature
+root@lamp habari/tests# DISPLAY=:99 cucumber features/installer.feature
 ```
