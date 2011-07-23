@@ -141,6 +141,10 @@ class UnitTestCase
 
 		$results->test(get_class($this));
 
+		if(method_exists($this, 'module_setup')) {
+			$this->module_setup();
+		}
+
 		foreach($methods as $method) {
 			$this->messages = array();
 
@@ -180,6 +184,10 @@ class UnitTestCase
 			$results->method_results(get_class($this), $method, $this->messages);
 
 			$this->case_count++;
+		}
+		
+		if(method_exists($this, 'module_teardown')) {
+			$this->module_teardown();
 		}
 
 		$results->summary(get_class($this), get_object_vars($this));

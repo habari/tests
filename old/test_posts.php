@@ -2,7 +2,7 @@
 
 include 'bootstrap.php';
 
-define('NUM_POSTS', 20);
+define('NUM_POSTS', 1);
 
 class PostsTest extends UnitTestCase
 {
@@ -11,7 +11,7 @@ class PostsTest extends UnitTestCase
 	protected $types = array('entry', 'page');
 	protected $statuses = array('published', 'draft');
 
-	protected function setup()
+	protected function module_setup()
 	{
 		set_time_limit(0);
 
@@ -29,13 +29,17 @@ class PostsTest extends UnitTestCase
 		$time = time() - 160;
 
 		// Create all the posts we're going to be retrieving in our tests
-		for ( $i = 0; $i < NUM_POSTS; $i++ ) {
-			$this->posts[] = $this->make_post( $user, $time = $time - rand(3600, 3600*36) );
+		foreach($this->types as $type) {
+			foreach($this->statuses as $status) {
+				for ( $i = 0; $i < NUM_POSTS; $i++ ) {
+					$this->posts[] = $this->make_post( $user, $time = $time - rand(3600, 3600*36), $type, $status );
+				}
+			}
 		}
 
 	}
 
-	protected function teardown()
+	protected function module_teardown()
 	{
 		foreach ( $this->posts as $post ) {
 			$post->delete();
@@ -197,14 +201,14 @@ class PostsTest extends UnitTestCase
 	 * @param object $user The posts_test user
 	 * @param timestamp $time The published timestamp of the new posts
 	 */
-	private function make_post( $user, $time )
+	private function make_post( $user, $time, $content_type, $status )
 	{
 		$post = Post::create(array(
 			'title' => $this->get_title(),
 			'content' => $this->get_content(1, 3, 'some', array('ol'=>1, 'ul'=>1), 'cat'),
 			'user_id' => $user->id,
-			'status' => Post::status($this->statuses[array_rand($this->statuses)]),
-			'content_type' => Post::type($this->types[array_rand($this->types)]),
+			'status' => $status,
+			'content_type' => $content_type,
 			//'tags' => 'posts_test',
 			'pubdate' => HabariDateTime::date_create( $time ),
 		));
