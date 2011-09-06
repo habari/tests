@@ -1,3 +1,0 @@
-<div><p><![CDATA[
-test
-]]></p></div>

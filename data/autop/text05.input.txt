@@ -1,5 +1,0 @@
-foo bar
-
-<h2>heading!</h2>
-
-bar baz

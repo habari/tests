@@ -1,4 +1,0 @@
-First paragraph.
-
-Second paragraph, first sentence. Second paragraph second sentence.
-Second paragraph third sentence (after a line break).
