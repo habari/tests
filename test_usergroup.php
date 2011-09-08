@@ -63,6 +63,8 @@ class UserGroupTest extends UnitTestCase
 			'The user does not have a permission his group has been granted.'
 		);
 
+		ACL::destroy_token( 'test permission' );
+		ACL::destroy_token( 'test deny permission' );
 	}
 
 	function test_deletegroup()
