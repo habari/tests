@@ -6,7 +6,7 @@ class PostTest extends UnitTestCase
 {
 	protected $user;
 
-	protected function setup()
+	protected function module_setup()
 	{
 		set_time_limit(0);
 
@@ -22,7 +22,7 @@ class PostTest extends UnitTestCase
 
 	}
 
-	protected function teardown()
+	protected function module_teardown()
 	{
 		$posts = Posts::get( array('user_id' => $this->user->id ));
 		foreach ( $posts as $post ) {
@@ -55,6 +55,9 @@ class PostTest extends UnitTestCase
 		$this->assert_equal(count($post->tags), count($tags), 'All tags should have been created.');
 		foreach ( $post->tags as $tag ) {
 			$this->assert_equal($tag->tag_slug, Utils::slugify($tag->tag_text), 'Tags key should be slugified tag.');
+		}
+		foreach( $post->tags as $tag ) {
+			Tags::vocabulary()->delete_term( $tag );
 		}
 
 	}
