@@ -8,9 +8,11 @@
 * Step 2: Include this file at the beginning of a test
 **/
 
-$shortopts = 'r::';
-$longopts = array();
-$options = getopt($shortopts, $longopts);
+if( function_exists( 'getopt' ) ) {
+	$shortopts = 'r::';
+	$longopts = array();
+	$options = getopt($shortopts, $longopts);
+}
 
 if(!defined('HABARI_PATH')) {
 	if(isset($options['r'])) {
