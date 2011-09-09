@@ -101,6 +101,18 @@ class UnitTestCase
 		$this->asserted_exception = array($exception, $message);
 	}
 
+	public function assert_type( $type, $object, $message = 'Types not equal' )
+	{
+		$class = get_class( $object );
+		if( $class != $type ) {
+			$this->messages[] = array($message, debug_backtrace());
+			$this->fail_count++;
+		}
+		else {
+			$this->pass_count++;
+		}
+	}
+
 	public function check($checkval, $message = 'Expected check')
 	{
 		$this->checks[$checkval] = $message;
