@@ -17,35 +17,35 @@ class TaxonomyTest extends UnitTestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'features' => array('hierarchical')
+			'features' => array( 'hierarchical' )
 		);
 		$v = new Vocabulary($params);
 
 		$this->assert_true( $v instanceof Vocabulary );
-		$this->assert_equal($v->name, $this->vocab_name);
-		$this->assert_equal($v->description, $this->vocab_desc);
-		$this->assert_equal(true, $v->hierarchical);
-		$this->assert_equal(false, $v->free);
+		$this->assert_equal( $v->name, $this->vocab_name );
+		$this->assert_equal( $v->description, $this->vocab_desc );
+		$this->assert_equal( true, $v->hierarchical );
+		$this->assert_equal( false, $v->free );
 	}
 
 	public function test_get_names()
 	{
-		$this->assert_true(is_array(Vocabulary::names()));
+		$this->assert_true( is_array( Vocabulary::names() ) );
 	}
 
 	public function test_insert_vocabulary()
 	{
-		$vocab_count = count(Vocabulary::names());
+		$vocab_count = count( Vocabulary::names() );
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
 			'features' => array( 'hierarchical' )
 		);
-		$v = new Vocabulary($params);
+		$v = new Vocabulary( $params );
 		$v->insert();
 
-		$this->assert_equal($vocab_count + 1, count(Vocabulary::names()), 'Count of names should increase by one');
-		$this->assert_true(in_array($this->vocab_name, Vocabulary::names()), 'Test vocabulary name should be in the list of names');
+		$this->assert_equal( $vocab_count + 1, count( Vocabulary::names() ), 'Count of names should increase by one' );
+		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ), 'Test vocabulary name should be in the list of names' );
 
 		$new_v = new Vocabulary( $params );
 		$results = $new_v->insert();
@@ -55,7 +55,7 @@ class TaxonomyTest extends UnitTestCase
 		try {
 			$v->delete();
 		}
-		catch (Exception $e) {
+		catch ( Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -67,24 +67,24 @@ class TaxonomyTest extends UnitTestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'features' => array('hierarchical')
+			'features' => array( 'hierarchical' )
 		);
-		$u = new Vocabulary($params);
+		$u = new Vocabulary( $params );
 		$u->insert();
 
 		// Retrieve the vocabulary
-		$v = Vocabulary::get($this->vocab_name);
+		$v = Vocabulary::get( $this->vocab_name );
 
 		$this->assert_true( $v instanceof Vocabulary );
-		$this->assert_equal($v->name, $this->vocab_name);
-		$this->assert_equal($v->description, $this->vocab_desc);
+		$this->assert_equal( $v->name, $this->vocab_name );
+		$this->assert_equal( $v->description, $this->vocab_desc );
 
 		// Clean up
 		// Delete the vocabulary
 		try {
 			$v->delete();
 		}
-		catch (Exception $e) {
+		catch ( Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -92,7 +92,7 @@ class TaxonomyTest extends UnitTestCase
 	public function test_get_vocabularies()
 	{
 		 // Use SQL to get a count of rows in the Vocabularies table
-		 $sql_count = DB::get_value( "SELECT COUNT(*) FROM {vocabularies};");
+		 $sql_count = DB::get_value( "SELECT COUNT(*) FROM {vocabularies};" );
 		// Retrieve the vocabularies
 		$vocabularies = Vocabulary::get_all();
 
@@ -107,27 +107,27 @@ class TaxonomyTest extends UnitTestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'features' => array('hierarchical')
+			'features' => array( 'hierarchical' )
 		);
-		$v = new Vocabulary($params);
+		$v = new Vocabulary( $params );
 		$v->insert();
 
 		// Rename vocabulary
-		$vocab_count = count(Vocabulary::names());
+		$vocab_count = count( Vocabulary::names() );
 
 		$v = Vocabulary::get( $this->vocab_name );
 		$v->rename( $this->vocab_rename );
 
-		$this->assert_true(in_array($this->vocab_rename, Vocabulary::names()), 'New vocabulary name should be in list of vocabulary names');
-		$this->assert_false(in_array($this->vocab_name, Vocabulary::names()), 'Old vocabulary name should not be in list of vocabulary names');
-		$this->assert_equal($vocab_count, count(Vocabulary::names()), 'Number of vocabularies should not change on rename');
+		$this->assert_true( in_array( $this->vocab_rename, Vocabulary::names() ), 'New vocabulary name should be in list of vocabulary names' );
+		$this->assert_false(in_array( $this->vocab_name, Vocabulary::names() ), 'Old vocabulary name should not be in list of vocabulary names' );
+		$this->assert_equal( $vocab_count, count(Vocabulary::names() ), 'Number of vocabularies should not change on rename' );
 
 		// Clean up
 		// Delete the vocabulary
 		try {
 			$v->delete();
 		}
-		catch (Exception $e) {
+		catch ( Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -139,44 +139,44 @@ class TaxonomyTest extends UnitTestCase
 		$params = array(
 			'name' => $this->vocab_name,
 			'description' => $this->vocab_desc,
-			'features' => array('hierarchical')
+			'features' => array( 'hierarchical' )
 		);
-		$v = new Vocabulary($params);
+		$v = new Vocabulary( $params );
 		$v->insert();
 
 		// Count the number of vocabularies before deletion
-		$vocab_count = count(Vocabulary::names());
+		$vocab_count = count( Vocabulary::names() );
 
 		// Retrieve and delete vocabulary
-		$v = Vocabulary::get($this->vocab_name);
+		$v = Vocabulary::get( $this->vocab_name );
 		try {
 			$v->delete();
 		}
-		catch (Exception $e) {
+		catch ( Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 
-		$this->assert_equal($vocab_count - 1, count(Vocabulary::names()), 'Number of vocabularies should decrease by one');
-		$this->assert_false(in_array($this->vocab_name, Vocabulary::names()), 'Deleted vocabulary name should not be in list of vocabulary names');
+		$this->assert_equal( $vocab_count - 1, count( Vocabulary::names() ), 'Number of vocabularies should decrease by one' );
+		$this->assert_false( in_array( $this->vocab_name, Vocabulary::names() ), 'Deleted vocabulary name should not be in list of vocabulary names' );
 	}
 
 	/* Term tests */
 	public function test_construct_term()
 	{
 		$params = array(
-			'term' => Utils::slugify($this->term_name),
+			'term' => Utils::slugify( $this->term_name ),
 			'term_display' => $this->term_name
 		);
-		$t = new Term($params);
+		$t = new Term( $params );
 
 		$this->assert_true( $t instanceof Term );
-		$this->assert_equal($t->term, Utils::slugify($this->term_name));
-		$this->assert_equal($t->term_display, $this->term_name);
+		$this->assert_equal( $t->term, Utils::slugify( $this->term_name ) );
+		$this->assert_equal( $t->term_display, $this->term_name );
 
 		$t = new Term( $this->term_name );
 		$this->assert_true( $t instanceof Term );
-		$this->assert_equal($t->term, Utils::slugify($this->term_name));
-		$this->assert_equal($t->term_display, $this->term_name);
+		$this->assert_equal( $t->term, Utils::slugify( $this->term_name ) );
+		$this->assert_equal( $t->term_display, $this->term_name );
 	}
 
 	public function test_add_term()
@@ -190,20 +190,20 @@ class TaxonomyTest extends UnitTestCase
 			'description' => 'Some integers.',
 		));
 
-		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat');
+		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat' );
 
 		$one = $v->add_term( 'one' );
-		$this->assert_true( $one instanceof Term, 'add_term should return the new Term on success');
-		$this->assert_equal( 'one', $one->term_display, 'The first term entered should be the root');
-		$this->assert_equal( 1, $one->mptt_left, 'The first term should have mptt_left 1');
-		$this->assert_equal( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term');
+		$this->assert_true( $one instanceof Term, 'add_term should return the new Term on success' );
+		$this->assert_equal( 'one', $one->term_display, 'The first term entered should be the root' );
+		$this->assert_equal( 1, $one->mptt_left, 'The first term should have mptt_left 1' );
+		$this->assert_equal( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term' );
 
 		$two = $v->add_term( 'two' );
 		$four = $v->add_term( 'four' );
 
 		$three = $v->add_term( 'three', $four, true );
 		$four = $v->get_term( $four->id );
-		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term');
+		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the new Term should be inserted before $target_term' );
 
 		// clean up
 		$v->delete();
@@ -218,11 +218,11 @@ class TaxonomyTest extends UnitTestCase
 		$v = Vocabulary::create( array(
 			'name' => 'numbers',
 			'description' => 'Some integers.',
-		));
+		) );
 
-		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat');
+		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat' );
 
-		$sample_ary = array('1', 2, 'a'=>'b');
+		$sample_ary = array( '1', 2, 'a'=>'b' );
 		
 		$one = $v->add_term( 'one' );
 		$one->info->value = 1;
@@ -232,11 +232,11 @@ class TaxonomyTest extends UnitTestCase
 		
 		$one = null;
 		
-		$one = $v->get_term('one');
-		$this->assert_true($one instanceof Term, 'The added term was not returned.');
-		$this->assert_equal($one->info->value, 1, 'The integer term info value is not identical');
-		$this->assert_identical($one->info->url, 'http://google.com/', 'The string term info value is not identical');
-		$this->assert_identical($one->info->ary, $sample_ary, 'The array term info value is not identical');
+		$one = $v->get_term( 'one' );
+		$this->assert_true( $one instanceof Term, 'The added term was not returned.' );
+		$this->assert_equal( $one->info->value, 1, 'The integer term info value is not identical' );
+		$this->assert_identical( $one->info->url, 'http://google.com/', 'The string term info value is not identical' );
+		$this->assert_identical( $one->info->ary, $sample_ary, 'The array term info value is not identical' );
 		
 		// clean up
 		$v->delete();
@@ -251,7 +251,7 @@ class TaxonomyTest extends UnitTestCase
 		$v = Vocabulary::create( array(
 			'name' => 'numbers',
 			'description' => 'Some integers.',
-		));
+		) );
 
 		$one = $v->add_term( 'one' );
 		$two = $v->add_term( 'two' );
@@ -277,15 +277,15 @@ class TaxonomyTest extends UnitTestCase
 		$v = Vocabulary::create( array(
 			'name' => 'numbers',
 			'description' => 'Some integers.',
-		));
+		) );
 
-		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat');
+		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat' );
 		$fale = $v->move_term( 'new_term' );
 		$this->assert_false( $fale, 'Return false for an empty vocabulary' );
 
 		$one = $v->add_term( 'one' );
-		$this->assert_equal( 1, $one->mptt_left, 'The first term should have mptt_left 1');
-		$this->assert_equal( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term');
+		$this->assert_equal( 1, $one->mptt_left, 'The first term should have mptt_left 1' );
+		$this->assert_equal( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term' );
 
 		$five = $v->add_term( 'five' );
 		$two = $v->add_term( 'two' );
@@ -295,13 +295,13 @@ class TaxonomyTest extends UnitTestCase
 		$three = $v->get_term( $three->id ); // not updated otherwise?
 		$four = $v->get_term( $four->id ); // not updated otherwise?
 
-		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term');
+		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term' );
 
 		$v->move_term( $five );
 
-		$four = $v->get_term( $four->id ); // not updated otherwise?otherwise
+		$four = $v->get_term( $four->id ); // not updated otherwise?
 		$five = $v->get_term( $five->id ); // not updated otherwise?
-		$this->assert_equal( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right');
+		$this->assert_equal( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right' );
 
 		// clean up
 		$v->delete();
@@ -321,7 +321,7 @@ class TaxonomyTest extends UnitTestCase
 
 		$fruit = $v->add_term( 'Fruit' );
 		$red_apples = $v->add_term( new Term( array( 'term' => 'red_apples', 'term_display' => 'Red Apples' ) ), $fruit );
-		$v->add_term( 'green_tomatoes', $fruit, FALSE );
+		$v->add_term( 'green_tomatoes', $fruit, false );
 		$v->add_term( 'Les oranges', $fruit );
 
 		$root = $v->get_term();
@@ -434,8 +434,8 @@ class TaxonomyTest extends UnitTestCase
 		}
 		$expected = array( $root, $no_backbone, $starfish, $mollusk, $legs, $snail, $clam, $insect, $spider, $crustacean );
 		$this->assert_true( 10 == count( $not_descendants ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
-		$e = array();;
-		foreach($expected as $el ) {
+		$e = array();
+		foreach( $expected as $el ) {
 			$e[] = (string)$el;
 		}
 		$this->assert_true( 0 == count( array_diff( $s, $e ) ) );
@@ -482,13 +482,13 @@ class TaxonomyTest extends UnitTestCase
 			$s[] = (string)$el;
 		}
 
-		$expected = array($clam, $insect, $spider, $crustacean, $legs, $starfish,
+		$expected = array( $clam, $insect, $spider, $crustacean, $legs, $starfish,
 			$backbone, $mammal, $lungs, $reptile, $bird, $gills, $fish, $amphibian );
 
 		$this->assert_true( 14 == count( $not_ancestors ), sprintf( 'Found: %s', implode( ', ', $s ) ) );
 
-		$e = array();;
-		foreach($expected as $el ) {
+		$e = array();
+		foreach( $expected as $el ) {
 			$e[] = (string)$el;
 		}
 		$this->assert_true( 0 == count( array_diff( $s, $e ) ), sprintf( 'Found: %s', implode( ', ', array_diff( $s, $e ) ) ) );
@@ -700,7 +700,7 @@ class TaxonomyTest extends UnitTestCase
 		) );
 
 		$root = $nv->add_term( 'Animal Kingdom' );
-		$nv->set_object_terms( 'post', $post->id, $root );
+		$nv->set_object_terms( 'post', $post->id, array( $root ) );
 
 		$terms = Vocabulary::get_all_object_terms( 'post', $post->id );
 		$new_terms[] = 'Animal Kingdom';
@@ -714,6 +714,7 @@ Utils::debug( 3, count( $terms ) );
 		$this->assert_equal( 0, count( array_diff( $new_terms, $t ) ) );
 Utils::debug( 0, count( array_diff( $new_terms, $t ) ) );
 
+		$v->delete_term( 'unit test' );
 		$post->delete();
 		$nv->delete();
 	}
