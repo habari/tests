@@ -89,7 +89,7 @@ class TagTest extends UnitTestCase
 
 	public function test_get_tag()
 	{
-		$this->tag->insert();
+		Tags::vocabulary()->add_term( $this->tag );
 		// Get tag by text
 		$t = Tags::vocabulary()->get_term( $this->text );
 		$this->assert_equal( $t->term_display, $this->tag->term_display );
