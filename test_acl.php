@@ -47,15 +47,22 @@ class ACLTest extends UnitTestCase {
 			'Could not grant acltest permission to acltest-group through UserGroup call.'
 		);
 		
-		// full > read/write
+		// full > read/edit
 		$this->assert_true(
 			$this->acl_group->can( 'acltest', 'read' ),
 			"Group with 'full' acltest permission cannot 'read'."
 		);
 		$this->assert_true(
-			$this->acl_group->can( 'acltest', 'write' ),
-			"Group with 'full' acltest permission cannot 'write'."
+			$this->acl_group->can( 'acltest', 'edit' ),
+			"Group with 'full' acltest permission cannot 'edit'."
 		);
+		$this->assert_true(
+			$this->acl_group->can( 'acltest', 'full' ),
+			"Group with 'full' acltest permission cannot 'full'."
+		);
+		$this->assert_exception( 'InvalidArgumentException', "'write' is an invalid token flag." );
+		$this->acl_group->can( 'acltest', 'write' );
+
 		ACL::destroy_token( 'acltest' );
 	}
 
