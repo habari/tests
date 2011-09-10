@@ -45,6 +45,8 @@ class BlockTest extends UnitTestCase
 		$block->insert();
 
 		$this->assert_equal( $count + 1, DB::get_value('SELECT count(*) FROM {blocks}'), 'Count of blocks should increase by one' );
+
+		$block->delete();
 	}
 
 	public function test_update_block()
@@ -74,6 +76,8 @@ class BlockTest extends UnitTestCase
 
 		$updated_block = DB::get_row('SELECT * FROM {blocks} WHERE id=:id', array('id' => $block_id), 'Block');
 		$this->assert_equal( $updated_block->data_test, $block->data_test, 'Block data should be updated' );
+
+		$block->delete();
 	}
 
 	public function test_delete_block()
