@@ -1,0 +1,6 @@
+foo bar
+
+<h2>heading</h2>
+foo bar
+
+foo bar

@@ -1,0 +1,5 @@
+Foo
+
+<!-- comment goes here -->
+
+Bar <!-- another comment -->.
