@@ -85,6 +85,17 @@ class UnitTestCase
 		}
 	}
 
+	public function assert_not_equal($value1, $value2, $message = 'Assertion failed')
+	{
+		if($value1 == $value2) {
+			$this->messages[] = array($message, debug_backtrace());
+			$this->fail_count++;
+		}
+		else {
+			$this->pass_count++;
+		}
+	}
+
 	public function assert_identical($value1, $value2, $message = 'Assertion failed')
 	{
 		if($value1 !== $value2) {
@@ -111,6 +122,11 @@ class UnitTestCase
 		else {
 			$this->pass_count++;
 		}
+	}
+
+	public function mark_test_incomplete( $message = 'Tests not implemented' )
+	{
+		$this->messages[] = array( $message );
 	}
 
 	public function check($checkval, $message = 'Expected check')
