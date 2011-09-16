@@ -42,12 +42,19 @@ if(!class_exists('UnitTestCase')):
 
 class UnitTestCase
 {
+	const FAIL = 0;
+	const INCOMPLETE = 1;
+	const SKIP = 2;
+
 	static $run_all = false;
+
 	public $messages = array();
 	public $pass_count = 0;
 	public $fail_count = 0;
+	public $incomplete_count = 0;
 	public $exception_count = 0;
 	public $case_count = 0;
+
 	private $exceptions = array();
 	private $checks = array();
 	private $asserted_exception = null;
@@ -55,7 +62,7 @@ class UnitTestCase
 	public function assert_true($value, $message = 'Assertion failed')
 	{
 		if($value !== true) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -66,7 +73,7 @@ class UnitTestCase
 	public function assert_false($value, $message = 'Assertion failed')
 	{
 		if($value !== false) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -77,7 +84,7 @@ class UnitTestCase
 	public function assert_equal($value1, $value2, $message = 'Assertion failed')
 	{
 		if($value1 != $value2) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -88,7 +95,7 @@ class UnitTestCase
 	public function assert_not_equal($value1, $value2, $message = 'Assertion failed')
 	{
 		if($value1 == $value2) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -99,7 +106,7 @@ class UnitTestCase
 	public function assert_identical($value1, $value2, $message = 'Assertion failed')
 	{
 		if($value1 !== $value2) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -116,7 +123,7 @@ class UnitTestCase
 	{
 		$class = get_class( $object );
 		if( $class != $type ) {
-			$this->messages[] = array($message, debug_backtrace());
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
 			$this->fail_count++;
 		}
 		else {
@@ -126,7 +133,8 @@ class UnitTestCase
 
 	public function mark_test_incomplete( $message = 'Tests not implemented' )
 	{
-		$this->messages[] = array( $message );
+		$this->messages[] = array( self::INCOMPLETE, $message);
+		$this->incomplete_count++;
 	}
 
 	public function check($checkval, $message = 'Expected check')
@@ -155,11 +163,11 @@ class UnitTestCase
 	{
 		if(isset($this->asserted_exception)) {
 			$this->fail_count++;
-			$this->messages[] = array($this->asserted_exception[1] . ': ' . $this->asserted_exception[0]);
+			$this->messages[] = array(self::FAIL, $this->asserted_exception[1] . ': ' . $this->asserted_exception[0]);
 		}
 		foreach($this->checks as $check => $message) {
 			$this->fail_count++;
-			$this->messages[] = array($message);
+			$this->messages[] = array(self::FAIL, $message);
 		}
 	}
 
@@ -285,12 +293,18 @@ class UnitTestResults
 	private $tests = array();
 	private $summaries = array();
 	private $options = array();
+	private $type;
 
 	function __construct()
 	{
 		global $options;
 		$this->options = $options;
 		$this->options['HABARI_PATH'] = HABARI_PATH;
+		$this->type = array(
+		    'Fail: ',
+		    'Incomplete: ',
+		    'Skipped: ',
+		);
 	}
 
 	function __toString()
@@ -325,16 +339,16 @@ class UnitTestResults
 			{
 				$output .= "<h2>{$methodname}</h2>";
 				foreach($messages as $message) {
-					$output .= '<div><em>Fail:</em> ' . $message[0];
-					if(count($message) > 1) {
-						$output .= '<br/>' . $message[1][0]['file'] . ':' . $message[1][0]['line'];
+					$output .= "<div><em>{$this->type[$message[0]]}</em> {$message[1]}";
+					if(count($message) > 2) {
+						$output .= '<br/>' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
 					}
 					$output .= '</div>';
 				}
 			}
 
 			$summary = $this->summaries[$test];
-			$output .= "<div class=\"test complete\">{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions.</div>";
+			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.</p></div>";
 		}
 
 		$output .= '<footer><h3>Options</h3><table>';
@@ -366,15 +380,15 @@ class UnitTestResults
 			{
 				$output[]= "  {$methodname}";
 				foreach($messages as $message) {
-					$output[]= '    Fail: ' . $message[0];
+					$output[]= str_pad($this->type[$message[0]], 10, ' ', STR_PAD_LEFT ) . $message[1];
 					if(count($message) > 1) {
-						$output[]= '      ' . $message[1][0]['file'] . ':' . $message[1][0]['line'];
+						$output[]= '      ' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
 					}
 				}
 			}
 
 			$summary = $this->summaries[$test];
-			$output[]= "\n{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions.";
+			$output[]= "\n{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.";
 		}
 
 		$output[]= "\n=== Options ===";
