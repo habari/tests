@@ -9,10 +9,15 @@
 **/
 
 if( function_exists( 'getopt' ) ) {
-	$shortopts = 'r::';
+	$shortopts = 'r::o';
 	$longopts = array();
 	$options = getopt($shortopts, $longopts);
 }
+if(!$options) {
+	$options = array();
+}
+$querystring_options = array_intersect_key($_GET, array('o'=>1));
+$options = array_merge($options, $querystring_options);
 
 if(!defined('HABARI_PATH')) {
 	if(isset($options['r'])) {
@@ -58,6 +63,7 @@ class UnitTestCase
 	private $exceptions = array();
 	private $checks = array();
 	private $asserted_exception = null;
+	protected $show_output = false;
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
@@ -137,6 +143,12 @@ class UnitTestCase
 		$this->incomplete_count++;
 	}
 
+	public function output($v)
+	{
+		$this->show_output = true;
+		print_r($v);
+	}
+
 	public function check($checkval, $message = 'Expected check')
 	{
 		$this->checks[$checkval] = $message;
@@ -173,6 +185,9 @@ class UnitTestCase
 
 	public function run($results)
 	{
+		global $options;
+		$this->options = $options;
+
 		$methods = get_class_methods($this);
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
 		$cases = 0;
@@ -185,6 +200,7 @@ class UnitTestCase
 
 		foreach($methods as $method) {
 			$this->messages = array();
+			$this->show_output = false;
 
 			$this->pre_test();
 			if(method_exists($this, 'setup')) {
@@ -209,6 +225,7 @@ class UnitTestCase
 						$ary = next($trace);
 					}
 					$ary = current($trace);
+					$this->messages[] = array(self::FAIL, get_class($e) . ':' . $e->getMessage(), array($ary['file'] . ':' . $ary['line']));
 //					echo '<div><em>Exception '. get_class($e) .':</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
 //					echo '<pre>' . print_r($trace, 1) . '</pre>';
 				}
@@ -218,6 +235,10 @@ class UnitTestCase
 				$this->teardown();
 			}
 			$this->post_test();
+
+			if($this->show_output) {
+				$this->messages[] = $output;
+			}
 
 			$results->method_results(get_class($this), $method, $this->messages);
 
@@ -270,7 +291,6 @@ class UnitTestCase
 		}
 
 		echo $results;
-//		echo "<div class=\"all test complete\">{$case_count}/{$case_count} tests complete.  {$fail_count} failed assertions.  {$pass_count} passed assertions.  {$exception_count} exceptions.</div>";
 	}
 
 	public static function run_dir($directory = null)
@@ -324,6 +344,8 @@ class UnitTestResults
 
 	function out_html()
 	{
+		$has_output = false;
+
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
 		}
@@ -339,16 +361,31 @@ class UnitTestResults
 			{
 				$output .= "<h2>{$methodname}</h2>";
 				foreach($messages as $message) {
-					$output .= "<div><em>{$this->type[$message[0]]}</em> {$message[1]}";
-					if(count($message) > 2) {
-						$output .= '<br/>' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+					if(is_string($message)) {
+						if(isset($this->options['o'])) {
+							$output .= "<div style=\"white-space:pre;border: 1px solid #ccc;padding: 0px 10px 10px;background: #efefef;\"><h3>Output</h3>{$message}</div>";
+						}
+						else {
+							$has_output = true;
+						}
 					}
-					$output .= '</div>';
+					else {
+						$output .= "<div><em>{$this->type[$message[0]]}</em> {$message[1]}";
+						if(count($message) > 2) {
+							$output .= '<br/>' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+						}
+						$output .= '</div>';
+					}
 				}
 			}
 
 			$summary = $this->summaries[$test];
 			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.</p></div>";
+
+			if($has_output) {
+				$output .= "<div class=\"test complete\">Some tests have output.  <a href=\"?o=1\">Turn on the output option</a> to see output.";
+			}
+
 		}
 
 		$output .= '<footer><h3>Options</h3><table>';
@@ -364,6 +401,8 @@ class UnitTestResults
 
 	function out_console()
 	{
+		$has_output = false;
+
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
 		}
@@ -380,15 +419,33 @@ class UnitTestResults
 			{
 				$output[]= "  {$methodname}";
 				foreach($messages as $message) {
-					$output[]= str_pad($this->type[$message[0]], 10, ' ', STR_PAD_LEFT ) . $message[1];
-					if(count($message) > 1) {
-						$output[]= '      ' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+					if(is_string($message)) {
+						if(isset($this->options['o'])) {
+							$output[]= "\n          == Begin Output ==\n";
+							$message = explode("\n", $message);
+							$message = array_map(create_function('$s', 'return "          " . $s;'), $message);
+							$output = array_merge($output, $message);
+							$output[]= "          ==  End Output  ==";
+						}
+						else {
+							$has_output = true;
+						}
+					}
+					else {
+						$output[]= str_pad($this->type[$message[0]], 10, ' ', STR_PAD_LEFT ) . $message[1];
+						if(count($message) > 2) {
+							$output[]= '      ' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+						}
 					}
 				}
 			}
 
 			$summary = $this->summaries[$test];
 			$output[]= "\n{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.";
+
+			if($has_output) {
+				$output[]= "\nSome tests have output.  Run again with -o to see output.";
+			}
 		}
 
 		$output[]= "\n=== Options ===";

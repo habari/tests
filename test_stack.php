@@ -19,6 +19,7 @@ class StackTest extends UnitTestCase
 		Stack::add( 'test_stack', 'after(e)',		'g', 'e');
 		$sorted = Stack::get_sorted_stack('test_stack');
 		$first = array_shift($sorted);
+		$this->output($sorted);
 		$this->assert_true( ($first == 'a') );
 	}
 }
