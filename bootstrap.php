@@ -16,8 +16,11 @@ if( function_exists( 'getopt' ) ) {
 if(!isset($options) || !$options) {
 	$options = array();
 }
-$querystring_options = array_intersect_key($_GET, array('o'=>1));
-$options = array_merge($options, $querystring_options);
+global $querystring_options;
+if(!isset($querystring_options)) {
+	$querystring_options = array_intersect_key($_GET, array('o'=>1));
+	$options = array_merge($options, $querystring_options);
+}
 
 if(!defined('HABARI_PATH')) {
 	if(isset($options['r'])) {
