@@ -140,34 +140,39 @@ class PostsTest extends UnitTestCase
 		// @todo How do we test this?
 	}
 
-//	public function test_get_posts_by_status()
-//	{
-//	}
+	public function test_get_posts_by_status()
+	{
+		$this->mark_test_incomplete();
+	}
 
-//	public function test_get_posts_by_user_id()
-//	{
-//	}
+	public function test_get_posts_by_user_id()
+	{
+		$this->mark_test_incomplete();
+	}
 
-//	public function test_get_posts_by_date()
-//	{
-//	}
+	public function test_get_posts_by_date()
+	{
+		$this->mark_test_incomplete();
+	}
 
-//	public function test_get_posts_by_tag()
-//	{
-		// tag
-		// tag_slug
-		// all:tag
-		// not:tag
-//	}
+	public function test_get_posts_by_tag()
+	{
+		$this->mark_test_incomplete();
+//		 tag
+//		 tag_slug
+//		 all:tag
+//		 not:tag
+	}
 
-//	public function test_get_posts_by_info()
-//	{
-		// has:info
-		// all:info
-		// any:info
-		// not:all:info
-		// not:any:info
-//	}
+	public function test_get_posts_by_info()
+	{
+		$this->mark_test_incomplete();
+//		 has:info
+//		 all:info
+//		 any:info
+//		 not:all:info
+//		 not:any:info
+	}
 
 	/*
 	 * @todo Make this test do something useful. It currently illustrates #1220 by failing on postgres, but it should actually assert things.
@@ -177,19 +182,22 @@ class PostsTest extends UnitTestCase
 		$got = Posts::get( array( 'tag' => 'one', 'has:info' => 'test', 'orderby' => 'ABS(info_test_value) DESC' ) );
 	}
 
-//	public function test_get_posts_by_where()
-//	{
-//	}
+	public function test_get_posts_by_where()
+	{
+		$this->mark_test_incomplete();
+	}
 
-//	public function test_get_posts_by_criteria()
-//	{
-//	}
+	public function test_get_posts_by_criteria()
+	{
+		$this->mark_test_incomplete();
+	}
 
-//	public function test_get_posts_with_limit()
-//	{
-		// limit
-		// nolimit
-//	}
+	public function test_get_posts_with_limit()
+	{
+		$this->mark_test_incomplete();
+//		 limit
+//		 nolimit
+	}
 
 	/**
 	 * Methods to create posts
