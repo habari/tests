@@ -62,11 +62,14 @@ class UnitTestCase
 	public $incomplete_count = 0;
 	public $exception_count = 0;
 	public $case_count = 0;
+	public $total_case_count = 0;
+	public $skipped_count = 0;
 
 	private $exceptions = array();
 	private $checks = array();
 	private $asserted_exception = null;
 	protected $show_output = false;
+	protected $conditions = array();
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
@@ -163,6 +166,11 @@ class UnitTestCase
 		unset($this->checks[$checkval]);
 	}
 
+	public function add_condition($condition, $reason = false)
+	{
+		$this->conditions[$condition] = $reason;
+	}
+
 	public function named_test_filter( $function_name )
 	{
 		return preg_match('%^test_%', $function_name);
@@ -234,42 +242,55 @@ class UnitTestCase
 				}
 			}
 
-			$this->pre_test();
-			if(method_exists($this, 'setup')) {
-				$this->setup();
-			}
-
-			try {
-				ob_start();
-				$this->$method();
-				$output = ob_get_clean();
-			}
-			catch(Exception $e) {
-				if(strpos($e->getMessage(), $this->asserted_exception[0]) !== false || get_class($e) == $this->asserted_exception[0]) {
-					$this->pass_count++;
-					$this->asserted_exception = null;
-				}
-				else {
-					$this->exception_count++;
-					$trace = $e->getTrace();
-					$ary = current($trace);
-					while( !isset($ary['file']) || strpos($ary['file'], 'error.php') != false ) {
-						$ary = next($trace);
+			$do_skip = false;
+			if(count($this->conditions) > 0) {
+				if(preg_match('%^test_(' . implode('|', array_keys($this->conditions)) . ')_.+%i', $method, $condition_matches)) {
+					if(isset($this->conditions[$condition_matches[1]]) && is_string($this->conditions[$condition_matches[1]])) {
+						$this->messages[] = array(self::SKIP, $this->conditions[$condition_matches[1]]);
+						$do_skip = true;
+						$this->skipped_count++;
 					}
-					$ary = current($trace);
-					$this->messages[] = array(self::FAIL, get_class($e) . ':' . $e->getMessage(), array($ary['file'] . ':' . $ary['line']));
-//					echo '<div><em>Exception '. get_class($e) .':</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
-//					echo '<pre>' . print_r($trace, 1) . '</pre>';
 				}
 			}
 
-			if(method_exists($this, 'teardown')) {
-				$this->teardown();
-			}
-			$this->post_test();
+			if(!$do_skip) {
+				$this->pre_test();
+				if(method_exists($this, 'setup')) {
+					$this->setup();
+				}
 
-			if($this->show_output) {
-				$this->messages[] = $output;
+				try {
+					ob_start();
+					$this->$method();
+					$output = ob_get_clean();
+				}
+				catch(Exception $e) {
+					if(strpos($e->getMessage(), $this->asserted_exception[0]) !== false || get_class($e) == $this->asserted_exception[0]) {
+						$this->pass_count++;
+						$this->asserted_exception = null;
+					}
+					else {
+						$this->exception_count++;
+						$trace = $e->getTrace();
+						$ary = current($trace);
+						while( !isset($ary['file']) || strpos($ary['file'], 'error.php') != false ) {
+							$ary = next($trace);
+						}
+						$ary = current($trace);
+						$this->messages[] = array(self::FAIL, get_class($e) . ':' . $e->getMessage(), array($ary['file'] . ':' . $ary['line']));
+	//					echo '<div><em>Exception '. get_class($e) .':</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
+	//					echo '<pre>' . print_r($trace, 1) . '</pre>';
+					}
+				}
+
+				if(method_exists($this, 'teardown')) {
+					$this->teardown();
+				}
+				$this->post_test();
+
+				if($this->show_output) {
+					$this->messages[] = $output;
+				}
 			}
 
 			$results->method_results(get_class($this), $method, $this->messages);
@@ -393,7 +414,7 @@ class UnitTestResults
 
 	function initial_results()
 	{
-		return array('total_case_count'=>0, 'case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
+		return array('total_case_count'=>0, 'case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0, 'skipped_count'=>0);
 	}
 
 	function out_html()
@@ -445,11 +466,11 @@ class UnitTestResults
 					$totals[$k] += $v;
 				}
 			}
-			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['total_case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete tests.</p></div>";
+			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['total_case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions.  {$summary['incomplete_count']} incomplete tests.  {$summary['skipped_count']} incomplete tests.</p></div>";
 		}
 
 		$output .= '<footer><h3>Results</h3>';
-		$output.= sprintf('<div class="all test complete">%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.</div>', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
+		$output.= sprintf('<div class="all test complete">%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.  %d skipped tests.</div>', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count'], $totals['skipped_count']);
 
 		if($has_output) {
 			$output .= "<div class=\"has_output\">Some tests have output.  <a href=\"?o=1\">Turn on the output option</a> to see output.</div>";
