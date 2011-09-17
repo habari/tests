@@ -13,7 +13,7 @@ if( function_exists( 'getopt' ) ) {
 	$longopts = array();
 	$options = getopt($shortopts, $longopts);
 }
-if(!$options) {
+if(!isset($options) || !$options) {
 	$options = array();
 }
 $querystring_options = array_intersect_key($_GET, array('o'=>1));
@@ -147,6 +147,7 @@ class UnitTestCase
 	{
 		$this->show_output = true;
 		print_r($v);
+		echo "\n";
 	}
 
 	public function check($checkval, $message = 'Expected check')
@@ -221,7 +222,7 @@ class UnitTestCase
 					$this->exception_count++;
 					$trace = $e->getTrace();
 					$ary = current($trace);
-					while( strpos($ary['file'], 'error.php') != false ) {
+					while( !isset($ary['file']) || strpos($ary['file'], 'error.php') != false ) {
 						$ary = next($trace);
 					}
 					$ary = current($trace);

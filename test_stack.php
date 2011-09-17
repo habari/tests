@@ -10,17 +10,31 @@ class StackTest extends UnitTestCase
 	
 	function test_stack_order()
 	{
-		Stack::add( 'test_stack', 'a',				'a' );
-		Stack::add( 'test_stack', 'after(a)',		'b', 'a' );
-		Stack::add( 'test_stack', 'after(b,d,f)',	'c', array('b','d','f') );
-		Stack::add( 'test_stack', 'after(b)',		'd', 'b' );
-		Stack::add( 'test_stack', 'after(b)',		'e', 'b' );
-		Stack::add( 'test_stack', 'after(b)',		'f', 'b' );
-		Stack::add( 'test_stack', 'after(e)',		'g', 'e');
+		Stack::add( 'test_stack', 'a', 'a' );
+		Stack::add( 'test_stack', 'b after(a)', 'b', 'a' );
 		$sorted = Stack::get_sorted_stack('test_stack');
-		$first = array_shift($sorted);
-		$this->output($sorted);
-		$this->assert_true( ($first == 'a') );
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a)' );
+
+		Stack::add( 'test_stack', 'c after(b,d,f)', 'c', array('b','d','f') );
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), c after(b,d,f)' );
+
+		Stack::add( 'test_stack', 'd after(b)', 'd', 'b' );
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), c after(b,d,f)' );
+
+		Stack::add( 'test_stack', 'e after(b)', 'e', 'b' );
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), c after(b,d,f), e after(b)' );
+
+		Stack::add( 'test_stack', 'f after(b)', 'f', 'b' );
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), e after(b), c after(b,d,f)' );
+
+		Stack::add( 'test_stack', 'g after(e)', 'g', 'e');
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), c after(b,d,f), e after(b), g after(e)' );
 	}
 }
 
