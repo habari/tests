@@ -9,7 +9,7 @@
 **/
 
 if( function_exists( 'getopt' ) ) {
-	$shortopts = 'r::o';
+	$shortopts = 'c::t::r::o';
 	$longopts = array();
 	$options = getopt($shortopts, $longopts);
 }
@@ -18,7 +18,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>''));
 	$options = array_merge($options, $querystring_options);
 }
 
@@ -203,10 +203,36 @@ class UnitTestCase
 		if(method_exists($this, 'module_setup')) {
 			$this->module_setup();
 		}
+		if(isset($options['t'])) {
+			$options['t'] = explode(',', $options['t']);
+			if(count($options['t']) == 0) {
+				unset($options['t']);
+			}
+		}
 
 		foreach($methods as $method) {
 			$this->messages = array();
 			$this->show_output = false;
+			$this->total_case_count++;
+
+			if(isset($options['t'])) {
+				$ref_method = new ReflectionMethod($this, $method);
+				$start_line = $ref_method->getStartLine();
+				$found = false;
+				foreach($options['t'] as $line) {
+					if($line > $ref_method->getStartLine() && $line < $ref_method->getEndLine()) {
+						$found = true;
+						break;
+					}
+					if(strtolower($ref_method->getName()) == strtolower($line)) {
+						$found = true;
+						break;
+					}
+				}
+				if(!$found) {
+					continue;
+				}
+			}
 
 			$this->pre_test();
 			if(method_exists($this, 'setup')) {
@@ -335,11 +361,27 @@ class UnitTestResults
 
 	function __toString()
 	{
-		if(defined('STDIN')) {
-			return $this->out_console();
+		global $options;
+		$default_output = defined('STDIN') ? 'console' : 'html';
+		if(isset($options['c'])) {
+			switch($options['c']) {
+				case 'console':
+				case 'c':
+					$default_output = 'console';
+					break;
+				case 'html':
+				case 'h':
+					$default_output = 'html';
+					break;
+			}
 		}
-		else {
-			return $this->out_html();
+		switch($default_output) {
+			case 'console':
+				header('content-type: text/plain');
+				return $this->out_console();
+			case 'html':
+				header('content-type: text/html');
+				return $this->out_html();
 		}
 	}
 
@@ -349,10 +391,15 @@ class UnitTestResults
 		$this->tests[$test] = $file;
 	}
 
+	function initial_results()
+	{
+		return array('total_case_count'=>0, 'case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
+	}
+
 	function out_html()
 	{
 		$has_output = false;
-		$totals = array('case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
+		$totals = $this->initial_results();
 
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
@@ -364,6 +411,11 @@ class UnitTestResults
 		$output = "<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><title>{$title}</title></head><body>";
 		foreach($this->tests as $test => $file) {
 			$output .= "<h1>{$test}<a href=\"{$file}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">{$file}</a></h1>";
+
+			if(!isset($this->methods[$test])) {
+				$this->methods[$test] = array();
+				$this->summaries[$test] = $this->initial_results();
+			}
 
 			foreach($this->methods[$test] as $methodname => $messages)
 			{
@@ -393,7 +445,7 @@ class UnitTestResults
 					$totals[$k] += $v;
 				}
 			}
-			$output .= "<div class=\"test complete\"><p>{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete tests.</p></div>";
+			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['total_case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete tests.</p></div>";
 		}
 
 		$output .= '<footer><h3>Results</h3>';
@@ -417,7 +469,7 @@ class UnitTestResults
 	function out_console()
 	{
 		$has_output = false;
-		$totals = array('case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
+		$totals = $this->initial_results();
 
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
@@ -428,8 +480,13 @@ class UnitTestResults
 
 		$output = array();
 		$output[] = "==== {$title} ====";
-		foreach($this->tests as $test) {
+		foreach($this->tests as $test => $file) {
 			$output[]= "\n=== {$test} ===";
+
+			if(!isset($this->methods[$test])) {
+				$this->methods[$test] = array();
+				$this->summaries[$test] = $this->initial_results();
+			}
 
 			foreach($this->methods[$test] as $methodname => $messages)
 			{
@@ -462,11 +519,11 @@ class UnitTestResults
 					$totals[$k] += $v;
 				}
 			}
-			$output[]= sprintf('\n%d tests complete. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', $summary['case_count'], $summary['fail_count'], $summary['pass_count'], $summary['exception_count'], $summary['incomplete_count']);
+			$output[]= sprintf("\n%d/%d tests complete.  %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.", $summary['case_count'], $summary['total_case_count'], $summary['fail_count'], $summary['pass_count'], $summary['exception_count'], $summary['incomplete_count']);
 		}
 
 		$output[]= "\n=== Results ===";
-		$output[]= sprintf('%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
+		$output[]= sprintf('%d units containing %d tests.  %d tests run.  %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', count($this->tests), $totals['total_case_count'], $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
 		if($has_output) {
 			$output[]= "\nSome tests have output.  Run again with -o to see output.";
 		}
