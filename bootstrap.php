@@ -196,7 +196,9 @@ class UnitTestCase
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
 		$cases = 0;
 
-		$results->test(get_class($this));
+		$class = new ReflectionClass( get_class( $this ) );
+
+		$results->test(get_class($this), $class->getFileName());
 
 		if(method_exists($this, 'module_setup')) {
 			$this->module_setup();
@@ -341,14 +343,16 @@ class UnitTestResults
 		}
 	}
 
-	function test($test)
+	function test($test, $file = null)
 	{
-		$this->tests[] = $test;
+		$file = ltrim(str_replace(dirname(__FILE__), '', $file), '\\/');
+		$this->tests[$test] = $file;
 	}
 
 	function out_html()
 	{
 		$has_output = false;
+		$totals = array('case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
 
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
@@ -358,8 +362,8 @@ class UnitTestResults
 		}
 
 		$output = "<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><title>{$title}</title></head><body>";
-		foreach($this->tests as $test) {
-			$output .= "<h1>{$test}</h1>";
+		foreach($this->tests as $test => $file) {
+			$output .= "<h1>{$test}<a href=\"{$file}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">{$file}</a></h1>";
 
 			foreach($this->methods[$test] as $methodname => $messages)
 			{
@@ -384,15 +388,22 @@ class UnitTestResults
 			}
 
 			$summary = $this->summaries[$test];
-			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.</p></div>";
-
-			if($has_output) {
-				$output .= "<div class=\"test complete\">Some tests have output.  <a href=\"?o=1\">Turn on the output option</a> to see output.";
+			foreach($summary as $k => $v) {
+				if(isset($totals[$k]) && is_numeric($v)) {
+					$totals[$k] += $v;
+				}
 			}
-
+			$output .= "<div class=\"test complete\"><p>{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete tests.</p></div>";
 		}
 
-		$output .= '<footer><h3>Options</h3><table>';
+		$output .= '<footer><h3>Results</h3>';
+		$output.= sprintf('<div class="all test complete">%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.</div>', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
+
+		if($has_output) {
+			$output .= "<div class=\"has_output\">Some tests have output.  <a href=\"?o=1\">Turn on the output option</a> to see output.</div>";
+		}
+
+		$output .= '<h3>Options</h3><table>';
 		foreach($this->options as $k => $v) {
 			$output .= "<tr><th>{$k}</th><td>{$v}</td></tr>";
 		}
@@ -406,6 +417,7 @@ class UnitTestResults
 	function out_console()
 	{
 		$has_output = false;
+		$totals = array('case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0);
 
 		if(count($this->tests) > 1) {
 			$title = "Test Results for " . count($this->tests) . " tests";
@@ -445,11 +457,18 @@ class UnitTestResults
 			}
 
 			$summary = $this->summaries[$test];
-			$output[]= "\n{$summary['case_count']}/{$summary['case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions. {$summary['incomplete_count']} incomplete.";
-
-			if($has_output) {
-				$output[]= "\nSome tests have output.  Run again with -o to see output.";
+			foreach($summary as $k => $v) {
+				if(isset($totals[$k]) && is_numeric($v)) {
+					$totals[$k] += $v;
+				}
 			}
+			$output[]= sprintf('\n%d tests complete. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', $summary['case_count'], $summary['fail_count'], $summary['pass_count'], $summary['exception_count'], $summary['incomplete_count']);
+		}
+
+		$output[]= "\n=== Results ===";
+		$output[]= sprintf('%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
+		if($has_output) {
+			$output[]= "\nSome tests have output.  Run again with -o to see output.";
 		}
 
 		$output[]= "\n=== Options ===";
