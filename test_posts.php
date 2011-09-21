@@ -10,9 +10,17 @@ class PostsTest extends UnitTestCase
 
 	protected $types = array('entry', 'page');
 	protected $statuses = array('published', 'draft');
+	protected $info_titles = array();
 
 	protected function module_setup()
 	{
+		$this->info_titles[] = 'This is a Post';
+		$this->info_titles[] = '';
+		$this->info_titles[] = 'I am not a Post';
+		$this->info_titles[] = 'Chili, The Breakfast of Champions';
+		$this->info_titles[] = 'More Cowbell!';
+		$this->info_titles[] = 'A Simple Test Post';
+
 		set_time_limit(0);
 
 		$this->posts = array();
@@ -158,20 +166,80 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_tag()
 	{
 		$this->mark_test_incomplete();
-//		 tag
-//		 tag_slug
-//		 all:tag
-//		 not:tag
+//		tags:term_display
+//		tags:term
+//		tags:all:term_display
+//		tags:all:term
+//		tags:not:term_display
+//		tags:not:term
 	}
 
 	public function test_get_posts_by_info()
 	{
+		// has:info
+
+		// all:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'comments_disabled' AND pi1.value = 1
+					WHERE
+						pi1.name <> ''
+		;" );
+		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'comments_disabled' AND pi1.value = 1
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'html_title' AND pi2.value = 'Chili, The Breakfast of Champions'
+					WHERE
+						pi1.name <> '' AND
+						pi2.name <> ''
+		;" );
+		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+		//Utils::debug( $query );die();
+
+		// any:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'comments_disabled' AND
+					pi1.value = 1
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'html_title' AND
+					pi2.value = 'Chili, The Breakfast of Champions'
+					WHERE
+						pi1.name <> '' OR
+						pi2.name <> ''
+		;" );
+		$count_posts = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+		$query = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+		//Utils::debug( $count, $count_posts, $query );die();
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'html_title' AND
+					pi1.value IN ( 'Chili, The Breakfast of Champions', 'This is a Post' )
+					WHERE
+						pi1.name <> ''
+		;" );
+		$count_posts = Posts::get( array( 'any:info' => array( 'html_title' => array( 'Chili, The Breakfast of Champions', 'This is a Post' ) ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		// not:all:info
+		// not:any:info
 		$this->mark_test_incomplete();
-//		 has:info
-//		 all:info
-//		 any:info
-//		 not:all:info
-//		 not:any:info
 	}
 
 	/*
@@ -179,7 +247,9 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_tag_and_info()
 	{
-		$got = Posts::get( array( 'tag' => 'one', 'has:info' => 'test', 'orderby' => 'ABS(info_test_value) DESC' ) );
+//		$got = Posts::get( array( 'tags:term' => 'one', 'has:info' => array( 'posts_test' => 'test' ), 'orderby' => 'ABS(info_test_value) DESC' ) );
+//		$got = Posts::get( array( 'tags:term' => 'one', 'all:info' => array( 'posts_test' => 'test' ) ) );
+		$this->mark_test_incomplete();
 	}
 
 	public function test_get_posts_by_where()
@@ -221,6 +291,13 @@ class PostsTest extends UnitTestCase
 			'pubdate' => HabariDateTime::date_create( $time ),
 		));
 		$post->info->posts_test = true;
+		$post->info->comments_disabled = rand( 0, 1 );
+
+		$max = count( $this->info_titles ) - 1;
+		if( rand( 0, 1) == 1 ) {
+
+			$post->info->html_title = $this->info_titles[rand(0, $max )];
+		}
 		$post->info->commit();
 
 		return $post;
