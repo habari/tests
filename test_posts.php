@@ -177,6 +177,33 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_info()
 	{
 		// has:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'comments_disabled'
+					WHERE
+						pi1.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'has:info' => array( 'comments_disabled' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'comments_disabled'
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'html_title'
+					WHERE
+						pi1.name <> '' OR
+						pi2.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'has:info' => array( 'comments_disabled', 'html_title' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+//		$query = Posts::get( array( 'has:info' => array( 'comments_disabled', 'html_title' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		Utils::debug( $query );die();
 
 		// all:info
 		$count = DB::get_value(
@@ -222,7 +249,7 @@ class PostsTest extends UnitTestCase
 		" );
 		$count_posts = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
-		$query = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts}
 				LEFT JOIN {postinfo} pi1 ON
@@ -260,8 +287,6 @@ class PostsTest extends UnitTestCase
 		" );
 		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
-//		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
-//		Utils::debug( $query );die();
 
 		// not:any:info
 		$count = DB::get_value(
@@ -286,8 +311,6 @@ class PostsTest extends UnitTestCase
 		$this->assert_equal( $count_posts, $count );
 //		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
 //		Utils::debug( $query );die();
-
-		$this->mark_test_incomplete( 'All tests not implemented' );
 	}
 
 	/*
