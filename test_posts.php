@@ -204,7 +204,6 @@ class PostsTest extends UnitTestCase
 		" );
 		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
-		//Utils::debug( $query );die();
 
 		// any:info
 		$count = DB::get_value(
@@ -224,7 +223,6 @@ class PostsTest extends UnitTestCase
 		$count_posts = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 		$query = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
-		//Utils::debug( $count, $count_posts, $query );die();
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts}
 				LEFT JOIN {postinfo} pi1 ON
@@ -242,7 +240,7 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 )
+						WHERE ( name = 'comments_disabled' AND value = 1 )
 						GROUP BY post_id
 						HAVING COUNT(*) = 1
 				)
@@ -254,18 +252,41 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 OR
-						 {postinfo}.name = 'html_title' AND {postinfo}.value = 'Chili, The Breakfast of Champions' )
+						WHERE ( name = 'comments_disabled' AND value = 1 OR
+						 name = 'html_title' AND value = 'Chili, The Breakfast of Champions' )
 						GROUP BY post_id
 						HAVING COUNT(*) = 2
 				)
 		" );
 		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
-//		$query = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
 //		Utils::debug( $query );die();
 
 		// not:any:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 )
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 OR
+						 {postinfo}.name = 'html_title' AND {postinfo}.value = 'Chili, The Breakfast of Champions' )
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+//		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		Utils::debug( $query );die();
+
 		$this->mark_test_incomplete( 'All tests not implemented' );
 	}
 
