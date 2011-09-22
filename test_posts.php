@@ -186,7 +186,7 @@ class PostsTest extends UnitTestCase
 					pi1.name = 'comments_disabled' AND pi1.value = 1
 					WHERE
 						pi1.name <> ''
-		;" );
+		" );
 		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
@@ -201,7 +201,7 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> '' AND
 						pi2.name <> ''
-		;" );
+		" );
 		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 		//Utils::debug( $query );die();
@@ -220,7 +220,7 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> '' OR
 						pi2.name <> ''
-		;" );
+		" );
 		$count_posts = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 		$query = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
@@ -233,13 +233,40 @@ class PostsTest extends UnitTestCase
 					pi1.value IN ( 'Chili, The Breakfast of Champions', 'This is a Post' )
 					WHERE
 						pi1.name <> ''
-		;" );
+		" );
 		$count_posts = Posts::get( array( 'any:info' => array( 'html_title' => array( 'Chili, The Breakfast of Champions', 'This is a Post' ) ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		// not:all:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 )
+						GROUP BY post_id
+						HAVING COUNT(*) = 1
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 OR
+						 {postinfo}.name = 'html_title' AND {postinfo}.value = 'Chili, The Breakfast of Champions' )
+						GROUP BY post_id
+						HAVING COUNT(*) = 2
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+//		$query = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		Utils::debug( $query );die();
+
 		// not:any:info
-		$this->mark_test_incomplete();
+		$this->mark_test_incomplete( 'All tests not implemented' );
 	}
 
 	/*
