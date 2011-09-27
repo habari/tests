@@ -4,14 +4,9 @@ include 'bootstrap.php';
 
 class UserGroupTest extends UnitTestCase
 {
-
 	function test_creategroup()
 	{
 		$user = User::create( array( 'username' => 'testcaseuser', 'email' => 'test@example.com', 'password' => 'test') );
-		$this->assert_true(
-			$user instanceof User,
-			'Could not create test user.'
-		);
 
 		$group = UserGroup::create( array( 'name' => 'new test group' ) );
 		$this->assert_true(
