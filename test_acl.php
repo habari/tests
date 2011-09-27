@@ -6,7 +6,7 @@ class ACLTest extends UnitTestCase {
 	private $acl_group;
 	private $acl_user_alice;
 	private $acl_user_bob;
-	
+
 	public function setup()
 	{
 		// create test group and user
@@ -25,7 +25,12 @@ class ACLTest extends UnitTestCase {
 			ACL::token_exists( 'acltest' ),
 			'Could not create acltest permission.'
 		);
-		
+
+		$this->assert_true(
+			ACL::token_exists( 'acLtEst ' ),
+			'Permission names are not normalized.'
+		);
+
 		$token_id = ACL::token_id( 'acltest' );
 
 		ACL::grant_group( $this->acl_group->id, $token_id, 'full' );
@@ -33,7 +38,7 @@ class ACLTest extends UnitTestCase {
 			$this->acl_group->can( 'acltest', 'full' ),
 			'Could not grant acltest permission to acltest-group.'
 		);
-		
+
 		ACL::revoke_group_token( $this->acl_group->id, $token_id );
 		$this->assert_false(
 			ACL::group_can( $this->acl_group->id, $token_id, 'full' ),
@@ -46,7 +51,7 @@ class ACLTest extends UnitTestCase {
 			$this->acl_group->can( 'acltest', 'full' ),
 			'Could not grant acltest permission to acltest-group through UserGroup call.'
 		);
-		
+
 		// full > read/edit
 		$this->assert_true(
 			$this->acl_group->can( 'acltest', 'read' ),
@@ -74,9 +79,9 @@ class ACLTest extends UnitTestCase {
 			$this->acl_user_alice->can( 'acltest', 'full' ),
 			'Could not grant acltest permission to user.'
 		);
-		
+
 		$this->acl_user_alice->revoke( 'acltest' );
-		
+
 		// check that members of a group inherit that group's permissions
 		$this->acl_group->grant( 'acltest', 'full' );
 		$this->assert_true(
