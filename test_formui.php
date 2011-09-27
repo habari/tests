@@ -89,17 +89,17 @@ class FormUITest extends UnitTestCase
 		$form = new FormUI('test8');
 		$form->append('text', 'firstname', 'username', 'Firstname:');
 		$form->append('submit', 'save', 'Save');
-		$form->on_success( array ( $this, 'my_callback1' ), 'Bob' );
+		$form->on_success( array( $this, 'my_callback1' ), 'Bob' );
 		$form->out();
 	}
 
-	function my_callback1($form, $special_name)
+	function my_callback1( $form, $special_name )
 	{
 		$this->pass_check('callback');
-	  // Perform normal save routines
-	  $form->save();
-	  // Display the form normally with the default confirmation message
-	  return false;
+		// Perform normal save routines
+		$form->save();
+		// Display the form normally with the default confirmation message
+		return false;
 	}
 
 	function test_form_post_processing2()
@@ -115,39 +115,39 @@ class FormUITest extends UnitTestCase
 		$form->out();
 	}
 
-  function filter_my_callback($success_html, $form, $special_name)
+	function filter_my_callback($success_html, $form, $special_name)
 	{
 		$this->pass_check('callback');
-	  // Perform normal save routines
-	  $form->save();
+		// Perform normal save routines
+		$form->save();
 
-	  $success_html = 'OK';
-    return $success_html;
-  }
+		$success_html = 'OK';
+		return $success_html;
+	}
 
-  function test_using_form_values()
+	function test_using_form_values()
 	{
-  	$form = $this->get_form1();
-  	$this->assert_true($form->about == 'About my site');
-  }
+		$form = $this->get_form1();
+		$this->assert_true($form->about == 'About my site');
+	}
 
-  function get_form1()
+	function get_form1()
 	{
-  	$form = new FormUI('test10');
+		$form = new FormUI('test10');
 		$form->append('text', 'about', 'test__about', 'About');
 		return $form;
-  }
+	}
 
-  function test_create_a_custom_control()
+	function test_create_a_custom_control()
 	{
 		Plugins::register(array($this, 'filter_available_templates'), 'filter', 'available_templates');
 		Plugins::register(array($this, 'filter_include_template_file'), 'filter', 'include_template_file');
 		$this->check('template', 'Template not loaded.');
 
-  	$form = new FormUI('test10');
+		$form = new FormUI('test10');
 		$form->append('custom', 'test', 'test__about', 'About');
 		$form->out();
-  }
+	}
 
 	function filter_available_templates( $list )
 	{
@@ -159,7 +159,7 @@ class FormUITest extends UnitTestCase
 	{
 		if($template == 'my_special_control_template') {
   		$this->pass_check('template');
-  		return dirname(__FILE__) . '/formcontrol_custom2.php';
+  		return dirname(__FILE__) . '/data/formcontrol_custom2.php';
 		}
 		return $filename;
 	}
@@ -173,15 +173,14 @@ class FormUITest extends UnitTestCase
 }
 
 if(class_exists('FormUI')):
-
-class FormControlCustom extends FormControl {
-  function get( $forvalidation = true ) {
-    // Get the theme object to use to render this control
-    $theme = $this->get_theme( $forvalidation );
-    // Tell the theme what template to render for this control
-    return $theme->fetch( 'my_special_control_template' );
-  }
-}
+	class FormControlCustom extends FormControl {
+		function get( $forvalidation = true ) {
+			// Get the theme object to use to render this control
+			$theme = $this->get_theme( $forvalidation );
+			// Tell the theme what template to render for this control
+			return $theme->fetch( 'my_special_control_template' );
+		}
+	}
 
 endif;
 

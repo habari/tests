@@ -1,12 +1,12 @@
 <?php
 
-require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
+include 'bootstrap.php';
 
-class system_classes_PostTest extends PHPUnit_Framework_TestCase
+class PostTest extends UnitTestCase
 {
 	protected $user;
 
-	protected function setUp()
+	protected function module_setup()
 	{
 		set_time_limit(0);
 
@@ -22,7 +22,7 @@ class system_classes_PostTest extends PHPUnit_Framework_TestCase
 
 	}
 
-	protected function tearDown()
+	protected function module_teardown()
 	{
 		$posts = Posts::get( array('user_id' => $this->user->id ));
 		foreach ( $posts as $post ) {
@@ -46,15 +46,18 @@ class system_classes_PostTest extends PHPUnit_Framework_TestCase
 		);
 		$post = Post::create($params);
 
-		$this->assertType('Post', $post, 'Post should be created.');
+		$this->assert_true( $post instanceof Post, 'Post should be created.' );
 
 		// Check the post's id is set.
-		$this->assertGreaterThan(0, (int)$post->id, 'The Post id should be greater than zero');
+		$this->assert_true( (int)$post->id > 0, 'The Post id should be greater than zero' );
 
 		// Check the post's tags are usable.
-		$this->assertEquals(count($post->tags), count($tags), 'All tags should have been created.');
+		$this->assert_equal(count($post->tags), count($tags), 'All tags should have been created.');
 		foreach ( $post->tags as $tag ) {
-			$this->assertEquals($tag->tag_slug, Utils::slugify($tag->tag_text), 'Tags key should be slugified tag.');
+			$this->assert_equal($tag->tag_slug, Utils::slugify($tag->tag_text), 'Tags key should be slugified tag.');
+		}
+		foreach( $post->tags as $tag ) {
+			Tags::vocabulary()->delete_term( $tag );
 		}
 
 	}
@@ -73,14 +76,15 @@ class system_classes_PostTest extends PHPUnit_Framework_TestCase
 		);
 		$post = Post::create($params);
 
-		$this->assertTrue( 'test_type' == $post->typename, "Post content type should be 'test_type'." );
-		$this->assertFalse( Post::delete_post_type( 'test_type' ), "Post still exists with the content type 'test_type'" );
+		$this->assert_true( 'test_type' == $post->typename, "Post content type should be 'test_type'." );
+		$this->assert_false( Post::delete_post_type( 'test_type' ), "Post still exists with the content type 'test_type'" );
 
 		$post->delete();
-		$this->assertTrue( Post::delete_post_type( 'test_type' ), "No posts exist with the content type 'test_type'" );
+		$this->assert_true( Post::delete_post_type( 'test_type' ), "No posts exist with the content type 'test_type'" );
 
 	}
 
 }
+PostTest::run_one( 'PostTest' );
 
 ?>

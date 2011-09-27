@@ -1,5 +1,6 @@
 <?php
-require_once dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR . 'phpunit_bootstrap.php';
+
+include 'bootstrap.php';
 
 /**
  * class to get fields/newfields to test logic
@@ -18,9 +19,9 @@ class TestQueryRecord extends QueryRecord
 }
 
 /**
- * Test class for Comment.
+ * Test class for QueryRecord.
  */
-class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
+class QueryRecordTest extends UnitTestCase
 {
 	protected $queryrecord;
 	protected $test_data = array(
@@ -44,33 +45,27 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 */
-	protected function setUp()
+	protected function setup()
 	{
-		$this->queryrecord = new QueryRecord($this->test_data);
+		$this->queryrecord = new QueryRecord( $this->test_data );
 	}
 
 	/**
 	 * Tears down the fixture, for example, closes a network connection.
 	 * This method is called after a test is executed.
 	 */
-	protected function tearDown()
+	protected function teardown()
 	{
 		unset( $this->queryrecord );
 	}
 
-	/**
-	 * 
-	 */
 	public function test__get()
 	{
 		foreach ( $this->test_data as $key => $val ) {
-			$this->assertEquals( $val, $this->queryrecord->$key );
+			$this->assert_equal( $val, $this->queryrecord->$key );
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public function test__set()
 	{
 		$setqueryrecord = new QueryRecord();
@@ -79,66 +74,57 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 		}
 		// test contruct and __set match
 		foreach ( $this->test_data as $key => $val ) {
-			$this->assertEquals( $this->queryrecord->$key, $setqueryrecord->$key );
+			$this->assert_equal( $this->queryrecord->$key, $setqueryrecord->$key );
 		}
 		// test __set matches
 		foreach ( $this->test_data as $key => $val ) {
-			$this->assertEquals( $val, $setqueryrecord->$key );
+			$this->assert_equal( $val, $setqueryrecord->$key );
 		}
 	}
 
-	/**
-	 *
-	 */
 	public function test__isset() {
 		foreach ( $this->test_data as $key => $val ) {
 			switch ($key) {
 				case 'null':
-					$this->assertFalse( isset( $this->queryrecord->$key ), "isset( '$key' )" );
+					$this->assert_false( isset( $this->queryrecord->$key ), "isset( '$key' )" );
 					break;
 				default:
-					$this->assertTrue( isset( $this->queryrecord->$key ), "isset( '$key' )" );
+					$this->assert_true( isset( $this->queryrecord->$key ), "isset( '$key' )" );
 					break;
 			}
 		}
 	}
 
-	/**
-	 *
-	 */
-	public function testNewfields__construct()
+	public function test_newfields__construct()
 	{
-		$testqueryrecord = new TestQueryRecord($this->test_data);
+		$testqueryrecord = new TestQueryRecord( $this->test_data );
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
 
-		$this->assertEquals( array(), $newfields );
+		$this->assert_equal( array(), $newfields );
 
 		// make sure new vals are in newfields
 		$new_val = 'newbar';
-		foreach ( array_keys($this->test_data) as $key ) {
+		foreach ( array_keys( $this->test_data ) as $key ) {
 			$testqueryrecord->$key = $new_val;
 		}
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
 		foreach ( $this->test_data as $key => $val ) {
-			$this->assertEquals( $new_val, $newfields[$key] );
-			$this->assertEquals( $val, $fields[$key] );
+			$this->assert_equal( $new_val, $newfields[$key] );
+			$this->assert_equal( $val, $fields[$key] );
 		}
 
 		// make sure brand new field goes in newfield
 		$testqueryrecord->pony = 'ponies';
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
-		$this->assertTrue( isset( $newfields['pony'] ) );
-		$this->assertEquals( 'ponies', $newfields['pony'] );
-		$this->assertTrue( !isset( $fields['pony'] ) );
+		$this->assert_true( isset( $newfields['pony'] ) );
+		$this->assert_equal( 'ponies', $newfields['pony'] );
+		$this->assert_true( !isset( $fields['pony'] ) );
 	}
 
-	/**
-	 *
-	 */
-	public function testNewfields__set()
+	public function test_newfields__set()
 	{
 		$testqueryrecord = new TestQueryRecord;
 		foreach ( $this->test_data as $key => $val ) {
@@ -147,91 +133,76 @@ class system_classes_QueryRecordTest extends PHPUnit_Framework_TestCase
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
 
-		$this->assertEquals( array(), $newfields );
+		$this->assert_equal( array(), $newfields );
 
 		// make sure new vals are in newfields
 		$new_val = 'newbar';
-		foreach ( array_keys($this->test_data) as $key ) {
+		foreach ( array_keys( $this->test_data ) as $key ) {
 			$testqueryrecord->$key = $new_val;
 		}
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
 		foreach ( $this->test_data as $key => $val ) {
-			$this->assertEquals( $new_val, $newfields[$key] );
-			$this->assertEquals( $val, $fields[$key] );
+			$this->assert_equal( $new_val, $newfields[$key] );
+			$this->assert_equal( $val, $fields[$key] );
 		}
 
 		// make sure brand new field goes in newfield
 		$testqueryrecord->pony = 'ponies';
 		$fields = $testqueryrecord->get_fields();
 		$newfields = $testqueryrecord->get_newfields();
-		$this->assertTrue( isset( $newfields['pony'] ) );
-		$this->assertEquals( 'ponies', $newfields['pony'] );
-		$this->assertTrue( !isset( $fields['pony'] ) );
+		$this->assert_true( isset( $newfields['pony'] ) );
+		$this->assert_equal( 'ponies', $newfields['pony'] );
+		$this->assert_true( !isset( $fields['pony'] ) );
 	}
 
-	/**
-	 *
-	 */
-	public function testExclude_fields()
+	public function test_exclude_fields()
 	{
-		$fields = array('id', 'null');
-		$this->queryrecord->exclude_fields($fields);
+		$fields = array( 'id', 'null' );
+		$this->queryrecord->exclude_fields( $fields );
 		$excluded = $this->queryrecord->list_excluded_fields();
 		foreach ( $fields as $field ) {
-			$this->assertTrue( isset( $excluded[$field] ) );
+			$this->assert_true( isset( $excluded[$field] ) );
 		}
 
 		$field = 'id';
-		$this->queryrecord->exclude_fields($field);
+		$this->queryrecord->exclude_fields( $field );
 		$excluded = $this->queryrecord->list_excluded_fields();
-		$this->assertTrue( isset( $excluded[$field] ) );
+		$this->assert_true( isset( $excluded[$field] ) );
 	}
 
-	/**
-	 *
-	 */
-	public function testTo_array()
+	public function test_to_array()
 	{
-		$this->assertEquals( $this->test_data, $this->queryrecord->to_array() );
+		$this->assert_equal( $this->test_data, $this->queryrecord->to_array() );
 	}
 
-	/**
-	 * 
-	 */
-	public function testGet_url_args()
+	public function test_get_url_args()
 	{
-		$this->assertEquals( $this->test_data, $this->queryrecord->get_url_args() );
+		$this->assert_equal( $this->test_data, $this->queryrecord->get_url_args() );
 	}
 
 	/**
-	 * @todo Implement testInsert().
+	 * @todo Implement test_insert().
 	 */
-	public function testInsert() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+	public function test_insert() {
+		$this->mark_test_incomplete();
 	}
 	
 	/**
 	 * @todo Implement testUpdate().
 	 */
-	public function testUpdate() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+	public function test_update() {
+		$this->mark_test_incomplete();
 	}
 
 	/**
-	 * @todo Implement testDelete().
+	 * @todo Implement test_delete().
 	 */
-	public function testDelete() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
+	public function test_delete() {
+		$this->mark_test_incomplete();
 	}
 }
+
+QueryRecordTest::run_one( 'QueryRecordTest' );
+
 ?>
