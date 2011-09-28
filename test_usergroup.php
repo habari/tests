@@ -114,7 +114,7 @@ class UserGroupTest extends UnitTestCase
 	public function test_addtogroup()
 	{
 		$group = UserGroup::get( "new test group" );
-		$this->group->add( 'alice' ); // need to also test by ID
+		$this->group->add( 'alice' ); // @TODO: test by ID
 
 		$this->assert_true(
 			in_array( $this->user_alice->id, $group->members ),
@@ -128,8 +128,7 @@ class UserGroupTest extends UnitTestCase
 			in_array( $this->user_carl->id, $group->members ),
 			'Array of users not added to group.'
 		);
-
-		// should check in ->member_ids also
+		// @TODO: Look in ->member_ids also?
 	}
 
 	public function test_removefromgroup()
@@ -154,27 +153,87 @@ class UserGroupTest extends UnitTestCase
 			in_array( $this->user_bob->id, $group->members ) and in_array( $this->user_carl->id, $group->members ),
 			'Array of users not removed from group.'
 		);
-		// should check in ->member_ids also
+		// @TODO: Look in ->member_ids also?
+	}
+
+	public function setup_acl()
+	{
+		ACL::create_token( 'test permission', 'A permission for test cases', 'Administration' );
+		ACL::create_token( 'test deny permission', 'A permission for test cases', 'Administration' );
+
+		$this->group->add( 'alice' );
+		$this->group->grant( 'test permission' );
+		$this->group->deny( 'test deny permission' );
+	}
+
+	public function teardown_acl()
+	{
+		ACL::destroy_token( 'test permission' );
+		ACL::destroy_token( 'test deny permission' );
 	}
 
 	public function test_grantgroup()
 	{
-		$this->mark_test_incomplete();
+		self::setup_acl();
+
+		$this->assert_true(
+			in_array( ACL::token_id( 'test permission' ), array_keys( $this->group->permissions ) ),
+			'The group does not have the new permission.'
+		);
+
+		$this->assert_true(
+			$this->user_alice->can( 'test permission' ),
+			'A group user does not have a permission granted to the group.'
+		);
+		self::teardown_acl();
 	}
 
 	public function test_denygroup()
 	{
-		$this->mark_test_incomplete();
+		self::setup_acl();
+
+		$group = UserGroup::get( "new test group" );
+		$this->assert_false(
+			in_array( ACL::token_id( 'test deny permission' ), array_keys( $group->permissions ) ),
+			'The group has a denied permission.'
+		);
+		self::teardown_acl();
 	}
 
 	public function test_revokegroup()
 	{
-		$this->mark_test_incomplete();
+		self::setup_acl();
+
+		$group = UserGroup::get( "new test group" );
+		$this->assert_true(
+			in_array( ACL::token_id( 'test permission' ), array_keys( $group->permissions ) ),
+			'The group does not have the new permission.'
+		);
+		$group->revoke( ACL::token_id( 'test permission' ) ); // @TODO: test by name
+
+		$group = UserGroup::get( "new test group" );
+		$this->assert_false(
+			in_array( ACL::token_id( 'test permission' ), array_keys( $group->permissions ) ),
+			'The group still has the revoked permission.'
+		);
+
+		self::teardown_acl();
 	}
 
 	public function test_groupcan()
 	{
-		$this->mark_test_incomplete();
+		self::setup_acl();
+
+		$this->assert_true(
+			$this->group->can( "test permission" ),
+			'The group does not have the new permission.'
+		);
+
+		$this->assert_false(
+			$this->group->can( "test deny permission" ),
+			'The group is not denied the new permission.'
+		);
+		self::teardown_acl();
 	}
 
 	public function test_groupgetaccess()
@@ -291,54 +350,30 @@ class UserGroupTest extends UnitTestCase
 
 	public function test_memberofgroup()
 	{
-		$this->mark_test_incomplete();
-	}
+		$group = UserGroup::get( "new test group" );
 
-/*	public function test_creategroup() // grant/deny parts of this need to be broken out of this
-	{
-		$user = User::create( array( 'username' => 'testcaseuser', 'email' => 'test@example.com', 'password' => 'test') );
-
-		$group = UserGroup::create( array( 'name' => 'new test group' ) );
-		$user = $this->user_alice;
-		$group = $this->group;
+		// Add Alice to the group.
+		$group->add( 'alice' );
 		$this->assert_true(
-			$group instanceof UserGroup,
-			'Could not create a new group named "new test group".'
+			$group->member( $this->user_alice->id ),
+			'Unable to find user added to test group.'
+		);
+		$this->assert_true(
+			$group->member( 'alice' ),
+			'Unable to find user added to test group.'
 		);
 
-		ACL::create_token( 'test permission', 'A permission for test cases', 'Administration' );
-		ACL::create_token( 'test deny permission', 'A permission for test cases', 'Administration' );
-
-		$group->add( 'group_alice' );
-		$group->grant( 'test permission' );
-		$group->deny( 'test deny permission' );
-		$group->update();
-
-		$newgroup = UserGroup::get( 'new test group' );
-
-		$this->assert_true(
-			in_array( ACL::token_id( 'test permission' ), array_keys( $newgroup->permissions ) ),
-			'The group does not have the new permission.'
-		);
-
-		$this->assert_true(
-			ACL::group_can( 'new test group', 'test permission' ),
-			'The group does not have the new permission.'
-		);
-
+		// Bob should not have been added to the group.
 		$this->assert_false(
-			ACL::group_can( 'new test group', 'test deny permission' ),
-			'The group has a denied permission.'
+			$group->member( $this->user_bob->id ),
+			'User not in test group should not be a member.'
+		);
+		$this->assert_false(
+			$group->member( 'bob' ),
+			'User not in test group should not be a member.'
 		);
 
-		$this->assert_true(
-			$user->can( 'test permission' ),
-			'The user does not have a permission his group has been granted.'
-		);
-
-		ACL::destroy_token( 'test permission' );
-		ACL::destroy_token( 'test deny permission' );
-	} */
+	}
 
 	public function teardown()
 	{
