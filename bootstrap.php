@@ -429,7 +429,9 @@ class UnitTestResults
 			$title = "Test Results for " . reset($this->tests);
 		}
 
-		$output = "<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><title>{$title}</title></head><body>";
+		$output = "<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><title>{$title}</title>" .
+			'<link rel="stylesheet" type="text/css" href="style.css">' .
+			"</head><body>";
 		foreach($this->tests as $test => $file) {
 			$output .= "<h1>{$test}<a href=\"{$file}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">{$file}</a></h1>";
 
