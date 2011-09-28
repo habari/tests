@@ -20,7 +20,7 @@ class UserGroupTest extends UnitTestCase
 		$this->user_carl = User::create( array( 'username' => 'carl' ) );
 	}
 
-	public function test_creategroup()
+	public function test_create()
 	{
 		// group should have been created in the setup
 		$this->assert_true(
@@ -45,10 +45,7 @@ class UserGroupTest extends UnitTestCase
 			'Plugin hook illogically prevented creation of a new group.'
 		);
 		$second_group->delete();
-	}
 
-	public function test_createduplicategroup() // probably should be part of the previous one
-	{
 		// Can I create two groups with the same name?
 		$group = UserGroup::create( array( 'name' => 'new dupe group' ) );
 		$group2 = UserGroup::create( array( 'name' => 'new dupe group' ) );
@@ -70,12 +67,12 @@ class UserGroupTest extends UnitTestCase
 		return $this->allow_filter;
 	}
 
-	public function test_updategroup()
+	public function test_update()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_deletegroup()
+	public function test_delete()
 	{
 		$group = UserGroup::get( "new test group" );
 
@@ -111,7 +108,7 @@ class UserGroupTest extends UnitTestCase
 		return $this->allow_filter;
 	}
 
-	public function test_addtogroup()
+	public function test_add()
 	{
 		$group = UserGroup::get( "new test group" );
 		$this->group->add( 'alice' ); // @TODO: test by ID
@@ -131,7 +128,7 @@ class UserGroupTest extends UnitTestCase
 		// @TODO: Look in ->member_ids also?
 	}
 
-	public function test_removefromgroup()
+	public function test_remove()
 	{
 		$group = UserGroup::get( "new test group" );
 		$this->group->add( array( 'alice', 'bob', 'carl' ) );
@@ -172,7 +169,7 @@ class UserGroupTest extends UnitTestCase
 		ACL::destroy_token( 'test deny permission' );
 	}
 
-	public function test_grantgroup()
+	public function test_grant()
 	{
 		self::setup_acl();
 
@@ -188,7 +185,7 @@ class UserGroupTest extends UnitTestCase
 		self::teardown_acl();
 	}
 
-	public function test_denygroup()
+	public function test_deny()
 	{
 		self::setup_acl();
 
@@ -200,7 +197,7 @@ class UserGroupTest extends UnitTestCase
 		self::teardown_acl();
 	}
 
-	public function test_revokegroup()
+	public function test_revoke()
 	{
 		self::setup_acl();
 
@@ -220,7 +217,7 @@ class UserGroupTest extends UnitTestCase
 		self::teardown_acl();
 	}
 
-	public function test_groupcan()
+	public function test_can()
 	{
 		self::setup_acl();
 
@@ -236,22 +233,22 @@ class UserGroupTest extends UnitTestCase
 		self::teardown_acl();
 	}
 
-	public function test_groupgetaccess()
+	public function test_get_access()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_cleargrouppermissionscache()
+	public function test_clear_permissions_cache()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_loadgrouppermissionscache()
+	public function test_load_permissions_cache()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getgroup()
+	public function test_get()
 	{
 		$group = UserGroup::get( "new test group" ); // ::get_by_name()
 		$this->assert_true(
@@ -276,7 +273,7 @@ class UserGroupTest extends UnitTestCase
 		);
 	}
 
-	public function test_groupexists()
+	public function test_exists()
 	{
 		$this->assert_true(
 			UserGroup::exists( "new test group" ),
@@ -300,7 +297,7 @@ class UserGroupTest extends UnitTestCase
 		);
 	}
 
-	public function test_groupname()
+	public function test_name()
 	{
 		$this->assert_equal( // silly, but the code would allow it
 			UserGroup::name( "new test group" ), "new test group",
@@ -324,7 +321,7 @@ class UserGroupTest extends UnitTestCase
 		);
 	}
 
-	public function test_groupid()
+	public function test_id()
 	{
 		$group = UserGroup::get( "new test group" );
 		$this->assert_equal(
@@ -348,7 +345,7 @@ class UserGroupTest extends UnitTestCase
 		);
 	}
 
-	public function test_memberofgroup()
+	public function test_member()
 	{
 		$group = UserGroup::get( "new test group" );
 

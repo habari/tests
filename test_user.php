@@ -12,17 +12,17 @@ class UserTest extends UnitTestCase
 
 	}
 
-	public function test_anonymoususer()
+	public function test_anonymous()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_identifyuser()
+	public function test_identify()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_createuser()
+	public function test_create() // also tests insert()
 	{
 		$this->assert_true(
 			$this->user instanceof User,
@@ -32,109 +32,109 @@ class UserTest extends UnitTestCase
 		// @TODO: test action_user_insert_allow
 	}
 
-	public function test_updateuser()
+	public function test_update()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_deleteuser()
+	public function test_delete()
 	{
 		$this->mark_test_incomplete();
 
 		// @TODO: test action_user_delete_allow
 	}
 
-	public function test_rememberuser()
+	public function test_remember()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_forgetuser()
+	public function test_forget()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_authenticateuser()
+	public function test_authenticate()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getuser()
+	public function test_get()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getuserid()
+	public function test_get_id()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_countuserposts()
+	public function test_count_posts()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_commenteruser()
+	public function test_commenter()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_usercan()
+	public function test_can()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_usercanany()
+	public function test_can_any()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_usercannot()
+	public function test_cannot()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_grantuser()
+	public function test_grant()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_denyuser()
+	public function test_deny()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_revokeuser()
+	public function test_revoke()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_listusergroups()
+	public function test_list_groups()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_useringroup()
+	public function test_in_group()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_addusertogroup()
+	public function test_add_to_group()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_removeuserfromgroup()
+	public function test_remove_from_group()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getuserinfo()
+	public function test_get_info()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getuserurlargs()
+	public function test_get_url_args()
 	{
 		$this->mark_test_incomplete();
 	}

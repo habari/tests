@@ -9,12 +9,12 @@ class UserGroupsTest extends UnitTestCase
 
 	}
 
-	public function test_getgroups()
+	public function test_get()
 	{
 		$this->mark_test_incomplete();
 	}
 
-	public function test_getallgroups()
+	public function test_get_all()
 	{
 		$this->mark_test_incomplete();
 	}
