@@ -206,26 +206,87 @@ class UserGroupTest extends UnitTestCase
 			"Could not retrieve group with id {$group->id}."
 		);
 
-		$invalid_group = UserGroup::get( "nonexistent test group" );
 		$this->assert_false(
-			$invalid_group,
-			'Was able to retrieve a nonexistent group.'
+			UserGroup::get( "nonexistent test group" ),
+			'Was able to retrieve a nonexistent group by name.'
+		);
+
+		$this->assert_false(
+			UserGroup::get( -1 ),
+			'Was able to retrieve a nonexistent group by ID.'
 		);
 	}
 
 	public function test_groupexists()
 	{
-		$this->mark_test_incomplete();
+		$this->assert_true(
+			UserGroup::exists( "new test group" ),
+			'Cannot confirm existence of "new test group".'
+		);
+
+		$group = UserGroup::get( "new test group" );
+		$this->assert_true(
+			UserGroup::exists( $group->id ),
+			'Cannot confirm existence of "new test group".'
+		);
+
+		$this->assert_false(
+			UserGroup::exists( "nonexistent test group" ),
+			'A nonexistent group should not exist.'
+		);
+
+		$this->assert_false(
+			UserGroup::exists( -1 ),
+			'A nonexistent group should not exist.'
+		);
 	}
 
 	public function test_groupname()
 	{
-		$this->mark_test_incomplete();
+		$this->assert_equal( // silly, but the code would allow it
+			UserGroup::name( "new test group" ), "new test group",
+			'Cannot retrieve "new test group" by ID.'
+		);
+
+		$group = UserGroup::get( "new test group" );
+		$this->assert_equal(
+			UserGroup::name( $group->id ), "new test group",
+			'Cannot retrieve "new test group" by ID.'
+		);
+
+		$this->assert_false(
+			UserGroup::name( "nonexistent test group" ),
+			'Retrieved a name for an invalid group name.'
+		);
+
+		$this->assert_false(
+			UserGroup::name( -1 ),
+			'Retrieved a name for an invalid group ID.'
+		);
 	}
 
 	public function test_groupid()
 	{
-		$this->mark_test_incomplete();
+		$group = UserGroup::get( "new test group" );
+		$this->assert_equal(
+			UserGroup::id( "new test group" ), $group->id,
+			'Cannot retrieve "new test group" by name.'
+		);
+
+		$this->assert_equal( // silly, but the code would allow it
+			UserGroup::id( $group->id ), $group->id,
+			'Cannot retrieve "new test group" by ID.'
+		);
+
+		$this->assert_false(
+			UserGroup::id( "nonexistent test group" ),
+			'Retrieved an ID for an invalid group name.'
+		);
+
+		$this->assert_false(
+			UserGroup::id( -1 ),
+			'Retrieved a ID for an invalid group ID.'
+		);
 	}
 
 	public function test_memberofgroup()
