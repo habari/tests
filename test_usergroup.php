@@ -80,7 +80,6 @@ class UserGroupTest extends UnitTestCase
 		$group = UserGroup::get( "new test group" );
 
 		Plugins::register( array( $this, 'filter_usergroup_delete_allow' ), 'filter','usergroup_delete_allow' );
-
 		$this->assert_true(
 			$group instanceof UserGroup,
 			'Could not retrieve group named "new test group".'
@@ -195,17 +194,23 @@ class UserGroupTest extends UnitTestCase
 
 	public function test_getgroup()
 	{
-		$this->mark_test_incomplete();
-	}
+		$group = UserGroup::get( "new test group" ); // ::get_by_name()
+		$this->assert_true(
+			$group instanceof UserGroup,
+			'Could not retrieve group named "new test group".'
+		);
 
-	public function test_getgroupbyid()
-	{
-		$this->mark_test_incomplete();
-	}
+		$second_group = UserGroup::get( $group->id ); // ::get_by_id()
+		$this->assert_true(
+			$second_group instanceof UserGroup,
+			"Could not retrieve group with id {$group->id}."
+		);
 
-	public function test_getgroupbyname()
-	{
-		$this->mark_test_incomplete();
+		$invalid_group = UserGroup::get( "nonexistent test group" );
+		$this->assert_false(
+			$invalid_group,
+			'Was able to retrieve a nonexistent group.'
+		);
 	}
 
 	public function test_groupexists()
