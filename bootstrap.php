@@ -10,8 +10,7 @@
 
 if( function_exists( 'getopt' ) ) {
 	$shortopts = 'c::t::r::o';
-	$longopts = array();
-	$options = getopt($shortopts, $longopts);
+	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
 	$options = array();
@@ -374,9 +373,9 @@ class UnitTestResults
 		$this->options = $options;
 		$this->options['HABARI_PATH'] = HABARI_PATH;
 		$this->type = array(
-		    'Fail: ',
-		    'Incomplete: ',
-		    'Skipped: ',
+		    'Fail',
+		    'Incomplete',
+		    'Skipped',
 		);
 	}
 
@@ -394,6 +393,10 @@ class UnitTestResults
 				case 'h':
 					$default_output = 'html';
 					break;
+				case 'symbolic':
+				case 's':
+					$default_output = 'symbolic';
+					break;
 			}
 		}
 		switch($default_output) {
@@ -403,6 +406,9 @@ class UnitTestResults
 			case 'html':
 				header('content-type: text/html');
 				return $this->out_html();
+			case 'symbolic':
+				header('content-type: text/html');
+				return $this->out_symbolic();
 		}
 	}
 
@@ -453,7 +459,7 @@ class UnitTestResults
 						}
 					}
 					else {
-						$output .= "<div><em>{$this->type[$message[0]]}</em> {$message[1]}";
+						$output .= "<div><em>{$this->type[$message[0]]}: </em> {$message[1]}";
 						if(count($message) > 2) {
 							$output .= '<br/>' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
 						}
@@ -528,7 +534,7 @@ class UnitTestResults
 						}
 					}
 					else {
-						$output[]= str_pad($this->type[$message[0]], 10, ' ', STR_PAD_LEFT ) . $message[1];
+						$output[]= str_pad($this->type[$message[0]] . ': ', 10, ' ', STR_PAD_LEFT ) . $message[1];
 						if(count($message) > 2) {
 							$output[]= '      ' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
 						}
@@ -558,6 +564,72 @@ class UnitTestResults
 
 		return implode("\n", $output) . "\n";
 	}
+
+	function out_symbolic()
+	{
+		$has_output = false;
+		$totals = $this->initial_results();
+
+		$xml = new SimpleXMLElement('<results></results>');
+
+		$xml->addAttribute('unit_count', count($this->tests));
+
+		foreach($this->tests as $test => $file) {
+			$xunit = $xml->addChild('unit');
+			$xunit->addAttribute('name', $test);
+
+			if(!isset($this->methods[$test])) {
+				$this->methods[$test] = array();
+				$this->summaries[$test] = $this->initial_results();
+			}
+
+			foreach($this->methods[$test] as $methodname => $messages) {
+				$xmethod = $xunit->addChild('method');
+				$xmethod->addAttribute('name', $methodname);
+
+				$has_output = 0;
+				foreach($messages as $message) {
+					if(is_string($message)) {
+						if(isset($this->options['o'])) {
+							$xmethod->addChild('output', $message);
+						}
+						$has_output = 1;
+					}
+					else {
+						$xmessage = $xmethod->addChild('message', $message[1]);
+						$xmessage->addAttribute('type', $this->type[$message[0]]);
+						if(count($message) > 2) {
+							$xmessage->addAttribute('file', $message[2][0]['file']);
+							$xmessage->addAttribute('line', $message[2][0]['line']);
+						}
+					}
+				}
+				$xmethod->addAttribute('has_output', $has_output);
+			}
+
+			$summary = $this->summaries[$test];
+			foreach($summary as $k => $v) {
+				if(isset($totals[$k]) && is_numeric($v)) {
+					$totals[$k] += $v;
+				}
+			}
+			$xunit->addAttribute('cases', $summary['case_count']);
+			$xunit->addAttribute('complete', $summary['total_case_count']);
+			$xunit->addAttribute('fail', $summary['fail_count']);
+			$xunit->addAttribute('pass', $summary['pass_count']);
+			$xunit->addAttribute('exception', $summary['exception_count']);
+			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
+		}
+
+		$xml->addAttribute('complete', $summary['total_case_count']);
+		$xml->addAttribute('fail', $summary['fail_count']);
+		$xml->addAttribute('pass', $summary['pass_count']);
+		$xml->addAttribute('exception', $summary['exception_count']);
+		$xml->addAttribute('incomplete', $summary['incomplete_count']);
+
+		return $xml->asXML();
+	}
+
 
 	function method_results($test, $method, $results)
 	{
