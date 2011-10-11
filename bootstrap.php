@@ -9,7 +9,7 @@
 **/
 
 if( function_exists( 'getopt' ) ) {
-	$shortopts = 'c::t::r::o';
+	$shortopts = 'd::c::t::r::o';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -17,7 +17,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>''));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>''));
 	$options = array_merge($options, $querystring_options);
 }
 
@@ -222,8 +222,8 @@ class UnitTestCase
 			$this->show_output = false;
 			$this->total_case_count++;
 
+			$ref_method = new ReflectionMethod($this, $method);
 			if(isset($options['t'])) {
-				$ref_method = new ReflectionMethod($this, $method);
 				$start_line = $ref_method->getStartLine();
 				$found = false;
 				foreach($options['t'] as $line) {
@@ -242,6 +242,7 @@ class UnitTestCase
 			}
 
 			$do_skip = false;
+			$dryrun = isset($options['d']);
 			if(count($this->conditions) > 0) {
 				if(preg_match('%^test_(' . implode('|', array_keys($this->conditions)) . ')_.+%i', $method, $condition_matches)) {
 					if(isset($this->conditions[$condition_matches[1]]) && is_string($this->conditions[$condition_matches[1]])) {
@@ -253,14 +254,18 @@ class UnitTestCase
 			}
 
 			if(!$do_skip) {
-				$this->pre_test();
-				if(method_exists($this, 'setup')) {
-					$this->setup();
+				if(!$dryrun) {
+					$this->pre_test();
+					if(method_exists($this, 'setup')) {
+						$this->setup();
+					}
 				}
 
 				try {
 					ob_start();
-					$this->$method();
+					if(!$dryrun) {
+						$this->$method();
+					}
 					$output = ob_get_clean();
 				}
 				catch(Exception $e) {
@@ -277,15 +282,15 @@ class UnitTestCase
 						}
 						$ary = current($trace);
 						$this->messages[] = array(self::FAIL, get_class($e) . ':' . $e->getMessage(), array($ary['file'] . ':' . $ary['line']));
-	//					echo '<div><em>Exception '. get_class($e) .':</em> ' . $e->getMessage() . '<br/>' . $ary['file'] . ':' . $ary['line'] . '</div>';
-	//					echo '<pre>' . print_r($trace, 1) . '</pre>';
 					}
 				}
 
-				if(method_exists($this, 'teardown')) {
-					$this->teardown();
+				if(!$dryrun) {
+					if(method_exists($this, 'teardown')) {
+						$this->teardown();
+					}
+					$this->post_test();
 				}
-				$this->post_test();
 
 				if($this->show_output) {
 					$this->messages[] = $output;
@@ -407,7 +412,7 @@ class UnitTestResults
 				header('content-type: text/html');
 				return $this->out_html();
 			case 'symbolic':
-				header('content-type: text/html');
+				header('content-type: text/xml');
 				return $this->out_symbolic();
 		}
 	}
