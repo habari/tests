@@ -339,6 +339,17 @@ class TaxonomyTest extends UnitTestCase
 
 		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term' );
 
+		$moved = $v->move_term( $two, $one, false );
+
+		// $v should be ( one, two, five, three, four )
+
+		$this->assert_false( !$moved, 'move_term should not return false on a successful move' );
+		$this->assert_true( $moved instanceof Term, 'move_term should return a Term' );
+		$this->assert_equal( $moved->id, $two->id, 'Returned term ID should match moved term ID' );
+		$this->assert_equal( 3, $moved->mptt_left, 'After moving, the returned term should have mptt_left 3, not ' . $moved->mptt_left );
+		$this->assert_equal( 4, $moved->mptt_right, 'After moving, the returned term should have mptt_right 4, not ' . $moved->mptt_right );
+
+		$five = $v->get_term( $five->id );
 		$moved = $v->move_term( $five );
 		$this->assert_false( !$moved, 'move_term should not return false on a successful move' );
 		$this->assert_true( $moved instanceof Term, 'move_term should return a Term' );
