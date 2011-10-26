@@ -19,7 +19,7 @@ class TaxonomyTest extends UnitTestCase
 			'description' => $this->vocab_desc,
 			'features' => array( 'hierarchical' )
 		);
-		$v = new Vocabulary($params);
+		$v = new Vocabulary( $params );
 
 		$this->assert_true( $v instanceof Vocabulary );
 		$this->assert_equal( $v->name, $this->vocab_name );
@@ -30,11 +30,26 @@ class TaxonomyTest extends UnitTestCase
 
 	public function test_get_names()
 	{
+		// ideally we would test here for false when there are no vocabularies. For now, though, there's a tag vocabulary in there by default.
+		if( Vocabulary::get( $this->vocab_name ) ) {
+			Vocabulary::get( $this->vocab_name )->delete();
+		}
+
+		$v = Vocabulary::create( array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+		) );
+		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ) );
+
 		$this->assert_true( is_array( Vocabulary::names() ) );
+		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ) );
 	}
 
 	public function test_insert_vocabulary()
 	{
+		if( Vocabulary::get( $this->vocab_name ) ) {
+			Vocabulary::get( $this->vocab_name )->delete();
+		}
 		$vocab_count = count( Vocabulary::names() );
 		$params = array(
 			'name' => $this->vocab_name,
@@ -43,7 +58,6 @@ class TaxonomyTest extends UnitTestCase
 		);
 		$v = new Vocabulary( $params );
 		$v->insert();
-
 		$this->assert_equal( $vocab_count + 1, count( Vocabulary::names() ), 'Count of names should increase by one' );
 		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ), 'Test vocabulary name should be in the list of names' );
 
@@ -223,21 +237,21 @@ class TaxonomyTest extends UnitTestCase
 		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat' );
 
 		$sample_ary = array( '1', 2, 'a'=>'b' );
-		
+
 		$one = $v->add_term( 'one' );
 		$one->info->value = 1;
 		$one->info->url = 'http://google.com/';
 		$one->info->ary = $sample_ary;
 		$one->info->commit();
-		
+
 		$one = null;
-		
+
 		$one = $v->get_term( 'one' );
 		$this->assert_true( $one instanceof Term, 'The added term was not returned.' );
 		$this->assert_equal( $one->info->value, 1, 'The integer term info value is not identical' );
 		$this->assert_identical( $one->info->url, 'http://google.com/', 'The string term info value is not identical' );
 		$this->assert_identical( $one->info->ary, $sample_ary, 'The array term info value is not identical' );
-		
+
 		// clean up
 		$v->delete();
 	}
@@ -710,10 +724,7 @@ class TaxonomyTest extends UnitTestCase
 		}
 
 		$this->assert_equal( 3, count( $terms ) );
-Utils::debug( 3, count( $terms ) );
 		$this->assert_equal( 0, count( array_diff( $new_terms, $t ) ) );
-Utils::debug( 0, count( array_diff( $new_terms, $t ) ) );
-
 		$v->delete_term( 'unit test' );
 		$post->delete();
 		$nv->delete();
@@ -722,7 +733,7 @@ Utils::debug( 0, count( array_diff( $new_terms, $t ) ) );
 	public function teardown()
 	{
 	}
-	
+
 }
 TaxonomyTest::run_one( 'TaxonomyTest' );
 ?>
