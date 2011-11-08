@@ -15,10 +15,11 @@
  *   -t {testname|linenumber} : Run a specific test, or multiple separated by commas
  *   -r {path} : Set the path for habari.
  *   -o : Display output.
+ *   -u {unitname} : Run only the specified units.
  */
 
 if( function_exists( 'getopt' ) ) {
-	$shortopts = 'd::c::t::r::o';
+	$shortopts = 'u::d::c::t::r::o';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -26,7 +27,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>''));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>''));
 	$options = array_merge($options, $querystring_options);
 }
 
@@ -333,6 +334,15 @@ class UnitTestCase
 
 	public static function run_all()
 	{
+		global $options;
+
+		if(isset($options['u'])) {
+			$options['u'] = explode(',', $options['u']);
+			if(count($options['u']) == 0) {
+				unset($options['u']);
+			}
+		}
+
 		$pass_count = 0;
 		$fail_count = 0;
 		$exception_count = 0;
@@ -344,6 +354,9 @@ class UnitTestCase
 		sort($classes);
 		$results = new UnitTestResults();
 		foreach($classes as $class) {
+			if(isset($options['u']) && !in_array($class, $options['u'])) {
+				continue;
+			}
 			$parents = class_parents($class, false);
 			if(in_array('UnitTestCase', $parents)) {
 				$obj = new $class();
@@ -635,6 +648,13 @@ class UnitTestResults
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
 		}
 
+		if(!isset($summary)) {
+			$summary['total_case_count'] = 0;
+			$summary['fail_count'] = 0;
+			$summary['pass_count'] = 0;
+			$summary['exception_count'] = 0;
+			$summary['incomplete_count'] = 0;
+		}
 		$xml->addAttribute('complete', $summary['total_case_count']);
 		$xml->addAttribute('fail', $summary['fail_count']);
 		$xml->addAttribute('pass', $summary['pass_count']);
