@@ -8,6 +8,15 @@
 * Step 2: Include this file at the beginning of a test
 **/
 
+/**
+ * Options:
+ *   -d : Dry-run, don't execute tests.
+ *   -c {console|html|symbolic} : Output type.
+ *   -t {testname|linenumber} : Run a specific test, or multiple separated by commas
+ *   -r {path} : Set the path for habari.
+ *   -o : Display output.
+ */
+
 if( function_exists( 'getopt' ) ) {
 	$shortopts = 'd::c::t::r::o';
 	$options = getopt($shortopts);
