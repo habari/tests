@@ -62,11 +62,11 @@ class TestsPlugin extends Plugin
 
 	private function make_table( $tests = array() ) {
 		$rows = "";
-		$header = "<tr><th>Name</th><th>Tests completed</th><th>Passing</th><th>Failing</th></tr>";
+		$header = "<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>";
 		foreach( $tests as $test ) {
-			$rows .= "<tr><td>{$test['name']}</td><td>{$test['complete']}</td><td>{$test['pass']}</td><td>{$test['fail']}</td></tr>";
+			$rows .= "<div class='item settings clear' id='{$test['name']}'><span class='pct30'>{$test['name']}</span><span class='pct10'>{$test['complete']}</span><span class='pct10'>{$test['pass']}</span><span class='pct10'>{$test['fail']}</span></div>";
 		}
-		return "<table><thead>{$header}</thead><tbody>{$rows}</tbody></table>";
+		return "{$header}{$rows}";
 	}
 }
 
