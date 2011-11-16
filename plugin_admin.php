@@ -3,7 +3,7 @@
 		<select name="navigationdropdown" onchange="navigationDropdown.filter();" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($units as $unit): ?>
-			<option><?php echo $unit; ?></option>
+			<option><?php echo $unit['name']; ?></option>
 			<?php endforeach; ?>
 		</select>
 	</span>
@@ -14,3 +14,6 @@
 </div>
 
 	<?php echo $content; ?>
+<div class="container">
+	<?php echo $table; ?>
+</div>
