@@ -25,7 +25,7 @@ class TestsPlugin extends Plugin
 				'url' => URL::get( 'admin', 'page=tests'),
 				'title' => _t('Tests'),
 				'text' => _t('Tests'),
-				'hotkey' => 'E',
+				'hotkey' => 'S',
 				'selected' => false
 			)
 		);
