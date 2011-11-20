@@ -174,6 +174,30 @@ class TaxonomyTest extends UnitTestCase
 		$this->assert_false( in_array( $this->vocab_name, Vocabulary::names() ), 'Deleted vocabulary name should not be in list of vocabulary names' );
 	}
 
+	public function test_update_vocabulary()
+	{
+		// Set up
+		// Create and insert a vocabulary
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'features' => array( 'hierarchical' )
+		);
+		$v = new Vocabulary( $params );
+		$v->insert();
+
+		// Change description and update
+		$v = Vocabulary::get( $this->vocab_name );
+		$v->description = "new description";
+		$v->update();
+
+		// Re-retrieve vocabulary (this step may be unnecessary)
+		$v = Vocabulary::get( $this->vocab_name );
+		$this->assert_equal( $v->description, "new description", 'Vocabulary description was not updated' );
+
+		$v->delete();
+	}
+
 	/* Term tests */
 	public function test_construct_term()
 	{
