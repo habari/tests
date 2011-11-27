@@ -47,26 +47,28 @@ class TestsPlugin extends Plugin
 
 		$output = '';
 		$units = array();
-		foreach($testlist->unit as $unit) {
+		foreach ($testlist->unit as $unit) {
 			$units[] = $unit->attributes();
 		}
 
+		if (isset($_GET['run']) && isset($_GET['test'])) {
+			if ($_GET['test'] == 'all') {
+				$theme->results = $units;
+			}
+			else {
+				foreach ($units as $unit) {
+					if ($unit->name == $_GET['test']) {
+						$theme->results = array($unit);
+					}
+				}
+			}
+		}
 		$theme->content = $output;
 		$theme->units = $units;
-		$theme->table = self::make_table( $units );
 		$theme->display('header');
 		$theme->display('tests_admin');
 		$theme->display('footer');
 		exit;
-	}
-
-	private function make_table( $tests = array() ) {
-		$rows = "";
-		$header = "<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>";
-		foreach( $tests as $test ) {
-			$rows .= "<div class='item settings clear' id='{$test['name']}'><span class='pct30'>{$test['name']}</span><span class='pct10'>{$test['complete']}</span><span class='pct10'>{$test['pass']}</span><span class='pct10'>{$test['fail']}</span></div>";
-		}
-		return "{$header}{$rows}";
 	}
 }
 

@@ -1,6 +1,7 @@
+<form action="" accept-charset="UTF-8">
 <div class="container navigation">
 	<span class="pct40">
-		<select name="navigationdropdown" onchange="navigationDropdown.filter();" tabindex="1">
+		<select name="test" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($units as $unit): ?>
 			<option><?php echo $unit['name']; ?></option>
@@ -13,7 +14,21 @@
 	</span>
 </div>
 
-	<?php echo $content; ?>
-<div class="container">
-	<?php echo $table; ?>
+<div class="container transparent formcontrol" id="run"><input type="submit" name="run" class="button" value="Run" tabindex="3">
 </div>
+</form>
+
+
+<?php if (isset($results)): ?>
+
+<div class="container">
+	<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
+	<?php foreach ( $results as $result ): ?>
+	<div class='item settings clear' id='<?php echo $result['name']?>'>
+		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span>
+	</div>
+	<?php endforeach; ?>
+</div>
+
+<?php endif; ?>
+
