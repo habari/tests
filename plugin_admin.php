@@ -4,7 +4,7 @@
 		<select name="test" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($units as $unit): ?>
-			<option<?php if (isset($test) && $test == $unit['name']) echo ' selected'?>><?php echo $unit['name']; ?></option>
+			<option<?php if (isset($test) && $test == $unit) echo ' selected'?>><?php echo $unit ?></option>
 			<?php endforeach; ?>
 		</select>
 	</span>

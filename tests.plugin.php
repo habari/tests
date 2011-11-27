@@ -48,7 +48,7 @@ class TestsPlugin extends Plugin
 		$output = '';
 		$units = array();
 		foreach ($test_list->unit as $unit) {
-			$units[] = $unit->attributes();
+			$units[] = (string)$unit->attributes()->name;
 		}
 
 		if (isset($_GET['run']) && isset($_GET['test'])) {
