@@ -39,35 +39,39 @@ class TestsPlugin extends Plugin
 		return $menu;
 	}
 
-
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&d=1');
 		$testlist = new SimpleXMLElement(file_get_contents($url));
 
-		$output = '';
 		$units = array();
+		$testnames = array('All tests');
 		foreach($testlist->unit as $unit) {
 			$units[] = $unit->attributes();
+			$testnames[] = (string)$unit->attributes()->name;
 		}
 
-		$theme->content = $output;
+		$form = new FormUI('Test Chooser');
+		$form->properties['method'] = 'get';
+		$fieldset = $form->append('wrapper', 'tests', 'tests');
+		$fieldset->class = 'container settings';
+		$tests = $fieldset->append('select', 'test', 'test', '&nbsp;');
+		$tests->options = $testnames;
+
+		$form->append('submit', 'run', _t('Run'), 'admincontrol_submit');
+		$form->on_success(array($this, 'run_tests'));
+
+		if ($form->submitted) {
+			$theme->results = true;
+		}
+		$theme->form = $form;
 		$theme->units = $units;
-		$theme->table = self::make_table( $units );
 		$theme->display('header');
 		$theme->display('tests_admin');
 		$theme->display('footer');
 		exit;
 	}
 
-	private function make_table( $tests = array() ) {
-		$rows = "";
-		$header = "<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>";
-		foreach( $tests as $test ) {
-			$rows .= "<div class='item settings clear' id='{$test['name']}'><span class='pct30'>{$test['name']}</span><span class='pct10'>{$test['complete']}</span><span class='pct10'>{$test['pass']}</span><span class='pct10'>{$test['fail']}</span></div>";
-		}
-		return "{$header}{$rows}";
-	}
 }
 
 ?>
