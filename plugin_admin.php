@@ -25,7 +25,13 @@
 	<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
-		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span>
+		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span><span class='pct40'>&nbsp;</span>
+		<ul id='<?php echo "{$result['name']}_{$method}"?>'>
+		<?php Utils::debug($result); ?>
+		<?php foreach ( $result->method as $method ): ?>
+			<li><?php echo $method['name']?></li>
+		<?php endforeach; ?>
+		</ul>
 	</div>
 	<?php endforeach; ?>
 </div>

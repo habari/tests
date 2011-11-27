@@ -43,23 +43,24 @@ class TestsPlugin extends Plugin
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&d=1');
-		$testlist = new SimpleXMLElement(file_get_contents($url));
+		$test_list = new SimpleXMLElement(file_get_contents($url));
 
 		$output = '';
 		$units = array();
-		foreach ($testlist->unit as $unit) {
+		foreach ($test_list->unit as $unit) {
 			$units[] = $unit->attributes();
 		}
 
 		if (isset($_GET['run']) && isset($_GET['test'])) {
 			$test = $_GET['test'];
 			if ($test == 'all') {
-				$theme->results = $units;
+				$theme->results = $test_list;
 			}
 			else {
-				foreach ($units as $unit) {
-					if ($unit->name == $test) {
-						$theme->results = array($unit);
+				foreach ($test_list as $test_result) {
+					if ($test_result->attributes()->name == $test) {
+						$theme->results = array($test_result);
+						break;
 					}
 				}
 				$theme->test = $test;
