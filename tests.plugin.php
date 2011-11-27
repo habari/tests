@@ -52,15 +52,17 @@ class TestsPlugin extends Plugin
 		}
 
 		if (isset($_GET['run']) && isset($_GET['test'])) {
-			if ($_GET['test'] == 'all') {
+			$test = $_GET['test'];
+			if ($test == 'all') {
 				$theme->results = $units;
 			}
 			else {
 				foreach ($units as $unit) {
-					if ($unit->name == $_GET['test']) {
+					if ($unit->name == $test) {
 						$theme->results = array($unit);
 					}
 				}
+				$theme->test = $test;
 			}
 		}
 		$theme->content = $output;
