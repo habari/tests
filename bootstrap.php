@@ -20,7 +20,7 @@
 
 if( function_exists( 'getopt' ) ) {
 	$shortopts = 'u::d::c::t::r::o';
-	$options = getopt($shortopts);
+//	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
 	$options = array();

@@ -2,6 +2,15 @@
 
 class TestsPlugin extends Plugin
 {
+	private $attributes = array(
+		'name',
+		'cases',
+		'complete',
+		'fail',
+		'pass',
+		'exception',
+		'incomplete',
+	);
 
 	public function filter_admin_access( $access, $page, $post_type )
 	{
@@ -61,6 +70,30 @@ class TestsPlugin extends Plugin
 			}
 			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 			$theme->results = $results;
+
+			foreach ($results as $test_result) {
+				if ($test_result->attributes()->name == $test) {
+					$results_array = array();
+					foreach($this->attributes as $attribute) {
+						$results_array = array_merge( $results_array, array( $attribute => (string)$test_result->attributes()->$attribute ));
+						$methods_array = array();
+
+						foreach($test_result->method as $method) {
+							$methods_array = array_merge( $methods_array, array(
+								'result' => "pass",
+								'name' => (string)$method['name'],
+							));
+						}
+						$results_array = array_merge( $results_array, array( 'methods' => $methods_array ));
+					}
+					$theme->results = $results_array;
+					break;
+				}
+			}
+			$theme->test = $test;
+
+
+
 			$theme->test = $test;
 		}
 
