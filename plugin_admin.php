@@ -22,10 +22,16 @@
 <?php if (isset($results)): ?>
 
 <div class="container">
-	<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
+	<div class='item clear'><h2>Tests</h2>
+	<span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
-		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span><span class='pct40'>&nbsp;</span>
+		<h3><?php echo $result['name']; ?></h3>
+		<h4><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</h4>
+		<h4><?php echo $result['incomplete']; ?> incomplete methods.</h4>
+		<h4><?php echo $result['pass']; ?> assertions passed.</h4>
+		<h4><?php echo $result['fail']; ?> assertions failed.</h4>
+		<h4><?php echo $result['exception']; ?> unexpected exceptions.</h4>
 		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>
 			<li class='<?php echo $method['result']; ?>'><?php echo $method['dingbat']; ?> <span class="name"><?php echo $method['name']?></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
