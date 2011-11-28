@@ -1,9 +1,9 @@
 ul.methods {
-	margin-top: 1em;
+	margin-top: 0.5em;
 }
 
 ul.methods li {
-	padding: 2px 0;
+	padding: 2px 4px;
 }
 
 ul.methods li.Pass:nth-child(even) {

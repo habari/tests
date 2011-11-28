@@ -22,11 +22,10 @@
 <?php if (isset($results)): ?>
 
 <div class="container">
-	<div class='item clear'><h2>Tests</h2>
-	<span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
+	<div class='item clear'>
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
-		<h3><?php echo $result['name']; ?></h3>
+		<h2><?php echo $result['name']; ?></h2>
 		<h4><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</h4>
 		<h4><?php echo $result['incomplete']; ?> incomplete methods.</h4>
 		<h4><?php echo $result['pass']; ?> assertions passed.</h4>
