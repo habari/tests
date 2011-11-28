@@ -30,3 +30,28 @@ ul.methods span.message {
 	float: right;
 	clear: both;
 }
+
+div.progress_bar {
+	border: 1px solid #444;
+	padding: 2px;
+}
+
+div.progress_bar span.green {
+	display: inline-block;
+	background-color: green;
+}
+
+div.progress_bar span.red {
+	display: inline-block;
+	background-color: red;
+}
+
+div.progress_bar span.yellow {
+	display: inline-block;
+	background-color: yellow;
+}
+
+div.progress_bar span.orange {
+	display: inline-block;
+	background-color: orange;
+}

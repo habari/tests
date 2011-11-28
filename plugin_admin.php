@@ -25,6 +25,7 @@
 	<div class='item clear'><h2>Tests</h2><h3><span class='pct30 last'>Name</span><span class='pct10'>Complete</span><span class='pct10'>Passed</span><span class='pct10'>Failed</span></h3></div>
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
+		<div class="progress_bar"><?php echo $result['progress_bar']?></div>
 		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span><span class='pct40'>&nbsp;</span>
 		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>

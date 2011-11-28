@@ -96,6 +96,14 @@ class TestsPlugin extends Plugin
 							"line" => (string)$method->message->attributes()->line,
 						));
 					}
+					$total = $result_array['pass'] + $result_array['fail'] + $result_array['exception'] + $result_array['incomplete'];
+					$result_array = array_merge( $result_array, array( 'progress_bar' =>
+						'<span class="green" style="width: ' . $result_array['pass'] / $total * 100 . '%" title="' . $result_array['pass'] .' passed">&nbsp;</span>' .
+						'<span class="red" style="width: ' . $result_array['fail'] / $total * 100 . '%" title="' . $result_array['fail'] .' failed">&nbsp;</span>' .
+						'<span class="orange" style="width: ' . $result_array['exception'] / $total * 100 . '%" title="' . $result_array['exception'] .' exceptions">&nbsp;</span>' .
+						'<span class="yellow" style="width: ' . $result_array['incomplete'] / $total * 100 . '%" title="' . $result_array['incomplete'] .' incomplete">&nbsp;</span>'
+
+					 ));
 				}
 				$results_array[] = $result_array;
 			}
