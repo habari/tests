@@ -2,6 +2,10 @@ ul.methods {
 	margin-top: 1em;
 }
 
+ul.methods li {
+	padding: 2px 0;
+}
+
 ul.methods li.Pass:nth-child(even) {
 	background-color: #DFD;
 }
@@ -26,32 +30,14 @@ ul.methods li.Incomplete:nth-child(odd) {
 	background-color: #F8F8C5;
 }
 
-ul.methods span.message {
-	float: right;
-	clear: both;
+ul.methods span.messages {
+	display: block;
 }
 
-div.progress_bar {
-	border: 1px solid #444;
-	padding: 2px;
+ul.methods span.messages em {
+	font-style: italic !important;
 }
 
-div.progress_bar span.green {
-	display: inline-block;
-	background-color: green;
-}
-
-div.progress_bar span.red {
-	display: inline-block;
-	background-color: red;
-}
-
-div.progress_bar span.yellow {
-	display: inline-block;
-	background-color: yellow;
-}
-
-div.progress_bar span.orange {
-	display: inline-block;
-	background-color: orange;
+ul.methods span.name {
+	font-weight: bold;
 }

@@ -89,21 +89,15 @@ class TestsPlugin extends Plugin
 					if( ! isset( $method->message ) ) { // no <message> means the method passed
 						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass" ));
 					} else {
+						$message_array = array();
+						foreach( $method->message as $message ) {
+							$message_array[] = "{$method->message}<br><em>" . basename($method->message->attributes()->file) . ":{$method->message->attributes()->line}</em>";
+						}
 						$result_array['methods'][] = array_merge( array_shift($method_array), array(
 							"result" => (string)$method->message->attributes()->type,
-							"message" => (string)$method->message,
-							"file" => (string)$method->message->attributes()->file,
-							"line" => (string)$method->message->attributes()->line,
+							"messages" => implode( "<br>", $message_array ),
 						));
 					}
-					$total = $result_array['pass'] + $result_array['fail'] + $result_array['exception'] + $result_array['incomplete'];
-					$result_array = array_merge( $result_array, array( 'progress_bar' =>
-						'<span class="green" style="width: ' . $result_array['pass'] / $total * 100 . '%" title="' . $result_array['pass'] .' passed">&nbsp;</span>' .
-						'<span class="red" style="width: ' . $result_array['fail'] / $total * 100 . '%" title="' . $result_array['fail'] .' failed">&nbsp;</span>' .
-						'<span class="orange" style="width: ' . $result_array['exception'] / $total * 100 . '%" title="' . $result_array['exception'] .' exceptions">&nbsp;</span>' .
-						'<span class="yellow" style="width: ' . $result_array['incomplete'] / $total * 100 . '%" title="' . $result_array['incomplete'] .' incomplete">&nbsp;</span>'
-
-					 ));
 				}
 				$results_array[] = $result_array;
 			}
