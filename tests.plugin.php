@@ -40,10 +40,13 @@ class TestsPlugin extends Plugin
 	}
 
 
+	/**
+	 * @todo Removing initial newline shouldn't be necessary, find out what's causing it
+	 */
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
-		$url = $this->get_url('/index.php?c=symbolic&d=1');
-		$test_list = new SimpleXMLElement(file_get_contents($url));
+		$url = $this->get_url('/index.php?c=symbolic');
+		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url.'&d=1')));
 
 		$output = '';
 		$units = array();
@@ -53,19 +56,14 @@ class TestsPlugin extends Plugin
 
 		if (isset($_GET['run']) && isset($_GET['test'])) {
 			$test = $_GET['test'];
-			if ($test == 'all') {
-				$theme->results = $test_list;
+			if ($test != 'all') {
+				$url = $this->get_url('/index.php?c=symbolic&u='.$test);
 			}
-			else {
-				foreach ($test_list as $test_result) {
-					if ($test_result->attributes()->name == $test) {
-						$theme->results = array($test_result);
-						break;
-					}
-				}
-				$theme->test = $test;
-			}
+			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
+			$theme->results = $results;
+			$theme->test = $test;
 		}
+
 		$theme->content = $output;
 		$theme->units = $units;
 		$theme->display('header');
