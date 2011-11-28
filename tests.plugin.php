@@ -90,11 +90,12 @@ class TestsPlugin extends Plugin
 						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass" ));
 					} else {
 						$message_array = array();
+						$result = (string)$method->message->attributes()->type;
 						foreach( $method->message as $message ) {
-							$message_array[] = "{$method->message}<br><em>" . basename($method->message->attributes()->file) . ":{$method->message->attributes()->line}</em>";
+							$message_array[] = "{$method->message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($method->message->attributes()->file) . ":{$method->message->attributes()->line}</em>");
 						}
 						$result_array['methods'][] = array_merge( array_shift($method_array), array(
-							"result" => (string)$method->message->attributes()->type,
+							"result" => $result,
 							"messages" => implode( "<br>", $message_array ),
 						));
 					}
