@@ -25,3 +25,8 @@ ul.methods li.Incomplete:nth-child(even) {
 ul.methods li.Incomplete:nth-child(odd) {
 	background-color: #F8F8C5;
 }
+
+ul.methods span.message {
+	float: right;
+	clear: both;
+}
