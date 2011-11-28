@@ -22,7 +22,6 @@
 <?php if (isset($results)): ?>
 
 <div class="container">
-	<div class='item clear'>
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
 		<h2><?php echo $result['name']; ?></h2>
