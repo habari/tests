@@ -65,7 +65,8 @@ _EOF_;
 			$tokens = $t->parse();
 			$new_str = (string)$tokens;
 
-			$this->assert_identical( $html_str, $new_str, "<br>" . Utils::htmlspecialchars( $html_str ) . "<br>" . Utils::htmlspecialchars( $new_str ) );
+			$this->assert_identical( $html_str, $new_str );
+			$this->output( Utils::htmlspecialchars( $html_str ) . "<br>" . Utils::htmlspecialchars( $new_str ) );
 		}
 	}
 
