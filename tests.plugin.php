@@ -79,9 +79,18 @@ class TestsPlugin extends Plugin
 				$result_array['methods'] = array();
 				foreach ($result->method as $method) {
 					$method_array = (array)$method;
-					$result_array['methods'][] = array_shift($method_array);
-				}
 
+					if( ! isset( $method->message ) ) { // no <message> means the method passed
+						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass" ));
+					} else {
+						$result_array['methods'][] = array_merge( array_shift($method_array), array(
+							"result" => (string)$method->message->attributes()->type,
+							"message" => (string)$method->message,
+							"file" => (string)$method->message->attributes()->file,
+							"line" => (string)$method->message->attributes()->line,
+						));
+					}
+				}
 				$results_array[] = $result_array;
 			}
 			$theme->results = $results_array;
