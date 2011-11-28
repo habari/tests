@@ -68,32 +68,23 @@ class TestsPlugin extends Plugin
 			if ($test != 'all') {
 				$url = $this->get_url('/index.php?c=symbolic&u='.$test);
 			}
+			$results = preg_replace("/^\n/", "", file_get_contents($url));
 			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
-			$theme->results = $results;
 
-			foreach ($results as $test_result) {
-				if ($test_result->attributes()->name == $test) {
-					$results_array = array();
-					foreach($this->attributes as $attribute) {
-						$results_array = array_merge( $results_array, array( $attribute => (string)$test_result->attributes()->$attribute ));
-						$methods_array = array();
+			$results_array = array();
+			foreach ($results as $result) {
+				$result_array = (array)$result->attributes();
+				$result_array = array_shift($result_array);
 
-						foreach($test_result->method as $method) {
-							$methods_array = array_merge( $methods_array, array(
-								'result' => "pass",
-								'name' => (string)$method['name'],
-							));
-						}
-						$results_array = array_merge( $results_array, array( 'methods' => $methods_array ));
-					}
-					$theme->results = $results_array;
-					break;
+				$result_array['methods'] = array();
+				foreach ($result->method as $method) {
+					$method_array = (array)$method;
+					$result_array['methods'][] = array_shift($method_array);
 				}
+
+				$results_array[] = $result_array;
 			}
-			$theme->test = $test;
-
-
-
+			$theme->results = $results_array;
 			$theme->test = $test;
 		}
 
