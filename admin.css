@@ -1,0 +1,27 @@
+ul.methods {
+	margin-top: 1em;
+}
+
+ul.methods li.Pass:nth-child(even) {
+	background-color: #DFD;
+}
+
+ul.methods li.Pass:nth-child(odd) {
+	background-color: #D6F8D6;
+}
+
+ul.methods li.Fail:nth-child(even) {
+	background-color: #FDD;
+}
+
+ul.methods li.Fail:nth-child(odd) {
+	background-color: #F8D6D6;
+}
+
+ul.methods li.Incomplete:nth-child(even) {
+	background-color: #FFC;
+}
+
+ul.methods li.Incomplete:nth-child(odd) {
+	background-color: #F8F8C5;
+}

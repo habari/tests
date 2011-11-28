@@ -26,9 +26,9 @@
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
 		<span class='pct30'><?php echo $result['name']?></span><span class='pct10'><?php echo $result['complete']?></span><span class='pct10'><?php echo $result['pass']?></span><span class='pct10'><?php echo $result['fail']?></span><span class='pct40'>&nbsp;</span>
-		<ul id='<?php echo "{$result['name']}_{$method}"?>'>
+		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>
-			<li class="<?php echo $method['result']; ?>"><?php echo $method['name']?></li>
+			<li class='<?php echo $method['result']; ?>'><?php echo $method['name']?></li>
 		<?php endforeach; ?>
 		</ul>
 	</div>

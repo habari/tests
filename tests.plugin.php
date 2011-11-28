@@ -26,6 +26,12 @@ class TestsPlugin extends Plugin
 		$this->add_template('tests_admin', dirname($this->get_file()) . '/plugin_admin.php');
 	}
 
+	public function action_admin_header( $theme )
+	{
+		if ( $theme->page == 'tests' ) {
+			Stack::add( 'admin_stylesheet', array( $this->get_url() . '/admin.css', 'screen' ), 'admin-css' );
+		}
+	}
 
 	public function filter_adminhandler_post_loadplugins_main_menu( array $menu )
 	{
