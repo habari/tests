@@ -8,13 +8,23 @@ class UserTest extends UnitTestCase
 
 	public function setup()
 	{
+		if( User::get( 'testcaseuser' ) ) {
+			User::get( 'testcaseuser' )->delete();
+		}
 		$this->user = User::create( array( 'username' => 'testcaseuser', 'email' => 'test@example.com', 'password' => 'test') );
 
 	}
 
 	public function test_anonymous()
 	{
-		$this->mark_test_incomplete();
+		$anonymous = User::anonymous();
+		$this->assert_true( $this->user instanceof User, 'Anonymous user should be a User.' );
+		$this->assert_equal( 0, $anonymous->id, "Anonymous user ID should be 0." );
+		$this->assert_equal( "Anonymous", $anonymous->username, "Anonymous username should be 'Anonymous'." );
+
+		// @TODO: test action_create_anonymous_user
+
+		unset( $anonymous );
 	}
 
 	public function test_identify()
