@@ -7,11 +7,11 @@
 }
 
 .methods .Skiped:before {
-	content: '\10141 ';
+	content: '\279D ';
 }
 
 .methods .Incomplete:before {
-	content: '\8677 ';
+	content: '\21E5 ';
 }
 
 .methods .Pass:before {
