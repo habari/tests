@@ -150,7 +150,26 @@ class PostsTest extends UnitTestCase
 
 	public function test_get_posts_by_status()
 	{
-		$this->mark_test_incomplete();
+		// Get by single status
+		$want = array();
+		foreach ( $this->posts as $post ) {
+			if ( $post->status == Post::status( 'draft' ) ) {
+				$want[] = $post;
+			}
+		}
+
+		$got = Posts::get( array( 'status' => Post::status( 'draft' ) ) );
+
+		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
+
+		foreach ( $got as $g ) {
+			$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
+			$this->assert_equal( $g->status, Post::status( 'draft' ), 'Returned posts should be of the requested status' );
+		}
+		// Get by an array of statuses
+		// @todo How do we test this?
+		// Get any status
+		// @todo How do we test this?
 	}
 
 	public function test_get_posts_by_user_id()
