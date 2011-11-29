@@ -24,7 +24,7 @@
 <div class="container">
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
-		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a></h2>
+		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a><?php if (isset($test)) echo ': '.$test; ?></h2>
 		<ul class="attributes">
 			<li><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</li>
 			<li><?php echo $result['incomplete']; ?> incomplete methods.</li>

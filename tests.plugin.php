@@ -74,7 +74,9 @@ class TestsPlugin extends Plugin
 			if ($unit != 'all') {
 				$url = '/index.php?c=symbolic&u='.$unit;
 				if (isset($_GET['test'])) {
-					$url = $url.'&t='.$_GET['test'];
+					$test = $_GET['test'];
+					$url = $url.'&t='.$test;
+					$theme->test = $test;
 				}
 				$url = $this->get_url($url);
 			}
