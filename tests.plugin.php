@@ -64,15 +64,19 @@ class TestsPlugin extends Plugin
 		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url.'&d=1')));
 
 		$output = '';
-		$units = array();
+		$unit_names = array();
 		foreach ($test_list->unit as $unit) {
-			$units[] = (string)$unit->attributes()->name;
+			$unit_names[] = (string)$unit->attributes()->name;
 		}
 
-		if (isset($_GET['run']) && isset($_GET['test'])) {
-			$test = $_GET['test'];
-			if ($test != 'all') {
-				$url = $this->get_url('/index.php?c=symbolic&u='.$test);
+		if (isset($_GET['run']) && isset($_GET['unit'])) {
+			$unit = $_GET['unit'];
+			if ($unit != 'all') {
+				$url = '/index.php?c=symbolic&u='.$unit;
+				if (isset($_GET['test'])) {
+					$url = $url.'&t='.$_GET['test'];
+				}
+				$url = $this->get_url($url);
 			}
 			$results = preg_replace("/^\n/", "", file_get_contents($url));
 			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
@@ -103,11 +107,11 @@ class TestsPlugin extends Plugin
 				$results_array[] = $result_array;
 			}
 			$theme->results = $results_array;
-			$theme->test = $test;
+			$theme->unit = $unit;
 		}
 
 		$theme->content = $output;
-		$theme->units = $units;
+		$theme->unit_names = $unit_names;
 		$theme->display('header');
 		$theme->display('tests_admin');
 		$theme->display('footer');
