@@ -60,32 +60,32 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_id()
 	{
 		// Get a single post by id
-		$want = $this->posts[array_rand( $this->posts )];
+		$expected = $this->posts[array_rand( $this->posts )];
 
-		$got = Posts::get( array( 'id' => $want->id ) );
+		$result = Posts::get( array( 'id' => $expected->id ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
-		$this->assert_true( $got->onepost, 'A single post should be returned if a single id is passed in' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result->onepost, 'A single post should be returned if a single id is passed in' );
 
-		$g = $got[0];
-		$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-		$this->assert_equal( $g->id, $want->id, 'id of returned Post should be the one we asked for' );
+		$result = $result[0];
+		$this->assert_true( $result instanceof Post, 'Items should be of type Post' );
+		$this->assert_equal( $result->id, $expected->id, 'id of returned Post should be the one we asked for' );
 
 		// Get multiple posts by id
-		$want = array_rand( $this->posts, count( $this->posts ) );
+		$expected = array_rand( $this->posts, count( $this->posts ) );
 
 		$ids = array();
-		foreach ( $want as $w ) $ids[] = $this->posts[$w]->id;
+		foreach ( $expected as $e ) $ids[] = $this->posts[$e]->id;
 
-		$got = Posts::get( array('id' => $ids ) );
+		$result = Posts::get( array('id' => $ids ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
 		// @todo This currently isn't true, because the options limit is respected. Should it be?
-		//$this->assert_equal( count( $got ), count( $want ), 'The number of posts we asked for should be returned' );
+		//$this->assert_equal( count( $result ), count( $expected ), 'The number of posts we asked for should be returned' );
 
-		foreach ( $got as $g ) {
-			$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-			$this->assert_true( in_array( $g->id, $ids ), 'id of returned Post should be in the list of the ones we asked for' );
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_true( in_array( $r->id, $ids ), 'id of returned Post should be in the list of the ones we asked for' );
 		}
 
 	}
@@ -93,53 +93,53 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_slug()
 	{
 		// Get a single post by slug
-		$want = $this->posts[array_rand( $this->posts )];
+		$expected = $this->posts[array_rand( $this->posts )];
 
-		$got = Posts::get( array( 'slug' => $want->slug, 'status' => 'any' ) );
+		$result = Posts::get( array( 'slug' => $expected->slug, 'status' => 'any' ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
-		$this->assert_true( $got->onepost, 'A single post should be returned if a single slug is passed in' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result->onepost, 'A single post should be returned if a single slug is passed in' );
 
-		$g = $got[0];
-		$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-		$this->assert_equal( $g->id, $want->id, 'id of returned Post should be the one we asked for' );
-		$this->assert_equal( $g->slug, $want->slug, 'slug of returned Post should be the one we asked for' );
+		$result = $result[0];
+		$this->assert_true( $result instanceof Post, 'Items should be of type Post' );
+		$this->assert_equal( $result->id, $expected->id, 'id of returned Post should be the one we asked for' );
+		$this->assert_equal( $result->slug, $expected->slug, 'slug of returned Post should be the one we asked for' );
 
 		// Get multiple posts by id
-		$want = array_rand( $this->posts, count( $this->posts ) );
+		$expected = array_rand( $this->posts, count( $this->posts ) );
 
 		$slugs = array();
-		foreach ( $want as $w ) $slugs[] = $this->posts[$w]->slug;
+		foreach ( $expected as $e ) $slugs[] = $this->posts[$e]->slug;
 
-		$got = Posts::get( array( 'slug' => $slugs ) );
+		$result = Posts::get( array( 'slug' => $slugs ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
 		// @todo This currently isn't true, because the options limit is respected. Should it be?
-		//$this->assert_equal( count( $got ), count( $want ), 'The number of posts we asked for should be returned' );
+		//$this->assert_equal( count( $result ), count( $expected ), 'The number of posts we asked for should be returned' );
 
-		foreach ( $got as $g ) {
-			$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-			$this->assert_true( in_array( $g->slug, $slugs ), 'slug of returned Post should be in the list of the ones we asked for' );
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_true( in_array( $r->slug, $slugs ), 'slug of returned Post should be in the list of the ones we asked for' );
 		}
 	}
 
 	public function test_get_posts_by_content_type()
 	{
 		// Get by single content type
-		$want = array();
+		$expected = array();
 		foreach ( $this->posts as $post ) {
 			if ( $post->content_type == Post::type( 'page' ) ) {
-				$want[] = $post;
+				$expected[] = $post;
 			}
 		}
 
-		$got = Posts::get( array( 'content_type' => Post::type( 'page' ) ) );
+		$result = Posts::get( array( 'content_type' => Post::type( 'page' ) ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
 
-		foreach ( $got as $g ) {
-			$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-			$this->assert_equal( $g->content_type, Post::type( 'page' ), 'Returned posts should be of the requested content type' );
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_equal( $r->content_type, Post::type( 'page' ), 'Returned posts should be of the requested content type' );
 		}
 
 		// Get by an array of content types
@@ -151,20 +151,20 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_status()
 	{
 		// Get by single status
-		$want = array();
+		$expected = array();
 		foreach ( $this->posts as $post ) {
 			if ( $post->status == Post::status( 'draft' ) ) {
-				$want[] = $post;
+				$expected[] = $post;
 			}
 		}
 
-		$got = Posts::get( array( 'status' => Post::status( 'draft' ) ) );
+		$result = Posts::get( array( 'status' => Post::status( 'draft' ) ) );
 
-		$this->assert_true( $got instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
 
-		foreach ( $got as $g ) {
-			$this->assert_true( $g instanceof Post, 'Items should be of type Post' );
-			$this->assert_equal( $g->status, Post::status( 'draft' ), 'Returned posts should be of the requested status' );
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_equal( $r->status, Post::status( 'draft' ), 'Returned posts should be of the requested status' );
 		}
 		// Get by an array of statuses
 		// @todo How do we test this?
@@ -337,8 +337,8 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_tag_and_info()
 	{
-//		$got = Posts::get( array( 'tags:term' => 'one', 'has:info' => array( 'posts_test' => 'test' ), 'orderby' => 'ABS(info_test_value) DESC' ) );
-//		$got = Posts::get( array( 'tags:term' => 'one', 'all:info' => array( 'posts_test' => 'test' ) ) );
+//		$result = Posts::get( array( 'tags:term' => 'one', 'has:info' => array( 'posts_test' => 'test' ), 'orderby' => 'ABS(info_test_value) DESC' ) );
+//		$result = Posts::get( array( 'tags:term' => 'one', 'all:info' => array( 'posts_test' => 'test' ) ) );
 		$this->mark_test_incomplete();
 	}
 
