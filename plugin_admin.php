@@ -32,7 +32,7 @@
 		<h4><?php echo $result['exception']; ?> unexpected exceptions.</h4>
 		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>
-			<li class='<?php echo $method['result']; ?>'><?php echo $method['dingbat']; ?> <span class="name"><?php echo $method['name']?></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
+			<li class='<?php echo $method['result']; ?>'> <span class="name"><?php echo $method['name']?></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
 		<?php endforeach; ?>
 		</ul>
 	</div>

@@ -6,6 +6,18 @@ ul.methods li {
 	padding: 2px 4px;
 }
 
+ul.methods li.Incomplete:before {
+	content: '\2610 ';
+}
+
+ul.methods li.Pass:before {
+	content: '\2611 ';
+}
+
+ul.methods li.Fail:before, ul.methods li.Exception:before  {
+	content: '\2612 ';
+}
+
 ul.methods li.Pass:nth-child(even) {
 	background-color: #DFD;
 }

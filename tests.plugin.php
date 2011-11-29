@@ -12,13 +12,6 @@ class TestsPlugin extends Plugin
 		'incomplete',
 	);
 
-	private $dingbat = array(
-		'Incomplete' => '&#x2610;',
-		'Pass' => '&#x2611;',
-		'Fail' => '&#x2612;',
-		'Exception' => '&#x2612;',
-	);
-
 	public function filter_admin_access( $access, $page, $post_type )
 	{
 		if ( $page != 'tests') {
@@ -94,7 +87,7 @@ class TestsPlugin extends Plugin
 					$method_array = (array)$method;
 
 					if( ! isset( $method->message ) ) { // no <message> means the method passed
-						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass", "dingbat" => $this->dingbat["Pass"] ) );
+						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass" ) );
 					} else {
 						$message_array = array();
 						$result = (string)$method->message->attributes()->type;
@@ -103,7 +96,6 @@ class TestsPlugin extends Plugin
 						}
 						$result_array['methods'][] = array_merge( array_shift($method_array), array(
 							"result" => $result,
-							"dingbat" => $this->dingbat[ $result ],
 							"messages" => implode( "<br>", $message_array ),
 						));
 					}
