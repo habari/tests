@@ -18,7 +18,7 @@
  *   -u {unitname} : Run only the specified units.
  */
 
-if( function_exists( 'getopt' ) ) {
+if(defined('STDIN') && function_exists( 'getopt' ) ) {
 	$shortopts = 'u::d::c::t::r::o';
 	$options = getopt($shortopts);
 }
@@ -661,6 +661,7 @@ class UnitTestResults
 		$xml->addAttribute('exception', $summary['exception_count']);
 		$xml->addAttribute('incomplete', $summary['incomplete_count']);
 
+		ob_end_clean();
 		return $xml->asXML();
 	}
 
