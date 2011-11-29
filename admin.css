@@ -1,55 +1,59 @@
-ul.methods {
+.methods {
 	margin-top: 0.5em;
 }
 
-ul.methods li {
+.methods  {
 	padding: 2px 4px;
 }
 
-ul.methods li.Incomplete:before {
-	content: '\2610 ';
+.methods .Skiped:before {
+	content: '\10141 ';
 }
 
-ul.methods li.Pass:before {
+.methods .Incomplete:before {
+	content: '\8677 ';
+}
+
+.methods .Pass:before {
 	content: '\2611 ';
 }
 
-ul.methods li.Fail:before, ul.methods li.Exception:before  {
+.methods .Fail:before, .methods .Exception:before  {
 	content: '\2612 ';
 }
 
-ul.methods li.Pass:nth-child(even) {
+.methods .Pass:nth-child(even) {
 	background-color: #DFD;
 }
 
-ul.methods li.Pass:nth-child(odd) {
+.methods .Pass:nth-child(odd) {
 	background-color: #D6F8D6;
 }
 
-ul.methods li.Fail:nth-child(even) {
+.methods .Fail:nth-child(even) {
 	background-color: #FDD;
 }
 
-ul.methods li.Fail:nth-child(odd) {
+.methods .Fail:nth-child(odd) {
 	background-color: #F8D6D6;
 }
 
-ul.methods li.Incomplete:nth-child(even) {
+.methods .Incomplete:nth-child(even) {
 	background-color: #FFC;
 }
 
-ul.methods li.Incomplete:nth-child(odd) {
+.methods .Incomplete:nth-child(odd) {
 	background-color: #F8F8C5;
 }
 
-ul.methods span.messages {
+.methods .messages {
 	display: block;
 }
 
-ul.methods span.messages em {
+.methods .messages em {
 	font-style: italic !important;
 }
 
-ul.methods span.name {
+.methods .name {
 	font-weight: bold;
 }
