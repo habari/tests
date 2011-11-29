@@ -1,6 +1,6 @@
 <form action="" accept-charset="UTF-8">
 <div class="container navigation">
-	<span class="pct80">
+	<span class="pct75">
 		<select name="unit" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($unit_names as $unit_name): ?>
@@ -22,7 +22,11 @@
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
 		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a><?php if (isset($test)) echo ': '.$test; ?></h2>
 		<ul class="attributes">
+			<?php if (isset($test)): ?>
+			<li>1 test completed (<?php echo ($result['complete'] - 1); ?> more not executed)</li>
+			<?php else: ?>
 			<li><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</li>
+			<?php endif; ?>
 			<li><?php echo $result['incomplete']; ?> incomplete methods.</li>
 			<li><?php echo $result['pass']; ?> assertions passed.</li>
 			<li><?php echo $result['fail']; ?> assertions failed.</li>
