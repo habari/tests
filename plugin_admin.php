@@ -1,6 +1,6 @@
 <form action="" accept-charset="UTF-8">
 <div class="container navigation">
-	<span class="pct40">
+	<span class="pct80">
 		<select name="unit" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($unit_names as $unit_name): ?>
@@ -8,13 +8,9 @@
 			<?php endforeach; ?>
 		</select>
 	</span>
-	<span class="or pct20"> or </span>
-	<span class="pct40">
-		<input type="search" id="search" placeholder="search tests" tabindex="2">
-	</span>
-</div>
+<span class="pct20" id="run"><input type="submit" name="run" class="button" value="Run" tabindex="3">
+</span>
 
-<div class="container transparent formcontrol" id="run"><input type="submit" name="run" class="button" value="Run" tabindex="3">
 </div>
 </form>
 
