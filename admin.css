@@ -8,18 +8,22 @@
 
 .methods .Skiped:before {
 	content: '\279D ';
+	padding-left: 4px;
 }
 
 .methods .Incomplete:before {
 	content: '\21E5 ';
+	padding-left: 4px;
 }
 
 .methods .Pass:before {
 	content: '\2611 ';
+	padding-left: 4px;
 }
 
 .methods .Fail:before, .methods .Exception:before  {
 	content: '\2612 ';
+	padding-left: 4px;
 }
 
 .methods .Pass:nth-child(even) {
@@ -48,6 +52,8 @@
 
 .methods .messages {
 	display: block;
+	padding-left: 4px;
+	padding-bottom: 2px;
 }
 
 .methods .messages em {
