@@ -25,11 +25,13 @@
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
 		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a></h2>
-		<h4><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</h4>
-		<h4><?php echo $result['incomplete']; ?> incomplete methods.</h4>
-		<h4><?php echo $result['pass']; ?> assertions passed.</h4>
-		<h4><?php echo $result['fail']; ?> assertions failed.</h4>
-		<h4><?php echo $result['exception']; ?> unexpected exceptions.</h4>
+		<ul class="attributes">
+			<li><?php echo $result['complete']; ?>/<?php echo $result['cases']; ?> tests completed.</li>
+			<li><?php echo $result['incomplete']; ?> incomplete methods.</li>
+			<li><?php echo $result['pass']; ?> assertions passed.</li>
+			<li><?php echo $result['fail']; ?> assertions failed.</li>
+			<li><?php echo $result['exception']; ?> unexpected exceptions.</li>
+		</ul>
 		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>
       <li class='<?php echo $method['result']; ?>'> <span class="name"><a href="tests?unit=<?php echo $result['name']; ?>&test=<?php echo $method['name']; ?>&run=Run" title="Run <?php echo $method['name']; ?>"><?php echo $method['name']?></a></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
