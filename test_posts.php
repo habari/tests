@@ -174,7 +174,26 @@ class PostsTest extends UnitTestCase
 
 	public function test_get_posts_by_user_id()
 	{
-		$this->mark_test_incomplete();
+		// Create another user and a post
+		$decoy = User::create(array (
+			'username'=>'decoy',
+			'email'=>'decoy@example.com',
+			'password'=>md5('q' . rand( 0,65535 ) ),
+		) );
+		$this->posts[] = $this->make_post( $user, time() - rand( 3600, 3600*36 ), 'entry', 'published' );
+
+		$expected = User::get_by_name( 'posts_test' );
+
+		$result = Posts::get( array( 'user_id' => $expected->id ) );
+
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
+
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_equal( $r->author->id, $expected->id, 'Returned posts should belong to the expected user' );
+		}
+
+		// Get by an array of ids
 	}
 
 	public function test_get_posts_by_date()
