@@ -72,7 +72,7 @@ class TestsPlugin extends Plugin
 		if (isset($_GET['run']) && isset($_GET['unit'])) {
 			$unit = $_GET['unit'];
 			if ($unit != 'all') {
-				$url = '/index.php?c=symbolic&u='.$unit;
+				$url = '/index.php?c=symbolic&o=1&u='.$unit;
 				if (isset($_GET['test'])) {
 					$test = $_GET['test'];
 					$url = $url.'&t='.$test;
@@ -91,9 +91,15 @@ class TestsPlugin extends Plugin
 				$result_array['methods'] = array();
 				foreach ($result->method as $method) {
 					$method_array = (array)$method;
+					$output_array = array();
+					if( isset( $method->output ) ) { // output is on, and output can appear whether passing or failing.
+						foreach( $method->output as $output ) {
+							$output_array[] = "<div class='method_output'>{$method->output}</div>";
+						}
+					}
 
 					if( ! isset( $method->message ) ) { // no <message> means the method passed
-						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass" ) );
+						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass", "output" => implode( " ", $output_array ) ) );
 					} else {
 						$message_array = array();
 						$result = (string)$method->message->attributes()->type;
@@ -103,6 +109,7 @@ class TestsPlugin extends Plugin
 						$result_array['methods'][] = array_merge( array_shift($method_array), array(
 							"result" => $result,
 							"messages" => implode( "<br>", $message_array ),
+							"output" => implode( " ", $output_array ),
 						));
 					}
 				}

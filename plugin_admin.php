@@ -35,7 +35,10 @@
 		<ul id='<?php echo $result['name']; ?>' class='methods'>
 		<?php foreach ( $result['methods'] as $method ): ?>
       <li class='<?php echo $method['result']; ?>'> <span class="name"><a href="tests?unit=<?php echo $result['name']; ?>&test=<?php echo $method['name']; ?>&run=Run" title="Run <?php echo $method['name']; ?>"><?php echo $method['name']?></a></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
-		<?php endforeach; ?>
+		<?php endforeach;
+		if (! empty( $method['output'] )):?>
+      <li class='output'><span>Output</span><?php echo $method['output']; ?></li>
+		<?php endif; ?>
 		</ul>
 	</div>
 	<?php endforeach; ?>
