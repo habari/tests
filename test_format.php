@@ -13,13 +13,16 @@ class FormatTest extends UnitTestCase
 	{
 		$data = $this->autop_data_provider();
 		foreach( $data as $index => $datum ) {
-			$this->assert_equal( trim( $datum['want'] ), trim( Format::autop( $datum['in'] ) ), 
-				sprintf( 'Test %d<br><strong>Expected:</strong><br>%s<br><strong>Got:</strong><br> %s',
+			$result = ( trim( $datum['want'] ) === trim( Format::autop( $datum['in'] ) ) ? true : false );
+
+			if( ! $result ) {
+				$this->output( htmlspecialchars( sprintf( 'Test %d<br><strong>Expected:</strong><br>%s<br><strong>Got:</strong><br> %s',
 					$index,
 					nl2br( Utils::htmlspecialchars( $datum['want'] ) ),
 					nl2br( Utils::htmlspecialchars( Format::autop( $datum['in'] ) ) )
-				)
-			);
+				) ) );
+			}
+			$this->assert_true( $result, "Output does not match desired output" );
 		}
 	}
 
