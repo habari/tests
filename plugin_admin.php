@@ -32,17 +32,46 @@
 			<li><?php echo $result['fail']; ?> assertions failed.</li>
 			<li><?php echo $result['exception']; ?> unexpected exceptions.</li>
 		</ul>
-		<ul id='<?php echo $result['name']; ?>' class='methods'>
-		<?php foreach ( $result['methods'] as $method ): ?>
-      <li class='<?php echo $method['result']; ?>'> <span class="name"><a href="tests?unit=<?php echo $result['name']; ?>&test=<?php echo $method['name']; ?>&run=Run" title="Run <?php echo $method['name']; ?>"><?php echo $method['name']?></a></span><span class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></span></li>
+		<table class="methods" id="<?php echo $result['name']; ?>">
+			<tr><th class="passfail">Result</th><th>Test Method</th><th>Messages</th><th class="hasoutput">Output</th></tr>
+			<?php foreach ( $result['methods'] as $method ): ?>
+			<tr class="<?php echo $method['result']; ?>">
+				<td class="passfail"><?php
+					// todo: Haha, this will be completely untranslatable later...
+					echo '<span title="' . $method['result'] . '">';
+					switch($method['result']) {
+						case 'Pass':
+							echo '&#x2714;';break;
+						case 'Fail':
+							echo '&#x2718;';break;
+						case 'Incomplete':
+							echo '&#x21e5;';break;
+						case 'Skipped':
+							echo '&#x21b7;';break;
+					}
+					echo '</span>';
+				?></td>
+				<td class="methodname"><a href="tests?unit=<?php echo $result['name']; ?>&test=<?php echo $method['name']; ?>&run=Run" title="Run <?php echo $method['name']; ?>"><?php echo $method['name']?></a></td>
+				<td class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></td>
+				<td class="hasoutput <?php echo (! empty( $method['output'] )) ? 'hasoutput_yes' : 'hasoutput_no' ?>"><?php echo (! empty( $method['output'] )) ? '<a href="#">details</a>' : '--' ?></td>
+			</tr>
 		<?php endforeach;
 		if (! empty( $method['output'] )):?>
-      <li class='output'><span>Output</span><?php echo $method['output']; ?></li>
+			<tr><td class="output" colspan="4"><?php echo $method['output']; ?></td></tr>
 		<?php endif; ?>
-		</ul>
+		</table>
 	</div>
 	<?php endforeach; ?>
 </div>
+
+<script type="text/javascript">
+	$(function(){
+		$('.hasoutput_yes a').click(function(){
+			$(this).parents('tr').next('tr').find('.method_output').slideToggle();
+			return false;
+		});
+	});
+</script>
 
 <?php endif; ?>
 

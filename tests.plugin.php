@@ -60,7 +60,7 @@ class TestsPlugin extends Plugin
 	 */
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
-		$url = $this->get_url('/index.php?c=symbolic');
+		$url = $this->get_url('/index.php?c=symbolic&o=1');
 		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url.'&d=1')));
 
 		$output = '';

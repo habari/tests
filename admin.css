@@ -5,30 +5,47 @@
 
 .methods {
 	margin-top: 0.5em;
+	width: 100%;
 }
 
-.methods li {
+.methods tr {
 	padding: 2px 4px;
 }
 
-.methods .Skiped:before {
-	content: '\279D ';
-	padding-left: 4px;
+.methods td {
+	vertical-align: top;
+	line-height: 1.5em;
 }
 
-.methods .Incomplete:before {
-	content: '\21E5 ';
-	padding-left: 4px;
+.methods th {
+	font-weight: bold;
+	border-bottom: #666;
 }
 
-.methods .Pass:before {
-	content: '\2611 ';
-	padding-left: 4px;
+.methods th.passfail,
+.methods .hasoutput {
+	text-align: center;
 }
 
-.methods .Fail:before, .methods .Exception:before  {
-	content: '\2612 ';
-	padding-left: 4px;
+.methods .output {
+	background: #e0e0e0;
+}
+
+.methods .method_output {
+	display: none;
+	margin: 10px;
+	background: #F8F8F8;
+	padding: 5px;
+	font-family: consolas, monospace;
+}
+
+.methods td.passfail {
+	text-align: center;
+	font-size: larger;
+}
+
+.hasoutput_yes a {
+	text-decoration: underline;
 }
 
 .methods .Pass:nth-child(even) {
@@ -65,6 +82,7 @@
 	font-style: italic !important;
 }
 
-.methods .name {
+.methods .methodname a {
 	font-weight: bold;
+	text-decoration: underline;
 }
