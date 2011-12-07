@@ -17,6 +17,10 @@
 	line-height: 1.5em;
 }
 
+.methods td:first-child {
+	width: 50px;
+}
+
 .methods th {
 	font-weight: bold;
 	border-bottom: #666;
