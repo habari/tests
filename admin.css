@@ -21,6 +21,10 @@
 	width: 50px;
 }
 
+.methods td:last-child {
+	width: 80px;
+}
+
 .methods th {
 	font-weight: bold;
 	border-bottom: #666;

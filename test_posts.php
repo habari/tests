@@ -175,11 +175,14 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_user_id()
 	{
 		// Create another user and a post
-		$decoy = User::create(array (
-			'username'=>'decoy',
-			'email'=>'decoy@example.com',
-			'password'=>md5('q' . rand( 0,65535 ) ),
-		) );
+		$decoy = User::get_by_name( 'decoy' );
+		if ( !$decoy ) {
+			$decoy = User::create(array (
+				'username'=>'decoy',
+				'email'=>'decoy@example.com',
+				'password'=>md5('q' . rand( 0,65535 ) ),
+			) );
+		}
 		$this->posts[] = $this->make_post( $user, time() - rand( 3600, 3600*36 ), 'entry', 'published' );
 
 		$expected = User::get_by_name( 'posts_test' );
