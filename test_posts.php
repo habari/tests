@@ -196,6 +196,7 @@ class PostsTest extends UnitTestCase
 			$this->assert_equal( $r->author->id, $expected->id, 'Returned posts should belong to the expected user' );
 		}
 
+		$decoy->delete();
 		// Get by an array of ids
 	}
 
