@@ -183,7 +183,7 @@ class PostsTest extends UnitTestCase
 				'password'=>md5('q' . rand( 0,65535 ) ),
 			) );
 		}
-		$this->posts[] = $this->make_post( $user, time() - rand( 3600, 3600*36 ), 'entry', 'published' );
+		$this->posts[] = $this->make_post( $decoy, time() - rand( 3600, 3600*36 ), 'entry', 'published' );
 
 		$expected = User::get_by_name( 'posts_test' );
 
