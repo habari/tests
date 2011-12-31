@@ -12,6 +12,18 @@ class OptionsTest extends UnitTestCase
 		$option = Options::get( 'installed' );
 
 		$this->assert_equal( '1', $option, 'Could not retrieve single option.' );
+
+		$option = Options::get( null ); // null is not a valid name
+
+		$this->assert_equal( null, $option, 'Unset option should return null.' );
+	}
+
+	public function test_getSingleDefaultValue()
+	{
+		// The installed option is guaranteed to exist, so we try to get that
+		$option = Options::get( null, "default value" );
+
+		$this->assert_equal( "default value", $option, 'Default value not returned.' );
 	}
 
 	public function test_getMultiple()

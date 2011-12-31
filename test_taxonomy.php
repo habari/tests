@@ -19,7 +19,7 @@ class TaxonomyTest extends UnitTestCase
 			'description' => $this->vocab_desc,
 			'features' => array( 'hierarchical' )
 		);
-		$v = new Vocabulary($params);
+		$v = new Vocabulary( $params );
 
 		$this->assert_true( $v instanceof Vocabulary );
 		$this->assert_equal( $v->name, $this->vocab_name );
@@ -30,11 +30,26 @@ class TaxonomyTest extends UnitTestCase
 
 	public function test_get_names()
 	{
+		// ideally we would test here for false when there are no vocabularies. For now, though, there's a tag vocabulary in there by default.
+		if( Vocabulary::get( $this->vocab_name ) ) {
+			Vocabulary::get( $this->vocab_name )->delete();
+		}
+
+		$v = Vocabulary::create( array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+		) );
+		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ) );
+
 		$this->assert_true( is_array( Vocabulary::names() ) );
+		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ) );
 	}
 
 	public function test_insert_vocabulary()
 	{
+		if( Vocabulary::get( $this->vocab_name ) ) {
+			Vocabulary::get( $this->vocab_name )->delete();
+		}
 		$vocab_count = count( Vocabulary::names() );
 		$params = array(
 			'name' => $this->vocab_name,
@@ -43,7 +58,6 @@ class TaxonomyTest extends UnitTestCase
 		);
 		$v = new Vocabulary( $params );
 		$v->insert();
-
 		$this->assert_equal( $vocab_count + 1, count( Vocabulary::names() ), 'Count of names should increase by one' );
 		$this->assert_true( in_array( $this->vocab_name, Vocabulary::names() ), 'Test vocabulary name should be in the list of names' );
 
@@ -160,6 +174,30 @@ class TaxonomyTest extends UnitTestCase
 		$this->assert_false( in_array( $this->vocab_name, Vocabulary::names() ), 'Deleted vocabulary name should not be in list of vocabulary names' );
 	}
 
+	public function test_update_vocabulary()
+	{
+		// Set up
+		// Create and insert a vocabulary
+		$params = array(
+			'name' => $this->vocab_name,
+			'description' => $this->vocab_desc,
+			'features' => array( 'hierarchical' )
+		);
+		$v = new Vocabulary( $params );
+		$v->insert();
+
+		// Change description and update
+		$v = Vocabulary::get( $this->vocab_name );
+		$v->description = "new description";
+		$v->update();
+
+		// Re-retrieve vocabulary (this step may be unnecessary)
+		$v = Vocabulary::get( $this->vocab_name );
+		$this->assert_equal( $v->description, "new description", 'Vocabulary description was not updated' );
+
+		$v->delete();
+	}
+
 	/* Term tests */
 	public function test_construct_term()
 	{
@@ -223,21 +261,21 @@ class TaxonomyTest extends UnitTestCase
 		$this->assert_true( $v instanceof Vocabulary, 'Vocabulary without features should be flat' );
 
 		$sample_ary = array( '1', 2, 'a'=>'b' );
-		
+
 		$one = $v->add_term( 'one' );
 		$one->info->value = 1;
 		$one->info->url = 'http://google.com/';
 		$one->info->ary = $sample_ary;
 		$one->info->commit();
-		
+
 		$one = null;
-		
+
 		$one = $v->get_term( 'one' );
 		$this->assert_true( $one instanceof Term, 'The added term was not returned.' );
 		$this->assert_equal( $one->info->value, 1, 'The integer term info value is not identical' );
 		$this->assert_identical( $one->info->url, 'http://google.com/', 'The string term info value is not identical' );
 		$this->assert_identical( $one->info->ary, $sample_ary, 'The array term info value is not identical' );
-		
+
 		// clean up
 		$v->delete();
 	}
@@ -284,24 +322,70 @@ class TaxonomyTest extends UnitTestCase
 		$this->assert_false( $fale, 'Return false for an empty vocabulary' );
 
 		$one = $v->add_term( 'one' );
-		$this->assert_equal( 1, $one->mptt_left, 'The first term should have mptt_left 1' );
-		$this->assert_equal( 2, $one->mptt_right, 'The first term should have mptt_right 2, as long as it is the only term' );
+		$this->assert_equal( 1, $one->mptt_left, 'The first term "one" should have mptt_left 1, not ' . $one->mptt_left );
+		$this->assert_equal( 2, $one->mptt_right, 'The first term "one" should have mptt_right 2, not ' . $one->mptt_right );
 
 		$five = $v->add_term( 'five' );
+		$this->assert_equal( 3, $five->mptt_left, 'The second term "five" should have mptt_left 3, not ' . $five->mptt_left );
+		$this->assert_equal( 4, $five->mptt_right, 'The second term "five" should have mptt_right 4, not ' . $five->mptt_right );
+
 		$two = $v->add_term( 'two' );
+		$this->assert_equal( 5, $two->mptt_left, 'The third term "two" should have mptt_left 5, not ' . $two->mptt_left );
+		$this->assert_equal( 6, $two->mptt_right, 'The third term "two" should have mptt_right 6, not ' . $two->mptt_right );
+
 		$four = $v->add_term( 'four' );
+		$this->assert_equal( 7, $four->mptt_left, 'The fourth term "four" should have mptt_left 7, not ' . $four->mptt_left );
+		$this->assert_equal( 8, $four->mptt_right, 'The fourth term "four" should have mptt_right 8, not ' . $four->mptt_right );
+
 		$three = $v->add_term( 'three' );
-		$v->move_term( $three, $four, true );
-		$three = $v->get_term( $three->id ); // not updated otherwise?
-		$four = $v->get_term( $four->id ); // not updated otherwise?
+		$this->assert_equal( 9, $three->mptt_left, 'The fifth term "three" should have mptt_left 9, not ' . $three->mptt_left );
+		$this->assert_equal( 10, $three->mptt_right, 'The fifth term "three" should have mptt_right 10, not ' . $three->mptt_right );
+
+		// $v should be ( one, five, two, four, three )
+
+		$moved = $v->move_term( $three, $four, true );
+
+		// $v should be ( one, five, two, three, four )
+
+		$this->assert_false( !$moved, 'move_term should not return false on a successful move' );
+		// @TODO: test failures on the UPDATEs
+		$this->assert_true( $moved instanceof Term, 'move_term should return a Term' );
+		$this->assert_equal( $moved->id, $three->id, 'Returned term ID should match moved term ID' );
+		$this->assert_equal( 7, $moved->mptt_left, 'After moving, the returned term should have mptt_left 7, not ' . $moved->mptt_left );
+		$this->assert_equal( 8, $moved->mptt_right, 'After moving, the returned term should have mptt_right 8, not ' . $moved->mptt_right );
+
+		$three = $v->get_term( $three->id );
+		$four = $v->get_term( $four->id );
+		$this->assert_equal( 9, $four->mptt_left, 'After moving, "four" should have mptt_left 9, not ' . $four->mptt_left );
+		$this->assert_equal( 10, $four->mptt_right, 'After moving, "four" should have mptt_right 10, not ' . $four->mptt_right );
+		$this->assert_equal( 7, $three->mptt_left, 'After moving, "three" should have mptt_left 7, not ' . $three->mptt_left );
+		$this->assert_equal( 8, $three->mptt_right, 'After moving, "three" should have mptt_right 8, not ' . $three->mptt_right );
 
 		$this->assert_equal( $four->mptt_left - 1, $three->mptt_right, 'When $before is true the Term should be inserted before $target_term' );
 
-		$v->move_term( $five );
+		$moved = $v->move_term( $two, $one, false );
 
-		$four = $v->get_term( $four->id ); // not updated otherwise?
-		$five = $v->get_term( $five->id ); // not updated otherwise?
+		// $v should be ( one, two, five, three, four )
+
+		$this->assert_false( !$moved, 'move_term should not return false on a successful move' );
+		$this->assert_true( $moved instanceof Term, 'move_term should return a Term' );
+		$this->assert_equal( $moved->id, $two->id, 'Returned term ID should match moved term ID' );
+		$this->assert_equal( 3, $moved->mptt_left, 'After moving, the returned term should have mptt_left 3, not ' . $moved->mptt_left );
+		$this->assert_equal( 4, $moved->mptt_right, 'After moving, the returned term should have mptt_right 4, not ' . $moved->mptt_right );
+
+		$five = $v->get_term( $five->id );
+		$moved = $v->move_term( $five );
+		$this->assert_false( !$moved, 'move_term should not return false on a successful move' );
+		$this->assert_true( $moved instanceof Term, 'move_term should return a Term' );
+		$this->assert_equal( $moved->id, $five->id, 'Returned term ID should match moved term ID' );
+
+		// $v should be ( one, two, three, four, five )
+
+		$four = $v->get_term( $four->id );
+		$five = $v->get_term( $five->id );
 		$this->assert_equal( $four->mptt_right + 1, $five->mptt_left, 'Without arguments the Term should be moved all the way to the right' );
+		$this->assert_equal( 9, $five->mptt_left, 'After moving, "five" should have mptt_left 9, not ' . $five->mptt_left );
+		$this->assert_equal( 10, $five->mptt_right, 'After moving, "five" should have mptt_right 10, not ' . $five->mptt_right );
 
 		// clean up
 		$v->delete();
@@ -710,10 +794,7 @@ class TaxonomyTest extends UnitTestCase
 		}
 
 		$this->assert_equal( 3, count( $terms ) );
-Utils::debug( 3, count( $terms ) );
 		$this->assert_equal( 0, count( array_diff( $new_terms, $t ) ) );
-Utils::debug( 0, count( array_diff( $new_terms, $t ) ) );
-
 		$v->delete_term( 'unit test' );
 		$post->delete();
 		$nv->delete();
@@ -722,7 +803,7 @@ Utils::debug( 0, count( array_diff( $new_terms, $t ) ) );
 	public function teardown()
 	{
 	}
-	
+
 }
 TaxonomyTest::run_one( 'TaxonomyTest' );
 ?>

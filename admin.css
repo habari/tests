@@ -1,0 +1,96 @@
+#run {
+	margin-left: 5%;
+	margin-top: 1px;
+}
+
+.methods {
+	margin-top: 0.5em;
+	width: 100%;
+}
+
+.methods tr {
+	padding: 2px 4px;
+}
+
+.methods td {
+	vertical-align: top;
+	line-height: 1.5em;
+}
+
+.methods td:first-child {
+	width: 50px;
+}
+
+.methods td:last-child {
+	width: 80px;
+}
+
+.methods th {
+	font-weight: bold;
+	border-bottom: #666;
+}
+
+.methods th.passfail,
+.methods .hasoutput {
+	text-align: center;
+}
+
+.methods .output {
+	background: #e0e0e0;
+}
+
+.methods .method_output {
+	display: none;
+	margin: 10px;
+	background: #F8F8F8;
+	padding: 5px;
+	font-family: consolas, monospace;
+}
+
+.methods td.passfail {
+	text-align: center;
+	font-size: larger;
+}
+
+.hasoutput_yes a {
+	text-decoration: underline;
+}
+
+.methods .Pass:nth-child(even) {
+	background-color: #DFD;
+}
+
+.methods .Pass:nth-child(odd) {
+	background-color: #D6F8D6;
+}
+
+.methods .Fail:nth-child(even) {
+	background-color: #FDD;
+}
+
+.methods .Fail:nth-child(odd) {
+	background-color: #F8D6D6;
+}
+
+.methods .Incomplete:nth-child(even) {
+	background-color: #FFC;
+}
+
+.methods .Incomplete:nth-child(odd) {
+	background-color: #F8F8C5;
+}
+
+.methods .messages {
+	display: block;
+	padding-left: 4px;
+	padding-bottom: 2px;
+}
+
+.methods .messages em {
+	font-style: italic !important;
+}
+
+.methods .methodname a {
+	font-weight: bold;
+	text-decoration: underline;
+}

@@ -1,0 +1,12 @@
+<dl>
+<dt>One line</dt>
+<dd>Line 1</dd>
+<dt>Lines with Breaks</dt>
+<dd>Line 1<br>
+Line 2<br>
+Line 2</dd>
+<dt>Paragraphs</dt>
+<dd><p>Paragraph 1</p>
+<p>Paragraph 2</p>
+<p>Paragraph 3</p></dd>
+</dl>
