@@ -74,10 +74,12 @@ class PluggableTest extends UnitTestCase {
 		Pluggable::register_assets();
 
 		$key = 'simple_assets';
-		$expected = array($key => array('files' => array('of')));
+		//$expected = array($key => array('files' => array('of')));
 		$result = Options::get('released_pluggable_assets');
 
-		$this->assert_equal($expected, $result, "Expected <em>" . var_export($result, true) . "</em> to equal <em>" . var_export($expected, true) . "</em>");
+		// Like to do this, but PHP's mushing together of arrays and dictionaries makes the keys not match
+		//$this->assert_equal($expected, $result, "Expected <em>" . var_export($result, true) . "</em> to equal <em>" . var_export($expected, true) . "</em>");
+		$this->assert_true(array_key_exists($key, $result) && array_key_exists('files', $result[$key]) && in_array('of', $result[$key]['files']));
 	}
 
 	/* Dummy plugin hooks */
@@ -107,7 +109,8 @@ class PluggableTest extends UnitTestCase {
 	public function filter_register_release_asset($assets)
 	{
 		$released_assets = $this->simple_assets;
-		unset($released_assets['simple_assets']['files']['of']);
+		// Have to unset 'of' value using key
+		unset($released_assets['simple_assets']['files'][1]);
 		// Overwrite the assets
 		return $released_assets;
 	}
