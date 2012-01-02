@@ -319,7 +319,7 @@ class UnitTestCase
 		}
 
 		if(isset($options['v'])) {
-			$results->code_coverage[] = xdebug_get_code_coverage();
+			$results->code_coverage(get_class($this), xdebug_get_code_coverage());
 
 			xdebug_stop_code_coverage();
 		}
@@ -517,6 +517,43 @@ class UnitTestResults
 				}
 			}
 			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['total_case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions.  {$summary['incomplete_count']} incomplete tests.  {$summary['skipped_count']} skipped tests.</p></div>";
+
+			$code_coverage = $this->code_coverage[$test];
+			foreach ( $code_coverage as $file => $coverage ) {
+				die(var_dump($file, $coverage);
+
+				echo $file . '<br />';
+
+				$lines = file( $file );
+
+				$i = 1;
+				foreach ( $lines as $line ) {
+					if ( isset( $code_coverage[$file][$i] ) ) {
+
+						$result = $code_coverage[$file][$i];
+
+						if ( $result > 0 ) {
+							echo $i . ': <span style="color: #b3e167;">' . htmlentities( $line ) . '</span><br />';
+						}
+						else if ( $result == -1 ) {
+							echo $i . ': <span style="color: #e78e3a;">' . htmlentities( $line ) . '</span><br />';
+						}
+						else if ( $result == -2 ) {
+							echo $i . ': <span style="color: #dcded9;">' . htmlentities( $line ) . '</span><br />';
+						}
+						else {
+							echo $i . ': ' . htmlentities( $line ) . '<br />';
+						}
+
+					}
+					else {
+						echo $i . ': ' . htmlentities( $line ) . '<br />';
+					}
+
+					$i++;
+				}
+
+			}
 		}
 
 		$output .= '<footer><h3>Results</h3>';
@@ -694,71 +731,76 @@ class UnitTestResults
 		$this->summaries[$test] = $values;
 	}
 
-	public function code_coverage ( ) {
-
-		// if ( extension_loaded('xdebug') ) {
-		//print_r($this->code_coverage);die();
-
-		// @todo what about @covers comments?
-		// @todo and @codeCoverageIgnore, @codeCoverageIgnoreStart, and @codeCoverageIgnoreEnd?
-		foreach ( $this->code_coverage[0] as $file => $coverage ) {
-
-			echo $file . '<br />';
-
-			$lines = file( $file );
-
-			$i = 1;
-			foreach ( $lines as $line ) {
-				if ( isset( $this->code_coverage[0][ $file ][ $i ] ) ) {
-
-					$result = $this->code_coverage[0][ $file ][ $i ];
-
-					if ( $result > 0 ) {
-						echo $i . ': <span style="color: #b3e167;">' . htmlentities( $line ) . '</span><br />';
-					}
-					else if ( $result == -1 ) {
-						echo $i . ': <span style="color: #e78e3a;">' . htmlentities( $line ) . '</span><br />';
-					}
-					else if ( $result == -2 ) {
-						echo $i . ': <span style="color: #dcded9;">' . htmlentities( $line ) . '</span><br />';
-					}
-					else {
-						echo $i . ': ' . htmlentities( $line ) . '<br />';
-					}
-
-				}
-				else {
-					echo $i . ': ' . htmlentities( $line ) . '<br />';
-				}
-
-				$i++;
-			}
-
-		}
-		return;
-
-		//print_r( $this->code_coverage );
-
-		foreach ( $this->tests as $test ) {
-
-			$file = new ReflectionClass( $test );
-			$file = $file->getFileName();
-
-			$lines = file( $file );
-
-			foreach ( $lines as $num => $line ) {
-
-				echo $num . ' ' . $line . '<br />';
-
-			}
-
-			// line number => # of execution units on this line have been executed
-			// 		-1 == unused line
-			print_r( $this->code_coverage[0][ $file ] );
-
-		}
-
+	function code_coverage($test, $coverage)
+	{
+		$this->code_coverage[$test] = $coverage;
 	}
+
+//	public function code_coverage() {
+//
+//		// if ( extension_loaded('xdebug') ) {
+//		//print_r($this->code_coverage);die();
+//
+//		// @todo what about @covers comments?
+//		// @todo and @codeCoverageIgnore, @codeCoverageIgnoreStart, and @codeCoverageIgnoreEnd?
+//		foreach ( $this->code_coverage[0] as $file => $coverage ) {
+//
+//			echo $file . '<br />';
+//
+//			$lines = file( $file );
+//
+//			$i = 1;
+//			foreach ( $lines as $line ) {
+//				if ( isset( $this->code_coverage[0][ $file ][ $i ] ) ) {
+//
+//					$result = $this->code_coverage[0][ $file ][ $i ];
+//
+//					if ( $result > 0 ) {
+//						echo $i . ': <span style="color: #b3e167;">' . htmlentities( $line ) . '</span><br />';
+//					}
+//					else if ( $result == -1 ) {
+//						echo $i . ': <span style="color: #e78e3a;">' . htmlentities( $line ) . '</span><br />';
+//					}
+//					else if ( $result == -2 ) {
+//						echo $i . ': <span style="color: #dcded9;">' . htmlentities( $line ) . '</span><br />';
+//					}
+//					else {
+//						echo $i . ': ' . htmlentities( $line ) . '<br />';
+//					}
+//
+//				}
+//				else {
+//					echo $i . ': ' . htmlentities( $line ) . '<br />';
+//				}
+//
+//				$i++;
+//			}
+//
+//		}
+//		return;
+//
+//		//print_r( $this->code_coverage );
+//
+//		foreach ( $this->tests as $test ) {
+//
+//			$file = new ReflectionClass( $test );
+//			$file = $file->getFileName();
+//
+//			$lines = file( $file );
+//
+//			foreach ( $lines as $num => $line ) {
+//
+//				echo $num . ' ' . $line . '<br />';
+//
+//			}
+//
+//			// line number => # of execution units on this line have been executed
+//			// 		-1 == unused line
+//			print_r( $this->code_coverage[0][ $file ] );
+//
+//		}
+//
+//	}
 }
 
 include HABARI_PATH . '/index.php';
