@@ -48,3 +48,30 @@ div.all:before {
     font-weight: normal;
     color: #999;
 }
+table {
+	font: 13px "Consolas", monospace;
+	color: black;
+}
+.line_number {
+	text-align: right;
+	padding-right: 5px;
+}
+.codeline {
+	white-space: pre;
+}
+.executed {
+	color: white;
+	font-weight: bold;
+	background-color: green;
+}
+.unexecuted {
+	color: red;
+	background-color: #dddddd;
+}
+.inaccessible {
+	color: #990000;
+	background-color: #ff8888;
+}
+.whitespace {
+	color: #dadadb;
+}
