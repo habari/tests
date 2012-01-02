@@ -16,6 +16,7 @@
  *   -r {path} : Set the path for habari.
  *   -o : Display output.
  *   -u {unitname} : Run only the specified units.
+ *   -v : Do code coverage.
  */
 
 if(defined('STDIN') && function_exists( 'getopt' ) ) {
@@ -220,6 +221,11 @@ class UnitTestCase
 		if(method_exists($this, 'module_setup')) {
 			$this->module_setup();
 		}
+
+		if(isset($options['v'])) {
+			xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
+		}
+
 		if(isset($options['t'])) {
 			$options['t'] = explode(',', $options['t']);
 			if(count($options['t']) == 0) {
@@ -311,7 +317,13 @@ class UnitTestCase
 
 			$this->case_count++;
 		}
-		
+
+		if(isset($options['v'])) {
+			$results->code_coverage[] = xdebug_get_code_coverage();
+
+			xdebug_stop_code_coverage();
+		}
+
 		if(method_exists($this, 'module_teardown')) {
 			$this->module_teardown();
 		}
@@ -330,6 +342,8 @@ class UnitTestCase
 
 		$testobj->run($results = new UnitTestResults());
 		echo $results;
+		
+		return $results;
 	}
 
 	public static function run_all()
@@ -392,6 +406,7 @@ class UnitTestResults
 	private $tests = array();
 	private $summaries = array();
 	private $options = array();
+	public $code_coverage = array();
 	private $type;
 
 	function __construct()
@@ -646,6 +661,9 @@ class UnitTestResults
 			$xunit->addAttribute('pass', $summary['pass_count']);
 			$xunit->addAttribute('exception', $summary['exception_count']);
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
+
+			$coverage = $this->code_coverage[0]; // this part here doesn't work yet.
+			$xunit->addAttribute('coverage', $coverage ); // the admin page doesn't do anything with this yet.
 		}
 
 		if(!isset($summary)) {
@@ -674,6 +692,72 @@ class UnitTestResults
 	function summary($test, $values)
 	{
 		$this->summaries[$test] = $values;
+	}
+
+	public function code_coverage ( ) {
+
+		// if ( extension_loaded('xdebug') ) {
+		//print_r($this->code_coverage);die();
+
+		// @todo what about @covers comments?
+		// @todo and @codeCoverageIgnore, @codeCoverageIgnoreStart, and @codeCoverageIgnoreEnd?
+		foreach ( $this->code_coverage[0] as $file => $coverage ) {
+
+			echo $file . '<br />';
+
+			$lines = file( $file );
+
+			$i = 1;
+			foreach ( $lines as $line ) {
+				if ( isset( $this->code_coverage[0][ $file ][ $i ] ) ) {
+
+					$result = $this->code_coverage[0][ $file ][ $i ];
+
+					if ( $result > 0 ) {
+						echo $i . ': <span style="color: #b3e167;">' . htmlentities( $line ) . '</span><br />';
+					}
+					else if ( $result == -1 ) {
+						echo $i . ': <span style="color: #e78e3a;">' . htmlentities( $line ) . '</span><br />';
+					}
+					else if ( $result == -2 ) {
+						echo $i . ': <span style="color: #dcded9;">' . htmlentities( $line ) . '</span><br />';
+					}
+					else {
+						echo $i . ': ' . htmlentities( $line ) . '<br />';
+					}
+
+				}
+				else {
+					echo $i . ': ' . htmlentities( $line ) . '<br />';
+				}
+
+				$i++;
+			}
+
+		}
+		return;
+
+		//print_r( $this->code_coverage );
+
+		foreach ( $this->tests as $test ) {
+
+			$file = new ReflectionClass( $test );
+			$file = $file->getFileName();
+
+			$lines = file( $file );
+
+			foreach ( $lines as $num => $line ) {
+
+				echo $num . ' ' . $line . '<br />';
+
+			}
+
+			// line number => # of execution units on this line have been executed
+			// 		-1 == unused line
+			print_r( $this->code_coverage[0][ $file ] );
+
+		}
+
 	}
 }
 
