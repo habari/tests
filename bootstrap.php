@@ -520,6 +520,7 @@ class UnitTestResults
 		}
 
 		if( count($this->code_coverage) ) {
+			ksort($this->code_coverage);
 			$output .= '<h1>Code Coverage</h1>';
 
 			// @todo what about @covers comments?
