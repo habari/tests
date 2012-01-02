@@ -20,7 +20,7 @@
  */
 
 if(defined('STDIN') && function_exists( 'getopt' ) ) {
-	$shortopts = 'u::d::c::t::r::o';
+	$shortopts = 'u::d::c::t::r::o::v';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -28,7 +28,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>''));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>'','v'=>''));
 	$options = array_merge($options, $querystring_options);
 }
 
