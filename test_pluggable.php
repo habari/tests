@@ -9,6 +9,15 @@ class PluggableTest extends UnitTestCase {
 		'tables' => array('table')
 	));
 
+	public function module_setup()
+	{
+		if(!method_exists('Pluggable', 'register_assets')) {
+			$this->skip_test('cache_assets', 'This test requires Pluggable::register_assets');
+			$this->skip_test('test_store_released_asset_type', 'This test requires Pluggable::register_assets');
+			$this->skip_test('test_store_released_asset', 'This test requires Pluggable::register_assets');
+		}
+	}
+
 	public function teardown()
 	{
 		Cache::expire('pluggable_assets');
