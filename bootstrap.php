@@ -80,6 +80,7 @@ class UnitTestCase
 	private $asserted_exception = null;
 	protected $show_output = false;
 	protected $conditions = array();
+	protected $methods = array();
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
@@ -181,6 +182,21 @@ class UnitTestCase
 		$this->conditions[$condition] = $reason;
 	}
 
+	public function skip_all()
+	{
+		$this->methods = array_fill_keys(array_keys($this->methods), 'Skipping all tests.');
+	}
+
+	public function skip_test($name, $reason = 'This test is explicitly skipped.')
+	{
+		if(isset($this->methods['test_' . $name])) {
+			$name = 'test_' . $name;
+		}
+		if(isset($this->methods[$name])) {
+			$this->methods[$name] = $reason;
+		}
+	}
+
 	public function named_test_filter( $function_name )
 	{
 		return preg_match('%^test_%', $function_name);
@@ -212,6 +228,7 @@ class UnitTestCase
 
 		$methods = get_class_methods($this);
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
+		$this->methods = array_fill_keys($methods, 1);
 		$cases = 0;
 
 		$class = new ReflectionClass( get_class( $this ) );
@@ -233,7 +250,7 @@ class UnitTestCase
 			}
 		}
 
-		foreach($methods as $method) {
+		foreach($this->methods as $method => $run_status) {
 			$this->messages = array();
 			$this->show_output = false;
 			$this->total_case_count++;
@@ -259,17 +276,33 @@ class UnitTestCase
 
 			$do_skip = false;
 			$dryrun = isset($options['d']);
+
+			/**
+			 *  === Check conditions ===
+			 * If a test module includes a line such as $this->add_condition('mysql', 'Skipping mysql tests');
+			 * then the test suite will skip any test named with the prefix test_mysql_*
+			 **/
 			if(count($this->conditions) > 0) {
 				if(preg_match('%^test_(' . implode('|', array_keys($this->conditions)) . ')_.+%i', $method, $condition_matches)) {
 					if(isset($this->conditions[$condition_matches[1]]) && is_string($this->conditions[$condition_matches[1]])) {
-						$this->messages[] = array(self::SKIP, $this->conditions[$condition_matches[1]]);
-						$do_skip = true;
-						$this->skipped_count++;
+						$do_skip = $this->conditions[$condition_matches[1]];
 					}
 				}
 			}
 
-			if(!$do_skip) {
+			/**
+			 * methods (keys) in the method list must have a value of 1
+			 * If not, they will be skipped using a message of the value in the list.
+			 */
+			if($this->methods[$method] != 1) {
+				$do_skip = $this->methods[$method];
+			}
+
+			if($do_skip) {
+				$this->messages[] = array(self::SKIP, $do_skip);
+				$this->skipped_count++;
+			}
+			else {
 				if(!$dryrun) {
 					$this->pre_test();
 					if(method_exists($this, 'setup')) {
