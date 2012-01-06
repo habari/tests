@@ -1,6 +1,6 @@
 <?php
 
-include 'bootstrap.php';
+include '../bootstrap.php';
 
 define('NUM_POSTS', 1);
 

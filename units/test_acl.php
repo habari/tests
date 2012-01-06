@@ -1,6 +1,6 @@
 <?php
 
-include 'bootstrap.php';
+include '../bootstrap.php';
 
 class ACLTest extends UnitTestCase {
 	private $acl_group;

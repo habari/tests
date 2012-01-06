@@ -3,7 +3,7 @@
 /**
  * Test for the InputFilter class.
  */
-include 'bootstrap.php';
+include '../bootstrap.php';
 
 class InputFilterTest extends UnitTestCase
 {

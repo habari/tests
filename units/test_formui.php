@@ -7,7 +7,7 @@
  * @copyright 2008
  */
 
-include 'bootstrap.php';
+include '../bootstrap.php';
 
 class FormUITest extends UnitTestCase
 {

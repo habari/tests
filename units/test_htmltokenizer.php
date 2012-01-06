@@ -2,7 +2,7 @@
 /**
  * Test for the HTMLTokenizer class.
  */
-include('bootstrap.php');
+include('../bootstrap.php');
 
 class HTMLTokenizerTest extends UnitTestCase
 {

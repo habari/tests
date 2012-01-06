@@ -1,5 +1,5 @@
 <?php
-include 'bootstrap.php';
+include '../bootstrap.php';
 
 class UUIDTest extends UnitTestCase
 {

@@ -411,7 +411,7 @@ class UnitTestCase
 		if(!isset($directory)) {
 			$directory = dirname(__FILE__);
 		}
-		$tests = glob($directory . '/test_*.php');
+		$tests = glob($directory . '/units/test_*.php');
 		foreach($tests as $test) {
 			include($test);
 		}
@@ -499,7 +499,7 @@ class UnitTestResults
 			'<link rel="stylesheet" type="text/css" href="style.css">' .
 			"</head><body>";
 		foreach($this->tests as $test => $file) {
-			$output .= "<h1>{$test}<a href=\"{$file}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">{$file}</a></h1>";
+			$output .= "<h1>{$test}<a href=\"index.php?u={$test}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">Run only {$test}</a></h1>";
 
 			if(!isset($this->methods[$test])) {
 				$this->methods[$test] = array();
