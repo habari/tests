@@ -605,7 +605,6 @@ class TestResults extends ArrayObject
 			}
 
 			$summary = $test->summaries;
-			var_dump($test->summaries);
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
 					$totals[$k] += $v;
