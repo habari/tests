@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class ACLTest extends UnitTestCase {
 	private $acl_group;
 	private $acl_user_alice;
@@ -15,6 +13,13 @@ class ACLTest extends UnitTestCase {
 		$this->acl_user_bob = User::create( array( 'username' => 'acl-bob' ) );
 		$this->acl_group->add( 'acl-alice' );
 		$this->acl_group->add( 'acl-bob' );
+	}
+
+	public function teardown()
+	{
+		$this->acl_group->delete();
+		$this->acl_user_alice->delete();
+		$this->acl_user_bob->delete();
 	}
 
 	public function test_group_permissions()
@@ -96,7 +101,7 @@ class ACLTest extends UnitTestCase {
 	 */
 	public function test_post_permissions()
 	{
-
+		$this->mark_test_incomplete();
 	}
 
 	/**
@@ -124,15 +129,9 @@ class ACLTest extends UnitTestCase {
 		);
 
 	}
-
-	public function teardown()
-	{
-		$this->acl_group->delete();
-		$this->acl_user_alice->delete();
-		$this->acl_user_bob->delete();
-	}
 }
 
-ACLTest::run_one( 'ACLTest' );
+include_once dirname(__FILE__) . '/../bootstrap.php';
+//ACLTest::run_one( 'ACLTest' );
 
 ?>

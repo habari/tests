@@ -10,6 +10,6 @@
 ob_start();
 include 'bootstrap.php';
 
-UnitTestCase::run_dir();
+TestSuite::run_dir();
 
 ?>

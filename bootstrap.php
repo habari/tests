@@ -13,7 +13,7 @@
  *   -d : Dry-run, don't execute tests.
  *   -c {console|html|symbolic} : Output type.
  *   -t {testname|linenumber} : Run a specific test, or multiple separated by commas
- *   -r {path} : Set the path for habari.
+ *   -r {path} : Set the root path for habari.
  *   -o : Display output.
  *   -u {unitname} : Run only the specified units.
  */
@@ -41,7 +41,7 @@ if(!defined('HABARI_PATH')) {
 		while(!file_exists($dirname . '/index.php')) {
 			$dirname = dirname($dirname);
 			if(strlen($dirname) <= 1) {
-				throw new Exception("Couldn't find Habari's index.php");
+				throw new \Exception("Couldn't find Habari's index.php");
 			}
 		}
 		define('HABARI_PATH', $dirname );
@@ -63,16 +63,8 @@ class UnitTestCase
 	const INCOMPLETE = 1;
 	const SKIP = 2;
 
-	static $run_all = false;
-
 	public $messages = array();
-	public $pass_count = 0;
-	public $fail_count = 0;
-	public $incomplete_count = 0;
-	public $exception_count = 0;
-	public $case_count = 0;
-	public $total_case_count = 0;
-	public $skipped_count = 0;
+	public $result;
 
 	private $exceptions = array();
 	private $checks = array();
@@ -85,10 +77,10 @@ class UnitTestCase
 	{
 		if($value !== true) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
@@ -96,10 +88,10 @@ class UnitTestCase
 	{
 		if($value !== false) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
@@ -107,10 +99,10 @@ class UnitTestCase
 	{
 		if($value1 != $value2) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
@@ -118,10 +110,10 @@ class UnitTestCase
 	{
 		if($value1 == $value2) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
@@ -129,10 +121,10 @@ class UnitTestCase
 	{
 		if($value1 !== $value2) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
@@ -146,17 +138,17 @@ class UnitTestCase
 		$class = get_class( $object );
 		if( $class != $type ) {
 			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
+			$this->result->fail_count++;
 		}
 		else {
-			$this->pass_count++;
+			$this->result->pass_count++;
 		}
 	}
 
 	public function mark_test_incomplete( $message = 'Tests not implemented' )
 	{
 		$this->messages[] = array( self::INCOMPLETE, $message);
-		$this->incomplete_count++;
+		$this->result->incomplete_count++;
 	}
 
 	public function output($v)
@@ -211,32 +203,36 @@ class UnitTestCase
 	private final function post_test()
 	{
 		if(isset($this->asserted_exception)) {
-			$this->fail_count++;
+			$this->result->fail_count++;
 			$this->messages[] = array(self::FAIL, $this->asserted_exception[1] . ': ' . $this->asserted_exception[0]);
 		}
 		foreach($this->checks as $check => $message) {
-			$this->fail_count++;
+			$this->result->fail_count++;
 			$this->messages[] = array(self::FAIL, $message);
 		}
 	}
 
-	public function run($results)
+	public function run()
 	{
 		global $options;
 		$this->options = $options;
 
+		// Get the list of methods that qualify as tests and mark them as "to test"
 		$methods = get_class_methods($this);
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
-		$this->methods = array_fill_keys($methods, 1);
+		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
 		$cases = 0;
 
+		// Get class info and build a result object, which will be returned
 		$class = new ReflectionClass( get_class( $this ) );
+		$this->result = new TestResult(get_class($this), $class->getFileName());
 
-		$results->test(get_class($this), $class->getFileName());
-
+		// Execute any module setup that might exist
 		if(method_exists($this, 'module_setup')) {
 			$this->module_setup();
 		}
+
+		// If specific tests are specified to run within this unit, get that list
 		if(isset($options['t'])) {
 			$options['t'] = explode(',', $options['t']);
 			if(count($options['t']) == 0) {
@@ -244,11 +240,13 @@ class UnitTestCase
 			}
 		}
 
+		// Attempt to execute test methods in this unit
 		foreach($this->methods as $method => $run_status) {
 			$this->messages = array();
 			$this->show_output = false;
 			$this->total_case_count++;
 
+			// Get test line numbers and skip the test if it's not specified
 			$ref_method = new ReflectionMethod($this, $method);
 			if(isset($options['t'])) {
 				$start_line = $ref_method->getStartLine();
@@ -272,7 +270,6 @@ class UnitTestCase
 			$dryrun = isset($options['d']);
 
 			/**
-			 *  === Check conditions ===
 			 * If a test module includes a line such as $this->add_condition('mysql', 'Skipping mysql tests');
 			 * then the test suite will skip any test named with the prefix test_mysql_*
 			 **/
@@ -292,11 +289,14 @@ class UnitTestCase
 				$do_skip = $this->methods[$method];
 			}
 
+
+			// Skip tests that are not meant to be run
 			if($do_skip) {
 				$this->messages[] = array(self::SKIP, $do_skip);
 				$this->skipped_count++;
 			}
 			else {
+				// Reset test results and run any per-test setup method that might exist in the unit
 				if(!$dryrun) {
 					$this->pre_test();
 					if(method_exists($this, 'setup')) {
@@ -304,6 +304,8 @@ class UnitTestCase
 					}
 				}
 
+
+				// Run the actual test
 				try {
 					ob_start();
 					if(!$dryrun) {
@@ -311,13 +313,14 @@ class UnitTestCase
 					}
 					$output = ob_get_clean();
 				}
+				// If exceptions occurred, determine if we were asserting them or not
 				catch(Exception $e) {
 					if(strpos($e->getMessage(), $this->asserted_exception[0]) !== false || get_class($e) == $this->asserted_exception[0]) {
-						$this->pass_count++;
+						$this->result->pass_count++;
 						$this->asserted_exception = null;
 					}
 					else {
-						$this->exception_count++;
+						$this->result->exception_count++;
 						$trace = $e->getTrace();
 						$ary = current($trace);
 						while( !isset($ary['file']) || strpos($ary['file'], 'error.php') != false ) {
@@ -328,6 +331,8 @@ class UnitTestCase
 					}
 				}
 
+				// Run any per-test teardown method that might be specified,
+				// then run post_test to check expected exception assertion counts
 				if(!$dryrun) {
 					if(method_exists($this, 'teardown')) {
 						$this->teardown();
@@ -340,30 +345,31 @@ class UnitTestCase
 				}
 			}
 
-			$results->method_results(get_class($this), $method, $this->messages);
+			$this->result->method_results($method, $this->messages);
 
-			$this->case_count++;
+			$this->result->case_count++;
 		}
 		
 		if(method_exists($this, 'module_teardown')) {
 			$this->module_teardown();
 		}
 
-		$results->summary(get_class($this), get_object_vars($this));
-
-		return $results;
+		return $this->result;
 	}
 
-	public static function run_one($classname)
-	{
-		if(self::$run_all) {
-			return;
-		}
-		$testobj = new $classname();
+	public static function run_one() {
+		/**
+		 * @stub
+		 * @todo remove this method
+		 **/
 
-		$testobj->run($results = new UnitTestResults());
-		echo $results;
 	}
+}
+
+class TestSuite {
+
+	static $features = array();
+	static $run_all = false;
 
 	public static function run_all()
 	{
@@ -385,7 +391,8 @@ class UnitTestCase
 		$classes = get_declared_classes();
 		$classes = array_unique($classes);
 		sort($classes);
-		$results = new UnitTestResults();
+
+		$results = new TestResults();
 		foreach($classes as $class) {
 			if(isset($options['u']) && !in_array($class, $options['u'])) {
 				continue;
@@ -393,15 +400,26 @@ class UnitTestCase
 			$parents = class_parents($class, false);
 			if(in_array('UnitTestCase', $parents)) {
 				$obj = new $class();
-				$obj->run($results);
+				$results[$class] = $obj->run();
 
-				$pass_count += $obj->pass_count;
+/*				$pass_count += $obj->pass_count;
 				$fail_count += $obj->fail_count;
 				$exception_count += $obj->exception_count;
-				$case_count += $obj->case_count;
+				$case_count += $obj->case_count;*/
 			}
 		}
 
+		echo $results;
+	}
+
+	public static function run_one($classname)
+	{
+		if(self::$run_all) {
+			return;
+		}
+		$testobj = new $classname();
+
+		$results = $testobj->run();
 		echo $results;
 	}
 
@@ -411,31 +429,84 @@ class UnitTestCase
 		if(!isset($directory)) {
 			$directory = dirname(__FILE__);
 		}
-		$tests = glob($directory . '/units/test_*.php');
-		foreach($tests as $test) {
+		// Find unit tests, include them
+		$unit_tests = glob($directory . '/units/test_*.php');
+		foreach($unit_tests as $test) {
 			include($test);
 		}
+		// Find feature files, list them
+		self::$features = glob($directory . '/features/*.feature');
+
 		self::run_all();
+	}
+
+}
+
+class TestResult
+{
+	public $methods = array();
+	public $test_name = '';
+	public $file = '';
+	public $summaries = array();
+	private $options = array();
+
+	function __construct($test_name, $file = null)
+	{
+		global $options;
+		$this->options = $options;
+		$this->options['HABARI_PATH'] = HABARI_PATH;
+		$this->test_name = $test_name;
+		$this->file = ltrim(str_replace(dirname(__FILE__), '', $file), '\\/');
+
+		$this->summaries = array(
+			'pass_count' => 0,
+			'fail_count' => 0,
+			'incomplete_count' => 0,
+			'exception_count' => 0,
+			'case_count' => 0,
+			'total_case_count' => 0,
+			'skipped_count' => 0,
+		);
+	}
+
+	function __set($key, $value)
+	{
+		return $this->summaries[$key] = $value;
+	}
+
+	function __get($key)
+	{
+		if(!isset($this->summaries[$key])) {
+			return 0;
+		}
+		return $this->summaries[$key];
+	}
+
+	function method_results($method, $results)
+	{
+		$this->methods[$method] = $results;
+	}
+
+	function summary($values)
+	{
+		$this->summaries = array_merge($this->summaries, $values);
 	}
 }
 
-class UnitTestResults
+
+class TestResults extends ArrayObject
 {
-	private $methods = array();
-	private $tests = array();
-	private $summaries = array();
 	private $options = array();
-	private $type;
+	private $type = array();
 
 	function __construct()
 	{
 		global $options;
 		$this->options = $options;
-		$this->options['HABARI_PATH'] = HABARI_PATH;
 		$this->type = array(
-		    'Fail',
-		    'Incomplete',
-		    'Skipped',
+			'Fail',
+			'Incomplete',
+			'Skipped',
 		);
 	}
 
@@ -472,12 +543,6 @@ class UnitTestResults
 		}
 	}
 
-	function test($test, $file = null)
-	{
-		$file = ltrim(str_replace(dirname(__FILE__), '', $file), '\\/');
-		$this->tests[$test] = $file;
-	}
-
 	function initial_results()
 	{
 		return array('total_case_count'=>0, 'case_count'=>0, 'fail_count'=>0, 'pass_count'=>0, 'exception_count'=>0, 'incomplete_count'=>0, 'skipped_count'=>0);
@@ -488,26 +553,30 @@ class UnitTestResults
 		$has_output = false;
 		$totals = $this->initial_results();
 
-		if(count($this->tests) > 1) {
-			$title = "Test Results for " . count($this->tests) . " tests";
-		}
-		else {
-			$title = "Test Results for " . reset($this->tests);
+		switch($this->count()) {
+			case 0:
+				$title = 'No tests were run.';
+				break;
+			case 1:
+				$title = "Test Results for " . reset($this)->test_name;
+				break;
+			default:
+				$title = "Test Results for " . $this->count() . " tests";
+				break;
 		}
 
 		$output = "<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><title>{$title}</title>" .
 			'<link rel="stylesheet" type="text/css" href="style.css">' .
 			"</head><body>";
-		foreach($this->tests as $test => $file) {
-			$output .= "<h1>{$test}<a href=\"index.php?u={$test}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">Run only {$test}</a></h1>";
+		foreach($this as /* TestRestult */ $test) {
+			$output .= "<h1>{$test->test_name}<a href=\"index.php?u={$test->test_name}\" style=\"font-size: xx-small;font-weight: normal;margin-left: 20px;\">Run only {$test->test_name}</a></h1>";
 
-			if(!isset($this->methods[$test])) {
-				$this->methods[$test] = array();
-				$this->summaries[$test] = $this->initial_results();
+			if(!isset($test->methods)) {
+				$test->methods = array();
+				$test->summaries = $this->initial_results();
 			}
 
-			foreach($this->methods[$test] as $methodname => $messages)
-			{
+			foreach($test->methods as $methodname => $messages) {
 				$output .= "<h2>{$methodname}</h2>";
 				foreach($messages as $message) {
 					if(is_string($message)) {
@@ -528,7 +597,7 @@ class UnitTestResults
 				}
 			}
 
-			$summary = $this->summaries[$test];
+			$summary = $test->summaries;
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
 					$totals[$k] += $v;
@@ -538,7 +607,7 @@ class UnitTestResults
 		}
 
 		$output .= '<footer><h3>Results</h3>';
-		$output.= sprintf('<div class="all test complete">%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.  %d skipped tests.</div>', count($this->tests), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count'], $totals['skipped_count']);
+		$output.= sprintf('<div class="all test complete">%d units containing %d tests. %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.  %d skipped tests.</div>', $this->count(), $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count'], $totals['skipped_count']);
 
 		if($has_output) {
 			$output .= "<div class=\"has_output\">Some tests have output.  <a href=\"?o=1\">Turn on the output option</a> to see output.</div>";
@@ -698,16 +767,6 @@ class UnitTestResults
 		return $xml->asXML();
 	}
 
-
-	function method_results($test, $method, $results)
-	{
-		$this->methods[$test][$method] = $results;
-	}
-
-	function summary($test, $values)
-	{
-		$this->summaries[$test] = $values;
-	}
 }
 
 include HABARI_PATH . '/index.php';
