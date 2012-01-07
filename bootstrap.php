@@ -240,11 +240,15 @@ class UnitTestCase
 			}
 		}
 
+		$dryrun = isset($options['d']);
+
 		// Attempt to execute test methods in this unit
 		foreach($this->methods as $method => $run_status) {
 			$this->messages = array();
 			$this->show_output = false;
-			$this->total_case_count++;
+			$this->result->total_case_count++;
+
+			$do_skip = false;
 
 			// Get test line numbers and skip the test if it's not specified
 			$ref_method = new ReflectionMethod($this, $method);
@@ -262,12 +266,9 @@ class UnitTestCase
 					}
 				}
 				if(!$found) {
-					continue;
+					$do_skip = 'Skipped by request';
 				}
 			}
-
-			$do_skip = false;
-			$dryrun = isset($options['d']);
 
 			/**
 			 * If a test module includes a line such as $this->add_condition('mysql', 'Skipping mysql tests');
@@ -293,7 +294,7 @@ class UnitTestCase
 			// Skip tests that are not meant to be run
 			if($do_skip) {
 				$this->messages[] = array(self::SKIP, $do_skip);
-				$this->skipped_count++;
+				$this->result->skipped_count++;
 			}
 			else {
 				// Reset test results and run any per-test setup method that might exist in the unit
@@ -348,6 +349,7 @@ class UnitTestCase
 			$this->result->method_results($method, $this->messages);
 
 			$this->result->case_count++;
+//			$this->result->total_case_tount++;
 		}
 		
 		if(method_exists($this, 'module_teardown')) {
@@ -409,6 +411,9 @@ class TestSuite {
 			}
 		}
 
+		while(ob_get_level()) {
+			ob_end_clean();
+		}
 		echo $results;
 	}
 
@@ -524,8 +529,10 @@ class TestResults extends ArrayObject
 				case 'h':
 					$default_output = 'html';
 					break;
-				case 'symbolic':
-				case 's':
+				case 'symbolic':;
+				case 's':;
+				case 'x':;
+				case 'xml':;
 					$default_output = 'symbolic';
 					break;
 			}
@@ -598,6 +605,7 @@ class TestResults extends ArrayObject
 			}
 
 			$summary = $test->summaries;
+			var_dump($test->summaries);
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
 					$totals[$k] += $v;
@@ -629,25 +637,29 @@ class TestResults extends ArrayObject
 		$has_output = false;
 		$totals = $this->initial_results();
 
-		if(count($this->tests) > 1) {
-			$title = "Test Results for " . count($this->tests) . " tests";
-		}
-		else {
-			$title = "Test Results for " . reset($this->tests);
+		switch($this->count()) {
+			case 0:
+				$title = 'No tests were run.';
+				break;
+			case 1:
+				$title = "Test Results for " . reset($this)->test_name;
+				break;
+			default:
+				$title = "Test Results for " . $this->count() . " tests";
+				break;
 		}
 
 		$output = array();
 		$output[] = "==== {$title} ====";
-		foreach($this->tests as $test => $file) {
-			$output[]= "\n=== {$test} ===";
+		foreach($this as /* TestRestult */ $test) {
+			$output[]= "\n=== {$test->test_name} ===";
 
-			if(!isset($this->methods[$test])) {
-				$this->methods[$test] = array();
-				$this->summaries[$test] = $this->initial_results();
+			if(!isset($test->methods)) {
+				$test->methods = array();
+				$test->summaries = $this->initial_results();
 			}
 
-			foreach($this->methods[$test] as $methodname => $messages)
-			{
+			foreach($test->methods as $methodname => $messages) {
 				$output[]= "  {$methodname}";
 				foreach($messages as $message) {
 					if(is_string($message)) {
@@ -671,7 +683,7 @@ class TestResults extends ArrayObject
 				}
 			}
 
-			$summary = $this->summaries[$test];
+			$summary = $test->summaries;
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
 					$totals[$k] += $v;
@@ -681,7 +693,7 @@ class TestResults extends ArrayObject
 		}
 
 		$output[]= "\n=== Results ===";
-		$output[]= sprintf('%d units containing %d tests.  %d tests run.  %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', count($this->tests), $totals['total_case_count'], $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
+		$output[]= sprintf('%d units containing %d tests.  %d tests run.  %d failed assertions.  %d passed assertions.  %d exceptions.  %d incomplete tests.', $this->count(), $totals['total_case_count'], $totals['case_count'], $totals['fail_count'], $totals['pass_count'], $totals['exception_count'], $totals['incomplete_count']);
 		if($has_output) {
 			$output[]= "\nSome tests have output.  Run again with -o to see output.";
 		}
@@ -701,18 +713,20 @@ class TestResults extends ArrayObject
 
 		$xml = new SimpleXMLElement('<results></results>');
 
-		$xml->addAttribute('unit_count', count($this->tests));
+		$xml->addAttribute('unit_count', $this->count());
 
-		foreach($this->tests as $test => $file) {
+		$totals = $this->initial_results();
+
+		foreach($this as $test) {
 			$xunit = $xml->addChild('unit');
-			$xunit->addAttribute('name', $test);
+			$xunit->addAttribute('name', $test->test_name);
 
-			if(!isset($this->methods[$test])) {
-				$this->methods[$test] = array();
-				$this->summaries[$test] = $this->initial_results();
+			if(!isset($test->methods)) {
+				$test->methods = array();
+				$test->summaries = $this->initial_results();
 			}
 
-			foreach($this->methods[$test] as $methodname => $messages) {
+			foreach($test->methods as $methodname => $messages) {
 				$xmethod = $xunit->addChild('method');
 				$xmethod->addAttribute('name', $methodname);
 
@@ -736,7 +750,7 @@ class TestResults extends ArrayObject
 				$xmethod->addAttribute('has_output', $has_output);
 			}
 
-			$summary = $this->summaries[$test];
+			$summary = $test->summaries;
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
 					$totals[$k] += $v;
@@ -750,20 +764,12 @@ class TestResults extends ArrayObject
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
 		}
 
-		if(!isset($summary)) {
-			$summary['total_case_count'] = 0;
-			$summary['fail_count'] = 0;
-			$summary['pass_count'] = 0;
-			$summary['exception_count'] = 0;
-			$summary['incomplete_count'] = 0;
-		}
-		$xml->addAttribute('complete', $summary['total_case_count']);
-		$xml->addAttribute('fail', $summary['fail_count']);
-		$xml->addAttribute('pass', $summary['pass_count']);
-		$xml->addAttribute('exception', $summary['exception_count']);
-		$xml->addAttribute('incomplete', $summary['incomplete_count']);
+		$xml->addAttribute('complete', $totals['total_case_count']);
+		$xml->addAttribute('fail', $totals['fail_count']);
+		$xml->addAttribute('pass', $totals['pass_count']);
+		$xml->addAttribute('exception', $totals['exception_count']);
+		$xml->addAttribute('incomplete', $totals['incomplete_count']);
 
-		ob_end_clean();
 		return $xml->asXML();
 	}
 
