@@ -15,11 +15,12 @@
  *   -t {testname|linenumber} : Run a specific test, or multiple separated by commas
  *   -r {path} : Set the root path for habari.
  *   -o : Display output.
+ *   -i : Display method timers.
  *   -u {unitname} : Run only the specified units.
  */
 
 if(defined('STDIN') && function_exists( 'getopt' ) ) {
-	$shortopts = 'u::d::c::t::r::o';
+	$shortopts = 'u::d::c::t::r::oi';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -27,7 +28,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>''));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>'','i'=>1));
 	$options = array_merge($options, $querystring_options);
 }
 
@@ -72,6 +73,8 @@ class UnitTestCase
 	protected $show_output = false;
 	protected $conditions = array();
 	protected $methods = array();
+	protected $timer_track = array();
+	protected $timers = array();
 
 	public function assert_true($value, $message = 'Assertion failed')
 	{
@@ -224,6 +227,17 @@ class UnitTestCase
 		$this->result = new TestResult(get_class($this), $class->getFileName());
 	}
 
+	public function timer_start($name)
+	{
+		$this->timer_track[$name] = microtime(true);
+	}
+
+	public function timer_stop($name)
+	{
+		$this->timers[$name] = microtime(true) - $this->timer_track[$name];
+		unset($this->timer_track[$name]);
+	}
+
 	public function run()
 	{
 		global $options;
@@ -305,7 +319,9 @@ class UnitTestCase
 				if(!$dryrun) {
 					$this->pre_test();
 					if(method_exists($this, 'setup')) {
+						$this->timer_start('setup');
 						$this->setup();
+						$this->timer_stop('setup');
 					}
 				}
 
@@ -314,7 +330,9 @@ class UnitTestCase
 				try {
 					ob_start();
 					if(!$dryrun) {
+						$this->timer_start('run');
 						$this->$method();
+						$this->timer_stop('run');
 					}
 					$output = ob_get_clean();
 				}
@@ -340,7 +358,9 @@ class UnitTestCase
 				// then run post_test to check expected exception assertion counts
 				if(!$dryrun) {
 					if(method_exists($this, 'teardown')) {
+						$this->timer_start('teardown');
 						$this->teardown();
+						$this->timer_stop('teardown');
 					}
 					$this->post_test();
 				}
@@ -351,9 +371,9 @@ class UnitTestCase
 			}
 
 			$this->result->method_results($method, $this->messages);
+			$this->result->method_timers($method, $this->timers);
 
 			$this->result->case_count++;
-//			$this->result->total_case_tount++;
 		}
 		
 		if(method_exists($this, 'module_teardown')) {
@@ -386,7 +406,8 @@ class FeatureTestCase extends UnitTestCase
 		// Parse the feature file
 		// Create lambda functions for scenarios
 		// Add lambdas to the methods array
-
+		$feature = file_get_contents($this->feature_file);
+		$feature = explode("\n", $feature);
 
 		// Get the list of methods that qualify as tests and mark them as "to test"
 		$methods = get_class_methods($this);
@@ -489,6 +510,7 @@ class TestSuite {
 class TestResult
 {
 	public $methods = array();
+	public $timers = array();
 	public $test_name = '';
 	public $file = '';
 	public $summaries = array();
@@ -529,6 +551,11 @@ class TestResult
 	function method_results($method, $results)
 	{
 		$this->methods[$method] = $results;
+	}
+
+	function method_timers($method, $timers)
+	{
+		$this->timers[$method] = $timers;
 	}
 
 	function summary($values)
@@ -623,7 +650,16 @@ class TestResults extends ArrayObject
 			}
 
 			foreach($test->methods as $methodname => $messages) {
-				$output .= "<h2>{$methodname}</h2>";
+				$output .= "<div class=\"method\"><h2>{$methodname}</h2>";
+				if(isset($this->options['i'])) {
+					$output .= "<span class=\"timers\">(";
+					$comma = '';
+					foreach($test->timers[$methodname] as $k => $v) {
+						$output .= $comma . $k . ':' . sprintf('%.2f', $v * 1000);
+						$comma = ',';
+					}
+					$output .= ")</span>";
+				}
 				foreach($messages as $message) {
 					if(is_string($message)) {
 						if(isset($this->options['o'])) {
@@ -641,6 +677,7 @@ class TestResults extends ArrayObject
 						$output .= '</div>';
 					}
 				}
+				$output .= '</div>';
 			}
 
 			$summary = $test->summaries;
