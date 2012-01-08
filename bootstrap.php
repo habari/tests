@@ -212,20 +212,24 @@ class UnitTestCase
 		}
 	}
 
+	public function run_init()
+	{
+		// Get the list of methods that qualify as tests and mark them as "to test"
+		$methods = get_class_methods($this);
+		$methods = array_filter($methods, array($this, 'named_test_filter'));
+		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
+
+		// Get class info and build a result object, which will be returned
+		$class = new ReflectionClass( get_class( $this ) );
+		$this->result = new TestResult(get_class($this), $class->getFileName());
+	}
+
 	public function run()
 	{
 		global $options;
 		$this->options = $options;
 
-		// Get the list of methods that qualify as tests and mark them as "to test"
-		$methods = get_class_methods($this);
-		$methods = array_filter($methods, array($this, 'named_test_filter'));
-		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
-		$cases = 0;
-
-		// Get class info and build a result object, which will be returned
-		$class = new ReflectionClass( get_class( $this ) );
-		$this->result = new TestResult(get_class($this), $class->getFileName());
+		$this->run_init();
 
 		// Execute any module setup that might exist
 		if(method_exists($this, 'module_setup')) {
@@ -368,6 +372,34 @@ class UnitTestCase
 	}
 }
 
+class FeatureTestCase extends UnitTestCase
+{
+	public $feature_file;
+
+	public function __construct($feature_file)
+	{
+		$this->feature_file = $feature_file;
+	}
+
+	public function run_init()
+	{
+		// Parse the feature file
+		// Create lambda functions for scenarios
+		// Add lambdas to the methods array
+
+
+		// Get the list of methods that qualify as tests and mark them as "to test"
+		$methods = get_class_methods($this);
+		$methods = array_filter($methods, array($this, 'named_test_filter'));
+		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
+
+		// Get class info and build a result object, which will be returned
+		$class = new ReflectionClass( get_class( $this ) );
+		$this->result = new TestResult(get_class($this), $class->getFileName());
+	}
+
+}
+
 class TestSuite {
 
 	static $features = array();
@@ -403,12 +435,12 @@ class TestSuite {
 			if(in_array('UnitTestCase', $parents)) {
 				$obj = new $class();
 				$results[$class] = $obj->run();
-
-/*				$pass_count += $obj->pass_count;
-				$fail_count += $obj->fail_count;
-				$exception_count += $obj->exception_count;
-				$case_count += $obj->case_count;*/
 			}
+		}
+
+		foreach(self::$features as $feature_file) {
+			$obj = new FeatureTestCase($feature_file);
+			$results[$feature_file] = $obj->run();
 		}
 
 		while(ob_get_level()) {
@@ -439,6 +471,13 @@ class TestSuite {
 		foreach($unit_tests as $test) {
 			include($test);
 		}
+
+		// Find feature steps, include them
+		$feature_steps = glob($directory . '/steps/step_*.php');
+		foreach($feature_steps as $step) {
+			include($step);
+		}
+
 		// Find feature files, list them
 		self::$features = glob($directory . '/features/*.feature');
 
