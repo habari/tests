@@ -792,6 +792,8 @@ class TestResults extends ArrayObject
 
 		$totals = $this->initial_results();
 
+		$timers = array();
+
 		foreach($this as $test) {
 			$xunit = $xml->addChild('unit');
 			$xunit->addAttribute('name', $test->test_name);
@@ -801,9 +803,18 @@ class TestResults extends ArrayObject
 				$test->summaries = $this->initial_results();
 			}
 
+			$unit_timers = array();
+
 			foreach($test->methods as $methodname => $messages) {
 				$xmethod = $xunit->addChild('method');
 				$xmethod->addAttribute('name', $methodname);
+
+				foreach($test->timers[$methodname] as $k => $v) {
+					$xtimer = $xmethod->addChild('timer');
+					$xtimer->addAttribute('name', $k);
+					$xtimer->addAttribute('value', $v * 1000);
+					$unit_timers[$k] = isset($unit_timers[$k]) ? $unit_timers[$k] + $v : $v;
+				}
 
 				$has_output = 0;
 				foreach($messages as $message) {
@@ -825,6 +836,13 @@ class TestResults extends ArrayObject
 				$xmethod->addAttribute('has_output', $has_output);
 			}
 
+			foreach($unit_timers as $k => $v) {
+				$xtimer = $xunit->addChild('timer');
+				$xtimer->addAttribute('name', $k);
+				$xtimer->addAttribute('value', $v * 1000);
+				$timers[$k] = isset($timers[$k]) ? $timers[$k] + $v : $v;
+			}
+
 			$summary = $test->summaries;
 			foreach($summary as $k => $v) {
 				if(isset($totals[$k]) && is_numeric($v)) {
@@ -837,6 +855,12 @@ class TestResults extends ArrayObject
 			$xunit->addAttribute('pass', $summary['pass_count']);
 			$xunit->addAttribute('exception', $summary['exception_count']);
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
+		}
+
+		foreach($timers as $k => $v) {
+			$xtimer = $xml->addChild('timer');
+			$xtimer->addAttribute('name', $k);
+			$xtimer->addAttribute('value', $v * 1000);
 		}
 
 		$xml->addAttribute('complete', $totals['total_case_count']);
