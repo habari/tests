@@ -136,6 +136,17 @@ class UnitTestCase
 		}
 	}
 
+	public function assert_not_identical($value1, $value2, $message = 'Assertion failed')
+	{
+		if($value1 === $value2) {
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
+			$this->fail_count++;
+		}
+		else {
+			$this->pass_count++;
+		}
+	}
+
 	public function assert_exception($exception = '', $message = 'Expected exception')
 	{
 		$this->asserted_exception = array($exception, $message);
