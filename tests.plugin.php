@@ -72,7 +72,7 @@ class TestsPlugin extends Plugin
 		if (isset($_GET['run']) && isset($_GET['unit'])) {
 			$unit = $_GET['unit'];
 			if ($unit != 'all') {
-				$url = '/index.php?c=symbolic&o=1&&u='.$unit;
+				$url = '/index.php?c=symbolic&o=1&u='.$unit;
 				if (isset($_GET['test'])) {
 					$test = $_GET['test'];
 					$url = $url.'&t='.$test;
