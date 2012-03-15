@@ -770,9 +770,10 @@ class UnitTestResults
 			$xunit->addAttribute('pass', $summary['pass_count']);
 			$xunit->addAttribute('exception', $summary['exception_count']);
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
-
+/*
 			$coverage = $this->code_coverage[0]; // this part here doesn't work yet.
 			$xunit->addAttribute('coverage', $coverage ); // the admin page doesn't do anything with this yet.
+*/
 		}
 
 		if(!isset($summary)) {
