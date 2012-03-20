@@ -428,8 +428,49 @@ class FeatureTestCase extends UnitTestCase
 		// Parse the feature file
 		// Create lambda functions for scenarios
 		// Add lambdas to the methods array
-		$feature = file_get_contents($this->feature_file);
-		$feature = explode("\n", $feature);
+		$feature_file = file_get_contents($this->feature_file);
+		$feature_file = explode("\n", $feature);
+
+		$tree = array(
+			'*' => array(
+				'Feature:\s*' => 'feature',
+			),
+			'feature' => array(
+				'Background:\s*' => 'background',
+				'Scenario:\s*' => 'scenario',
+				'.*' => 'feature',
+			),
+			'background' => array(
+				'Given\s' => 'given',
+			),
+			'given' => array(
+				'And\s' => 'given',
+				'But\s' => 'given',
+				'When\s' => 'when',
+				'Then\s' => 'then',
+			),
+			'scenario' => array(
+				'Given\s' => 'given',
+				'When\s' => 'when',
+				'Then\s' => 'then',
+			),
+			'when' => array(
+				'And\s' => 'when',
+				'But\s' => 'when',
+				'Then\s' => 'then',
+			),
+			'then' => array(
+				'And\s' => 'then',
+				'But\s' => 'then',
+				'Scenario:\s*' => 'scenario',
+			)
+		);
+
+		$state = '*';
+		$features = array();
+
+		foreach($feature_file as $line) {
+		}
 
 		// Get the list of methods that qualify as tests and mark them as "to test"
 		$methods = get_class_methods($this);
@@ -482,6 +523,9 @@ class TestSuite {
 		}
 
 		foreach(self::$features as $feature_file) {
+			if(isset($options['u']) && !in_array(basename($feature_file, '.feature'), $options['u'])) {
+				continue;
+			}
 			$obj = new FeatureTestCase($feature_file);
 			$results[$feature_file] = $obj->run();
 		}
@@ -914,9 +958,11 @@ class TestResults extends ArrayObject
 				$xmethod->addAttribute('name', $methodname);
 
 				foreach($test->timers[$methodname] as $k => $v) {
-					$xtimer = $xmethod->addChild('timer');
-					$xtimer->addAttribute('name', $k);
-					$xtimer->addAttribute('value', $v * 1000);
+					if(isset($this->options['i'])) {
+						$xtimer = $xmethod->addChild('timer');
+						$xtimer->addAttribute('name', $k);
+						$xtimer->addAttribute('value', $v * 1000);
+					}
 					$unit_timers[$k] = isset($unit_timers[$k]) ? $unit_timers[$k] + $v : $v;
 				}
 
@@ -941,9 +987,11 @@ class TestResults extends ArrayObject
 			}
 
 			foreach($unit_timers as $k => $v) {
-				$xtimer = $xunit->addChild('timer');
-				$xtimer->addAttribute('name', $k);
-				$xtimer->addAttribute('value', $v * 1000);
+				if(isset($this->options['i'])) {
+					$xtimer = $xunit->addChild('timer');
+					$xtimer->addAttribute('name', $k);
+					$xtimer->addAttribute('value', $v * 1000);
+				}
 				$timers[$k] = isset($timers[$k]) ? $timers[$k] + $v : $v;
 			}
 
@@ -966,9 +1014,11 @@ class TestResults extends ArrayObject
 		}
 
 		foreach($timers as $k => $v) {
-			$xtimer = $xml->addChild('timer');
-			$xtimer->addAttribute('name', $k);
-			$xtimer->addAttribute('value', $v * 1000);
+			if(isset($this->options['i'])) {
+				$xtimer = $xml->addChild('timer');
+				$xtimer->addAttribute('name', $k);
+				$xtimer->addAttribute('value', $v * 1000);
+			}
 		}
 
 		$xml->addAttribute('complete', $totals['total_case_count']);

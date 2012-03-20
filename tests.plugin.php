@@ -84,7 +84,7 @@ class TestsPlugin extends Plugin
 			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 
 			$results_array = array();
-			foreach ($results as $result) {
+			foreach ($results->unit as $result) {
 				$result_array = (array)$result->attributes();
 				$result_array = array_shift($result_array);
 
