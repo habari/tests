@@ -17,10 +17,11 @@
  *   -o : Display output.
  *   -i : Display method timers.
  *   -u {unitname} : Run only the specified units.
+ *   -v : Do code coverage.
  */
 
 if(defined('STDIN') && function_exists( 'getopt' ) ) {
-	$shortopts = 'u::d::c::t::r::oi';
+	$shortopts = 'u::d::c::t::r::o::vi';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -28,7 +29,7 @@ if(!isset($options) || !$options) {
 }
 global $querystring_options;
 if(!isset($querystring_options)) {
-	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>'','i'=>1));
+	$querystring_options = array_intersect_key($_GET, array('o'=>1,'t'=>'','c'=>'','d'=>'','u'=>'','i'=>1,'v'=>''));
 	$options = array_merge($options, $querystring_options);
 }
 
@@ -128,6 +129,17 @@ class UnitTestCase
 		}
 		else {
 			$this->result->pass_count++;
+		}
+	}
+
+	public function assert_not_identical($value1, $value2, $message = 'Assertion failed')
+	{
+		if($value1 === $value2) {
+			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
+			$this->fail_count++;
+		}
+		else {
+			$this->pass_count++;
 		}
 	}
 
@@ -248,6 +260,10 @@ class UnitTestCase
 		// Execute any module setup that might exist
 		if(method_exists($this, 'module_setup')) {
 			$this->module_setup();
+		}
+
+		if(isset($options['v'])) {
+			xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 		}
 
 		// If specific tests are specified to run within this unit, get that list
@@ -375,7 +391,13 @@ class UnitTestCase
 
 			$this->result->case_count++;
 		}
-		
+
+		if(isset($options['v'])) {
+			$this->result->record_code_coverage(xdebug_get_code_coverage());
+
+			xdebug_stop_code_coverage();
+		}
+
 		if(method_exists($this, 'module_teardown')) {
 			$this->module_teardown();
 		}
@@ -515,6 +537,8 @@ class TestResult
 	public $file = '';
 	public $summaries = array();
 	private $options = array();
+	private $type;
+	public $code_coverage = array();
 
 	function __construct($test_name, $file = null)
 	{
@@ -561,6 +585,21 @@ class TestResult
 	function summary($values)
 	{
 		$this->summaries = array_merge($this->summaries, $values);
+	}
+
+	function record_code_coverage($coverage)
+	{
+		foreach($coverage as $filename => $lines) {
+			if(!isset($this->code_coverage[$filename])) {
+				$this->code_coverage[$filename] = array();
+			}
+			foreach($lines as $line_number => $result) {
+				if(isset($this->code_coverage[$filename][$line_number])) {
+					$result = max($this->code_coverage[$filename][$line_number], $result);
+				}
+				$this->code_coverage[$filename][$line_number] = $result;
+			}
+		}
 	}
 }
 
@@ -687,6 +726,71 @@ class TestResults extends ArrayObject
 				}
 			}
 			$output .= "<div class=\"test complete\"><p>{$summary['case_count']}/{$summary['total_case_count']} tests complete.  {$summary['fail_count']} failed assertions.  {$summary['pass_count']} passed assertions.  {$summary['exception_count']} exceptions.  {$summary['incomplete_count']} incomplete tests.  {$summary['skipped_count']} skipped tests.</p></div>";
+		}
+
+		if( count($test->code_coverage) ) {
+			ksort($test->code_coverage);
+			$output .= '<h1>Code Coverage</h1>';
+
+			// @todo what about @covers comments?
+			// @todo and @codeCoverageIgnore, @codeCoverageIgnoreStart, and @codeCoverageIgnoreEnd?
+			$file_id = 0;
+			foreach ( $test->code_coverage as $file => $coverage ) {
+
+				$file_id++;
+				$output .= '<h4>'. $file . '</h4>';
+
+				if(!file_exists($file)) {
+					$output .= '<div>File could not be opened to display coverage.</div>';
+					continue;
+				}
+				$lines = file( $file );
+
+				$output_file = '';
+				$executed = 0;
+				$executable = 0;
+				$inaccessible = 0;
+
+				$output_file .= '<table class="coverage" id="coverage_' . $file_id . '">';
+				for($i = 0; $i < count($lines); $i++) {
+					$line_number = $i + 1;
+					$line = $lines[$i];
+					if ( isset($coverage[$line_number]) ) {
+						$result = $coverage[$line_number];
+						if ( $result == -2 && (trim($line) != '}') ) {  // This code is inaccessible
+							$class = 'inaccessible';
+							$inaccessible++;
+							$executable++;
+						}
+						else if ( $result > 0 ) {  // This code executed
+							$class = 'executed';
+							$executed++;
+							$executable++;
+						}
+						else if ( $result == -1 ) {  // This code did not execute
+							$class = 'unexecuted';
+							$executable++;
+						}
+						else {
+							$class = 'whitespace';
+						}
+					}
+					else {
+						$class = 'unknown';
+					}
+					$output_file .=  "<tr><td class=\"line_number\">{$line_number}</td><td class=\"codeline {$class}\">" . htmlentities( $line ) . "</td></tr>";
+				}
+				$output_file .= '</table>';
+
+				$output .= '<details><summary>' . $executed . ' executed';
+				if($inaccessible > 0) {
+					$output .= ', ' . $inaccessible . ' inaccessible';
+				}
+				$pct = round($executed * 100 / $executable);
+				$output .= ' out of ' . $executable . ' lines -- ' . $pct . '%</summary>';
+				$output .= $output_file;
+				$output .= '</details>';
+			}
 		}
 
 		$output .= '<footer><h3>Results</h3>';
@@ -855,6 +959,10 @@ class TestResults extends ArrayObject
 			$xunit->addAttribute('pass', $summary['pass_count']);
 			$xunit->addAttribute('exception', $summary['exception_count']);
 			$xunit->addAttribute('incomplete', $summary['incomplete_count']);
+/*
+			$coverage = $this->code_coverage[0]; // this part here doesn't work yet.
+			$xunit->addAttribute('coverage', $coverage ); // the admin page doesn't do anything with this yet.
+*/
 		}
 
 		foreach($timers as $k => $v) {
@@ -870,6 +978,11 @@ class TestResults extends ArrayObject
 		$xml->addAttribute('incomplete', $totals['incomplete_count']);
 
 		return $xml->asXML();
+	}
+
+	function summary($test, $values)
+	{
+		$this->summaries[$test] = $values;
 	}
 
 }
