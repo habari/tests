@@ -190,7 +190,9 @@ class UnitTestCase
 
 	public function skip_all()
 	{
-		$this->methods = array_fill_keys(array_keys($this->methods), 'Skipping all tests.');
+		foreach($this->methods as $method => $data) {
+			$this->methods[$method]['go'] = 'Skipping all tests.';
+		}
 	}
 
 	public function skip_test($name, $reason = 'This test is explicitly skipped.')
@@ -199,7 +201,7 @@ class UnitTestCase
 			$name = 'test_' . $name;
 		}
 		if(isset($this->methods[$name])) {
-			$this->methods[$name] = $reason;
+			$this->methods[$name]['go'] = $reason;
 		}
 	}
 
@@ -232,7 +234,17 @@ class UnitTestCase
 		// Get the list of methods that qualify as tests and mark them as "to test"
 		$methods = get_class_methods($this);
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
-		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
+
+		foreach($methods as $method) {
+			$ref_method = new ReflectionMethod($this, $method);
+			$method_data = array(
+				'go' => true,
+				'start_line' => $ref_method->getStartLine(),
+				'end_line' => $ref_method->getEndLine(),
+				'method_name' => $ref_method->getName(),
+			);
+			$this->methods[$method] = $method_data;
+		}
 
 		// Get class info and build a result object, which will be returned
 		$class = new ReflectionClass( get_class( $this ) );
@@ -285,16 +297,14 @@ class UnitTestCase
 			$do_skip = false;
 
 			// Get test line numbers and skip the test if it's not specified
-			$ref_method = new ReflectionMethod($this, $method);
 			if(isset($options['t'])) {
-				$start_line = $ref_method->getStartLine();
 				$found = false;
 				foreach($options['t'] as $line) {
-					if($line > $ref_method->getStartLine() && $line < $ref_method->getEndLine()) {
+					if($line > $run_status['start_line'] && $line < $run_status['end_line']) {
 						$found = true;
 						break;
 					}
-					if(strtolower($ref_method->getName()) == strtolower($line)) {
+					if(strtolower($run_status['method_name']) == strtolower($line)) {
 						$found = true;
 						break;
 					}
@@ -320,8 +330,8 @@ class UnitTestCase
 			 * methods (keys) in the method list must have a value of 1
 			 * If not, they will be skipped using a message of the value in the list.
 			 */
-			if($this->methods[$method] != 1) {
-				$do_skip = $this->methods[$method];
+			if($this->methods[$method]['go'] !== true) {
+				$do_skip = $this->methods[$method]['go'];
 			}
 
 
@@ -417,6 +427,8 @@ class UnitTestCase
 class FeatureTestCase extends UnitTestCase
 {
 	public $feature_file;
+	public $scenarios = array();
+	public $features = array();
 
 	public function __construct($feature_file)
 	{
@@ -429,57 +441,77 @@ class FeatureTestCase extends UnitTestCase
 		// Create lambda functions for scenarios
 		// Add lambdas to the methods array
 		$feature_file = file_get_contents($this->feature_file);
-		$feature_file = explode("\n", $feature);
-
-		$tree = array(
-			'*' => array(
-				'Feature:\s*' => 'feature',
-			),
-			'feature' => array(
-				'Background:\s*' => 'background',
-				'Scenario:\s*' => 'scenario',
-				'.*' => 'feature',
-			),
-			'background' => array(
-				'Given\s' => 'given',
-			),
-			'given' => array(
-				'And\s' => 'given',
-				'But\s' => 'given',
-				'When\s' => 'when',
-				'Then\s' => 'then',
-			),
-			'scenario' => array(
-				'Given\s' => 'given',
-				'When\s' => 'when',
-				'Then\s' => 'then',
-			),
-			'when' => array(
-				'And\s' => 'when',
-				'But\s' => 'when',
-				'Then\s' => 'then',
-			),
-			'then' => array(
-				'And\s' => 'then',
-				'But\s' => 'then',
-				'Scenario:\s*' => 'scenario',
-			)
-		);
+		$feature_file = explode("\n", $feature_file);
 
 		$state = '*';
 		$features = array();
 
 		foreach($feature_file as $line) {
+			if(preg_match('#^\s*Feature:\s*(.+)$#i', $line, $matches)) {
+				$features[trim($matches[1])] = array(
+					'background' => array(),
+					'scenarios' => array(),
+					'description' => array(),
+				);
+				$feature = trim($matches[1]);
+				$state = 'feature';
+			}
+			elseif(preg_match('#^\s*Background:\s*(.+)$#i', $line, $matches)) {
+				$features[$feature]['background'][] = array();
+				$state = 'background';
+			}
+			elseif(preg_match('#^\s*Scenario:\s*(.+)$#i', $line, $matches)) {
+				$features[$feature]['scenarios'][trim($matches[1])] = array();
+				$state = 'scenario';
+				$scenario = trim($matches[1]);
+			}
+			elseif(trim($line) == '' || substr(trim($line), 1, 1) == '#') {
+				// Do nothing with this
+			}
+			elseif($state == 'feature') {
+				$features[$feature]['description'][] = $line;
+			}
+			elseif($state == 'background') {
+				$features[$feature]['background'][] = $line;
+			}
+			elseif($state == 'scenario') {
+				$features[$feature]['scenarios'][$scenario][] = $line;
+			}
 		}
 
 		// Get the list of methods that qualify as tests and mark them as "to test"
-		$methods = get_class_methods($this);
-		$methods = array_filter($methods, array($this, 'named_test_filter'));
-		$this->methods = array_fill_keys($methods, 1);  // Marked as "to test"
+		$methods = array();
+		foreach($features as $feature => $feature_content) {
+			foreach($feature_content['scenarios'] as $scenario => $scenario_content) {
+				$scenario = trim($scenario);
+				$fname = strtolower('scenario_' . preg_replace('#[^a-z0-9]+#i', '_', $scenario));
+				while(isset($this->scenarios[$fname])) {
+					$fname .= '_';
+				}
+				$this->scenarios[$fname] = array('feature' => $feature, 'scenario' => $scenario);
+				$this->methods[$fname] = array(
+					'go' => true,
+					'start_line' => 0,
+					'end_line' => 0,
+					'method_name' => $scenario,
+				);
+			}
+		}
+		$this->features = $features;
 
 		// Get class info and build a result object, which will be returned
 		$class = new ReflectionClass( get_class( $this ) );
 		$this->result = new TestResult(get_class($this), $class->getFileName());
+	}
+
+	public function __call($name, $params)
+	{
+		$scenario = $this->scenarios[$name];
+		$background = $this->features[$scenario['feature']]['background'];
+		$steps = $this->features[$scenario['feature']]['scenarios'][$scenario['scenario']];
+		$this->output($name);
+		$this->output('<br>' . implode("<br>\n", $steps));
+		$this->assert_true(true);
 	}
 
 }
@@ -523,7 +555,7 @@ class TestSuite {
 		}
 
 		foreach(self::$features as $feature_file) {
-			if(isset($options['u']) && !in_array(basename($feature_file, '.feature'), $options['u'])) {
+			if(isset($options['u']) && !in_array(basename($feature_file), $options['u'])) {
 				continue;
 			}
 			$obj = new FeatureTestCase($feature_file);
