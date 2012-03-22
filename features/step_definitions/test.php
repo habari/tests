@@ -11,10 +11,10 @@ class TestFeatureContext extends FeatureContext
 	}
 
 	/**
-	 * @Given /the test suite is running$/
+	 * @Given /the (.+) is running$/
 	 */
-	function the_test_suite_is_running() {
-		$this->mark_test_incomplete();
+	function the_test_suite_is_running($running_thing) {
+		$this->mark_test_incomplete("The {$running_thing} may be running, but this test is incomplete.");
 	}
 
 	/**
