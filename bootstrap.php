@@ -1139,18 +1139,18 @@ class TestResults extends ArrayObject
 
 				$has_output = 0;
 				foreach($messages as $message) {
-					if(is_string($message)) {
+					if(isset($message['output'])) {
 						if(isset($this->options['o'])) {
-							$xmethod->addChild('output', $message);
+							$xmethod->addChild('output', $message['output']);
 						}
 						$has_output = 1;
 					}
-					else {
-						$xmessage = $xmethod->addChild('message', $message[1]);
-						$xmessage->addAttribute('type', $this->type[$message[0]]);
-						if(count($message) > 2) {
-							$xmessage->addAttribute('file', $message[2][0]['file']);
-							$xmessage->addAttribute('line', $message[2][0]['line']);
+					if(isset($message['message'])) {
+						$xmessage = $xmethod->addChild('message', $message['message']);
+						$xmessage->addAttribute('type', $this->type[$message['type']]);
+						if(isset($message['line']) && isset($message['file'])) {
+							$xmessage->addAttribute('file', $message['file']);
+							$xmessage->addAttribute('line', $message['line']);
 						}
 					}
 				}
