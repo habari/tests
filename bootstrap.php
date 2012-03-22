@@ -77,70 +77,54 @@ class UnitTestCase
 	protected $timer_track = array();
 	protected $timers = array();
 
-	public function assert_true($value, $message = 'Assertion failed')
+	public function assert_something($true, $message, $file = null, $line = null, $type = self::FAIL)
 	{
-		if($value !== true) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
+		if(empty($file) && empty($line)) {
+			$trace = debug_backtrace(false);
+			$fn = current($trace);
+			while($fn['function'] == 'assert_something' || !isset($fn['file']) || basename($fn['file']) == 'bootstrap.php') {
+				$fn = next($trace);
+			}
+			$file = $fn['file'];
+			$line = $fn['line'];
+		}
+		if($true !== true) {
+			$this->messages[] = array('type' => self::FAIL, 'message' => $message, 'file' => $file, 'line' => $line);
 			$this->result->fail_count++;
 		}
 		else {
 			$this->result->pass_count++;
 		}
+	}
+
+	public function assert_true($value, $message = 'Assertion failed')
+	{
+		$this->assert_something(true == $value, $message);
 	}
 
 	public function assert_false($value, $message = 'Assertion failed')
 	{
-		if($value !== false) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->result->fail_count++;
-		}
-		else {
-			$this->result->pass_count++;
-		}
+		$this->assert_something($value === false, $message);
 	}
 
 	public function assert_equal($value1, $value2, $message = 'Assertion failed')
 	{
-		if($value1 != $value2) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->result->fail_count++;
-		}
-		else {
-			$this->result->pass_count++;
-		}
+		$this->assert_something($value1 == $value2, $message);
 	}
 
 	public function assert_not_equal($value1, $value2, $message = 'Assertion failed')
 	{
-		if($value1 == $value2) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->result->fail_count++;
-		}
-		else {
-			$this->result->pass_count++;
-		}
+		$this->assert_something($value1 != $value2, $message);
 	}
 
 	public function assert_identical($value1, $value2, $message = 'Assertion failed')
 	{
-		if($value1 !== $value2) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->result->fail_count++;
-		}
-		else {
-			$this->result->pass_count++;
-		}
+		$this->assert_something($value1 === $value2, $message);
 	}
 
 	public function assert_not_identical($value1, $value2, $message = 'Assertion failed')
 	{
-		if($value1 === $value2) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->fail_count++;
-		}
-		else {
-			$this->pass_count++;
-		}
+		$this->assert_something($value1 !== $value2, $message);
 	}
 
 	public function assert_exception($exception = '', $message = 'Expected exception')
@@ -151,18 +135,12 @@ class UnitTestCase
 	public function assert_type( $type, $object, $message = 'Types not equal' )
 	{
 		$class = get_class( $object );
-		if( $class != $type ) {
-			$this->messages[] = array(self::FAIL, $message, debug_backtrace());
-			$this->result->fail_count++;
-		}
-		else {
-			$this->result->pass_count++;
-		}
+		$this->assert_something($type == $class, $message);
 	}
 
 	public function mark_test_incomplete( $message = 'Tests not implemented' )
 	{
-		$this->messages[] = array( self::INCOMPLETE, $message);
+		$this->messages[] = array( 'type' => self::INCOMPLETE, 'message' => $message);
 		$this->result->incomplete_count++;
 	}
 
@@ -221,11 +199,11 @@ class UnitTestCase
 	{
 		if(isset($this->asserted_exception)) {
 			$this->result->fail_count++;
-			$this->messages[] = array(self::FAIL, $this->asserted_exception[1] . ': ' . $this->asserted_exception[0]);
+			$this->messages[] = array('type' => self::FAIL, 'message' => $this->asserted_exception[1] . ': ' . $this->asserted_exception[0]);
 		}
 		foreach($this->checks as $check => $message) {
 			$this->result->fail_count++;
-			$this->messages[] = array(self::FAIL, $message);
+			$this->messages[] = array('type' => self::FAIL, 'message' => $message);
 		}
 	}
 
@@ -337,7 +315,7 @@ class UnitTestCase
 
 			// Skip tests that are not meant to be run
 			if($do_skip) {
-				$this->messages[] = array(self::SKIP, $do_skip);
+				$this->messages[] = array('type' => self::SKIP, 'message' => $do_skip);
 				$this->result->skipped_count++;
 			}
 			else {
@@ -376,7 +354,7 @@ class UnitTestCase
 							$ary = next($trace);
 						}
 						$ary = current($trace);
-						$this->messages[] = array(self::FAIL, get_class($e) . ':' . $e->getMessage(), array($ary['file'] . ':' . $ary['line']));
+						$this->messages[] = array('type' => self::FAIL, 'message' => get_class($e) . ':' . $e->getMessage(), 'file' => $ary['file'], 'line' => $ary['line']);
 					}
 				}
 
@@ -391,8 +369,8 @@ class UnitTestCase
 					$this->post_test();
 				}
 
-				if($this->show_output) {
-					$this->messages[] = $output;
+					if($this->show_output) {
+					$this->messages[]['output'] = $output;
 				}
 			}
 
@@ -429,6 +407,8 @@ class FeatureTestCase extends UnitTestCase
 	public $feature_file;
 	public $scenarios = array();
 	public $features = array();
+	public $steps = array();
+	public $feature_contexts = array();
 
 	public function __construct($feature_file)
 	{
@@ -445,23 +425,27 @@ class FeatureTestCase extends UnitTestCase
 
 		$state = '*';
 		$features = array();
+		$ln = 0;
 
 		foreach($feature_file as $line) {
+			$ln++;
+			$line = trim($line);
 			if(preg_match('#^\s*Feature:\s*(.+)$#i', $line, $matches)) {
 				$features[trim($matches[1])] = array(
 					'background' => array(),
 					'scenarios' => array(),
-					'description' => array(),
+					'description' => array(array($line, $ln)),
+					'full' => array(),
 				);
 				$feature = trim($matches[1]);
 				$state = 'feature';
 			}
-			elseif(preg_match('#^\s*Background:\s*(.+)$#i', $line, $matches)) {
-				$features[$feature]['background'][] = array();
+			elseif(preg_match('#^\s*Background:\s*$#i', $line, $matches)) {
+				$features[$feature]['background'] = array(array($line, $ln));
 				$state = 'background';
 			}
 			elseif(preg_match('#^\s*Scenario:\s*(.+)$#i', $line, $matches)) {
-				$features[$feature]['scenarios'][trim($matches[1])] = array();
+				$features[$feature]['scenarios'][trim($matches[1])] = array(array($line, $ln));
 				$state = 'scenario';
 				$scenario = trim($matches[1]);
 			}
@@ -469,13 +453,16 @@ class FeatureTestCase extends UnitTestCase
 				// Do nothing with this
 			}
 			elseif($state == 'feature') {
-				$features[$feature]['description'][] = $line;
+				$features[$feature]['description'][] = array($line, $ln);
 			}
 			elseif($state == 'background') {
-				$features[$feature]['background'][] = $line;
+				$features[$feature]['background'][] = array($line, $ln);
 			}
 			elseif($state == 'scenario') {
-				$features[$feature]['scenarios'][$scenario][] = $line;
+				$features[$feature]['scenarios'][$scenario][] = array($line, $ln);
+			}
+			if($feature != '') {
+				$features[$feature]['full'][$ln] = $file;
 			}
 		}
 
@@ -509,16 +496,62 @@ class FeatureTestCase extends UnitTestCase
 		$scenario = $this->scenarios[$name];
 		$background = $this->features[$scenario['feature']]['background'];
 		$steps = $this->features[$scenario['feature']]['scenarios'][$scenario['scenario']];
-		$this->output($name);
-		$this->output('<br>' . implode("<br>\n", $steps));
-		$this->assert_true(true);
+
+		// Construct the story for this scenario
+		$story = array();
+		foreach($this->features[$scenario['feature']]['description'] as $description) {
+			list($description, $linenumber) = $description;
+			$story_description[$linenumber] = $description;
+		}
+		foreach($background as $step) {
+			list($step, $linenumber) = $step;
+			$story[$linenumber] = $step;
+		}
+		foreach($steps as $step) {
+			list($step, $linenumber) = $step;
+			$story[$linenumber] = $step;
+		}
+
+		foreach($story as $linenumber => $step) {
+			if(preg_match('#(Given|When|Then|And|But)\s+(.+)$#i', $step, $matches)) {
+				if(!$this->execute_step($matches[2])) {
+					$file = basename($this->feature_file);
+					throw new Exception("Step '{$matches[0]}' is not defined in {$file}:#{$linenumber}");
+				}
+			}
+		}
+
+		$this->output($story);
 	}
 
+	public function assign_step_map($steps, $classes)
+	{
+		$this->steps = $steps;
+		foreach($classes as $class) {
+			$this->feature_contexts[$class] = new $class($this);
+		}
+	}
+
+	public function execute_step($stripped_step)
+	{
+		foreach($this->steps as $regex => $fn) {
+			if(preg_match($regex, $stripped_step, $matches)) {
+				array_shift($matches);
+				$fn[0] = $this->feature_contexts[$fn[0]];
+				call_user_func_array($fn, $matches);
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 class TestSuite {
 
 	static $features = array();
+	static $step_files = array();
+	static $steps = array();
+	static $classes = array();
 	static $run_all = false;
 
 	public static function run_all()
@@ -558,7 +591,9 @@ class TestSuite {
 			if(isset($options['u']) && !in_array(basename($feature_file), $options['u'])) {
 				continue;
 			}
+			self::load_steps();
 			$obj = new FeatureTestCase($feature_file);
+			$obj->assign_step_map(self::$steps, self::$classes);
 			$results[$feature_file] = $obj->run();
 		}
 
@@ -566,6 +601,77 @@ class TestSuite {
 			ob_end_clean();
 		}
 		echo $results;
+	}
+
+	public static function load_steps()
+	{
+		foreach(self::$step_files as $step_file) {
+			include $step_file;
+			$phpfile = file_get_contents($step_file);
+			$tokens = token_get_all($phpfile);
+			$state = null;
+			$comment = '';
+			foreach($tokens as $token_value) {
+				if(count($token_value) > 1) {
+					list($token, $value) = $token_value;
+				}
+				else {
+					list($token) = $token_value;
+				}
+
+				switch($token) {
+					case T_DOC_COMMENT:
+						$comment = $value;
+						$state = 'comment';
+						break;
+					case T_FUNCTION:
+						switch($state) {
+							case 'comment':
+								$state = 'function';
+								break;
+							case 'function':;
+							case 'class':
+								$state = '';
+								break;
+						}
+						break;
+					case T_CLASS:
+						$state = 'class';
+						break;
+					case T_EXTENDS:
+					case T_IMPLEMENTS:
+						$state = '';
+						break;
+					case T_STRING:
+						switch($state) {
+							case 'class':
+								$class = $value;
+								self::$classes[] = $class;
+								break;
+							case 'function':
+								self::register_step($comment, $class, $value);
+								$state = '';
+								break;
+						}
+						break;
+					case '{':
+						$state = '';
+						break;
+				}
+			}
+		}
+	}
+
+	public static function register_step($comment, $class, $value)
+	{
+		if(preg_match('#@\s*(Given|When|Then)\s+(/.+?/)#i', $comment, $matches)) {
+			if(isset(self::$steps[$matches[1]])) {
+				// @todo Re-defined a step!  Throw an error!
+			}
+			else {
+				self::$steps[$matches[2]] = array($class, $value);
+			}
+		}
 	}
 
 	public static function run_one($classname)
@@ -600,9 +706,42 @@ class TestSuite {
 		// Find feature files, list them
 		self::$features = glob($directory . '/features/*.feature');
 
+		// Find step files, list them
+		self::$step_files = glob($directory . '/features/step_definitions/*.php');
+
 		self::run_all();
 	}
 
+}
+
+class FeatureContext
+{
+	/** @var UnitTestCase $testcase */
+	public $testcase;
+
+	public function __construct($testcase)
+	{
+		$this->testcase = $testcase;
+	}
+
+	public static function create()
+	{
+		$class = get_called_class();
+		$args = func_get_args();
+		$r_class = new \ReflectionClass($class);
+		return $r_class->newInstanceArgs( $args );
+	}
+
+	public function __call($method, $args)
+	{
+		if(method_exists($this->testcase, $method)) {
+			call_user_func_array(array($this->testcase, $method), $args);
+		}
+		else {
+			$class = get_called_class();
+			throw new Exception("Method ->{$method} does not exist in test case for '{$class}'.");
+		}
+	}
 }
 
 class TestResult
@@ -776,18 +915,18 @@ class TestResults extends ArrayObject
 					$output .= ")</span>";
 				}
 				foreach($messages as $message) {
-					if(is_string($message)) {
+					if(isset($message['output'])) {
 						if(isset($this->options['o'])) {
-							$output .= "<div style=\"white-space:pre;border: 1px solid #ccc;padding: 0px 10px 10px;background: #efefef;\"><h3>Output</h3>{$message}</div>";
+							$output .= "<div style=\"white-space:pre;border: 1px solid #ccc;padding: 0px 10px 10px;background: #efefef;\"><h3>Output</h3>{$message['output']}</div>";
 						}
 						else {
 							$has_output = true;
 						}
 					}
-					else {
-						$output .= "<div><em>{$this->type[$message[0]]}: </em> {$message[1]}";
-						if(count($message) > 2) {
-							$output .= '<br/>' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+					if(isset($message['type']) && isset($message['message'])) {
+						$output .= "<div><em>{$this->type[$message['type']]}: </em> {$message['message']}";
+						if(isset($message['file'])) {
+							$output .= '<br/>' . $message['file'] . ':' . $message['line'];
 						}
 						$output .= '</div>';
 					}
