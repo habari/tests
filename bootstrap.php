@@ -1056,7 +1056,7 @@ class TestResults extends ArrayObject
 			foreach($test->methods as $methodname => $messages) {
 				$output[]= "  {$methodname}";
 				foreach($messages as $message) {
-					if(is_string($message)) {
+					if(isset($message['output'])) {
 						if(isset($this->options['o'])) {
 							$output[]= "\n          == Begin Output ==\n";
 							$message = explode("\n", $message);
@@ -1068,10 +1068,10 @@ class TestResults extends ArrayObject
 							$has_output = true;
 						}
 					}
-					else {
-						$output[]= str_pad($this->type[$message[0]] . ': ', 10, ' ', STR_PAD_LEFT ) . $message[1];
-						if(count($message) > 2) {
-							$output[]= '      ' . $message[2][0]['file'] . ':' . $message[2][0]['line'];
+					if(isset($message['message'])) {
+						$output[]= str_pad($this->type[$message['type']] . ': ', 10, ' ', STR_PAD_LEFT ) . $message['message'];
+						if(isset($message['line'])) {
+							$output[]= '      ' . $message['file'] . ':' . $message['line'];
 						}
 					}
 				}
