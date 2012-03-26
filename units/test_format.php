@@ -16,7 +16,7 @@ class FormatTest extends UnitTestCase
 			$result = ( trim( $datum['want'] ) === trim( Format::autop( $datum['in'] ) ) ? true : false );
 
 			if( ! $result ) {
-				$this->output( ( sprintf( '<h2>Test %s</h2><strong>Input:</strong><textarea>%s</textarea><strong>Expected:</strong><textarea>%s</textarea><strong>Got:</strong><br><textarea>%s</textarea>',
+				$this->output( ( sprintf( '<h2>Test %s</h2><br><strong>Input:</strong><br><textarea>%s</textarea><br><strong>Expected:</strong><br><textarea>%s</textarea><br><strong>Got:</strong><br><textarea>%s</textarea>',
 					$index,
 					nl2br( Utils::htmlspecialchars( $datum['in'] ) ),
 					nl2br( Utils::htmlspecialchars( $datum['want'] ) ),
