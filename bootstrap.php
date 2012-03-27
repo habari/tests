@@ -575,7 +575,7 @@ class TestSuite {
 
 		$results = new TestResults();
 		foreach($classes as $class) {
-			if(isset($options['u']) && !in_array($class, $options['u'])) {
+			if($class == 'FeatureTestCase' || (isset($options['u']) && !in_array($class, $options['u']))) {
 				continue;
 			}
 			$parents = class_parents($class, false);
