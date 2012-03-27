@@ -4,7 +4,7 @@ include '../bootstrap.php';
 
 class ColorUtilsTest extends UnitTestCase
 {
-	function setup()
+	function module_setup()
 	{
 		$this->green = ColorUtils::rgb_rgbarr( 127, 255, 64 );
 		$this->green_hex = ColorUtils::rgb_hex( $this->green );
