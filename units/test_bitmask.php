@@ -6,7 +6,7 @@ class BitmaskTest extends UnitTestCase
 
 {
 
-	public function setup()
+	public function module_setup()
 	{
 		$this->access_names = array( 'read', 'edit', 'delete', 'create' );
 		$this->bitmask = new Bitmask($this->access_names);
@@ -17,7 +17,7 @@ class BitmaskTest extends UnitTestCase
 		$mask = new Bitmask( array( 'dog', 'cat' ), 3 );
 		$this->assert_true( $mask->dog );
 		$this->assert_true( $mask->cat );
-		
+
 		$mask = new Bitmask( array( 'dog', 'cat' ), '3' );
 		$this->assert_true( $mask->dog );
 		$this->assert_true( $mask->cat );
@@ -36,7 +36,7 @@ class BitmaskTest extends UnitTestCase
 		$mask = new Bitmask( array( 'flags' ), 'flags' );
 		$this->assert_true( $mask->flags );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -45,7 +45,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( 'brute' );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -53,7 +53,7 @@ class BitmaskTest extends UnitTestCase
 	{
 		$mask = new Bitmask( array( 'full' ) );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -61,7 +61,7 @@ class BitmaskTest extends UnitTestCase
 	{
 		$mask = new Bitmask( array( 'value' ) );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -69,7 +69,7 @@ class BitmaskTest extends UnitTestCase
 	{
 		$mask = new Bitmask( array( 'foo', 'foo' ) );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -77,7 +77,7 @@ class BitmaskTest extends UnitTestCase
 	{
 		$mask = new Bitmask( array( 1 ) );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -86,7 +86,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'giraffe' );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -95,7 +95,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), 'flags' );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -104,7 +104,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), array() );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -113,7 +113,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$mask = new Bitmask( array( 'dog', 'cat' ), -1 );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -146,7 +146,7 @@ class BitmaskTest extends UnitTestCase
 		$this->bitmask->delete = false;
 		$this->assert_equal(8, $this->bitmask->value);
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -179,20 +179,20 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_false($this->bitmask->read);
 		$this->assert_true($this->bitmask->delete);
 		$this->assert_true($this->bitmask->edit);
-		
+
 		$this->bitmask->value = 0;
 		$this->assert_false($this->bitmask->create);
 		$this->assert_false($this->bitmask->read);
 		$this->assert_false($this->bitmask->delete);
 		$this->assert_false($this->bitmask->edit);
-		
+
 		$this->bitmask->value = '8';
 		$this->assert_true($this->bitmask->create);
 		$this->assert_false($this->bitmask->read);
 		$this->assert_false($this->bitmask->delete);
 		$this->assert_false($this->bitmask->edit);
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -201,7 +201,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->value = array();
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -210,7 +210,7 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_exception('InvalidArgumentException');
 		$this->bitmask->value = -1;
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -227,7 +227,7 @@ class BitmaskTest extends UnitTestCase
 		$this->bitmask->full = false;
 		$this->assert_equal( 0, $this->bitmask->value );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -244,7 +244,7 @@ class BitmaskTest extends UnitTestCase
 
 		$this->assert_equal(9, $this->bitmask->value);
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -254,7 +254,7 @@ class BitmaskTest extends UnitTestCase
 		$mask = array( 1, 0, 0, 1 );
 		$this->bitmask->value = $mask;
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -264,7 +264,7 @@ class BitmaskTest extends UnitTestCase
 		$mask = array( 1 );
 		$this->bitmask->value = $mask;
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -274,7 +274,7 @@ class BitmaskTest extends UnitTestCase
 		$mask = array( 1, 0, 0, 1, 1 );
 		$this->bitmask->value = $mask;
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
@@ -288,7 +288,7 @@ class BitmaskTest extends UnitTestCase
 	{
 		$this->assert_equal( $this->bitmask->full, 15 );
 	}
-	
+
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
