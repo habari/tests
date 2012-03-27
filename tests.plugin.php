@@ -104,7 +104,7 @@ class TestsPlugin extends Plugin
 						$message_array = array();
 						$result = (string)$method->message->attributes()->type;
 						foreach( $method->message as $message ) {
-							$message_array[] = "{$method->message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($method->message->attributes()->file) . ":{$method->message->attributes()->line}</em>");
+							$message_array[] = "{$message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($message->attributes()->file) . ":{$message->attributes()->line}</em>");
 						}
 						$result_array['methods'][] = array_merge( array_shift($method_array), array(
 							"result" => $result,
