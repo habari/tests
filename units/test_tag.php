@@ -8,13 +8,13 @@ class TagTest extends UnitTestCase
 	private $slug;
 	private $tag;
 
-	public function setup()
+	public function module_setup()
 	{
 		$this->slug = Utils::slugify( $this->text );
 		$this->tag = new Tag( array( 'term_display' => $this->text, 'term' => $this->slug ) );
 	}
 
-	public function teardown()
+	public function module_teardown()
 	{
 		unset( $this->tag );
 	}
