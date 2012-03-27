@@ -486,9 +486,7 @@ class FeatureTestCase extends UnitTestCase
 		}
 		$this->features = $features;
 
-		// Get class info and build a result object, which will be returned
-		$class = new ReflectionClass( get_class( $this ) );
-		$this->result = new TestResult(get_class($this), $class->getFileName());
+		$this->result = new TestResult(basename($this->feature_file), basename($this->feature_file));
 	}
 
 	public function __call($name, $params)
