@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class VersionTest extends UnitTestCase
 {
 	function test_get_dbversion()
@@ -58,7 +56,4 @@ class VersionTest extends UnitTestCase
 		$this->assert_equal( $rev, Version::get_svn_revision() );
 	}
 }
-
-VersionTest::run_one( 'VersionTest' );
-
 ?>

@@ -1,13 +1,11 @@
 <?php
 
-include '../bootstrap.php';
-
 class StackTest extends UnitTestCase
 {
 	function setup()
 	{
 	}
-	
+
 	function test_stack_order()
 	{
 		Stack::add( 'test_stack', 'a', 'a' );
@@ -37,7 +35,4 @@ class StackTest extends UnitTestCase
 		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), c after(b,d,f), e after(b), g after(e)' );
 	}
 }
-
-StackTest::run_one( 'StackTest' );
-
 ?>

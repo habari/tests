@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class OptionsTest extends UnitTestCase
 {
 	private $prefix = 'optionstest__';
@@ -119,5 +117,4 @@ class OptionsTest extends UnitTestCase
 	}
 
 }
-OptionsTest::run_one( 'OptionsTest' );
 ?>

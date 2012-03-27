@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class UserGroupsTest extends UnitTestCase
 {
 	public function setup()
@@ -45,7 +43,4 @@ class UserGroupsTest extends UnitTestCase
 		// testcasegroup is deleted in test_get_all()
 	}
 }
-
-UserGroupsTest::run_one('UserGroupsTest');
-
 ?>

@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class TagTest extends UnitTestCase
 {
 	private $text = 'Test Tag';
@@ -113,6 +111,4 @@ class TagTest extends UnitTestCase
 	{
 	}
 }
-
-TagTest::run_one( 'TagTest' );
 ?>

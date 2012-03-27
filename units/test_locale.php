@@ -1,10 +1,8 @@
 <?php
 
 /**
- * Test for the InputFilter class.
+ * Test for the Locale class.
  */
-
-include '../bootstrap.php';
 
 class LocaleTest extends UnitTestCase
 {
@@ -37,5 +35,4 @@ class LocaleTest extends UnitTestCase
 
 }
 
-LocaleTest::run_one('LocaleTest');
 ?>

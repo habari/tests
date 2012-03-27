@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class UtilsTest extends UnitTestCase
 {
 	function setup()
@@ -263,7 +261,4 @@ class UtilsTest extends UnitTestCase
 	}
 */
 }
-
-UtilsTest::run_one( 'UtilsTest' );
-
 ?>

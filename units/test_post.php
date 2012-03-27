@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class PostTest extends UnitTestCase
 {
 	protected $user;
@@ -85,6 +83,4 @@ class PostTest extends UnitTestCase
 	}
 
 }
-PostTest::run_one( 'PostTest' );
-
 ?>

@@ -2,8 +2,6 @@
 /**
  * Test for the HTMLTokenizer class.
  */
-include('../bootstrap.php');
-
 class HTMLTokenizerTest extends UnitTestCase
 {
 	protected $html_strs = array();
@@ -74,5 +72,4 @@ _EOF_;
 	{
 	}
 }
-HTMLTokenizerTest::run_one( 'HTMLTokenizerTest' );
 ?>

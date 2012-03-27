@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class UserTest extends UnitTestCase
 {
 	private $user;
@@ -154,7 +152,4 @@ class UserTest extends UnitTestCase
 		$this->user->delete();
 	}
 }
-
-UserTest::run_one('UserTest');
-
 ?>

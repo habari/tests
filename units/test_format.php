@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class FormatTest extends UnitTestCase
 {
 	public function test_simple_autop()
@@ -41,10 +39,6 @@ class FormatTest extends UnitTestCase
 			$data[basename($wantedFile)] = array( 'in' => file_get_contents( $inputFile ), 'want' => file_get_contents( $wantedFile ) );
 		}
 		return $data;
-		
 	}
 }
-
-FormatTest::run_one( 'FormatTest' );
-
 ?>

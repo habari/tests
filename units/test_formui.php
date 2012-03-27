@@ -7,8 +7,6 @@
  * @copyright 2008
  */
 
-include '../bootstrap.php';
-
 class FormUITest extends UnitTestCase
 {
 
@@ -183,7 +181,5 @@ if(class_exists('FormUI')):
 	}
 
 endif;
-
-FormUITest::run_one('FormUITest');
 
 ?>

@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class BitmaskTest extends UnitTestCase
 
 {
@@ -318,5 +316,4 @@ class BitmaskTest extends UnitTestCase
 		$this->assert_equal( 'full', (string)$this->bitmask );
 	}
 }
-BitmaskTest::run_one( 'BitmaskTest' );
 ?>

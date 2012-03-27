@@ -131,7 +131,4 @@ class ACLTest extends UnitTestCase {
 	}
 }
 
-include_once dirname(__FILE__) . '/../bootstrap.php';
-//ACLTest::run_one( 'ACLTest' );
-
 ?>

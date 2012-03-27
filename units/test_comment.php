@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class CommentTest extends UnitTestCase
 {
 	protected $comment;
@@ -228,6 +226,4 @@ class CommentTest extends UnitTestCase
 	{
 	}
 }
-
-CommentTest::run_one( 'CommentTest' );
 ?>

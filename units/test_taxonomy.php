@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class TaxonomyTest extends UnitTestCase
 {
 	private $vocab_name = 'test';
@@ -805,5 +803,4 @@ class TaxonomyTest extends UnitTestCase
 	}
 
 }
-TaxonomyTest::run_one( 'TaxonomyTest' );
 ?>

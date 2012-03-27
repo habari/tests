@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 /**
  * class to get fields/newfields to test logic
  */
@@ -202,7 +200,5 @@ class QueryRecordTest extends UnitTestCase
 		$this->mark_test_incomplete();
 	}
 }
-
-QueryRecordTest::run_one( 'QueryRecordTest' );
 
 ?>

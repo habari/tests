@@ -1,7 +1,5 @@
 <?php
 
-include 'bootstrap.php';
-
 class PluggableTest extends UnitTestCase {
 
 	private $simple_assets = array('simple_assets' => array(
@@ -125,5 +123,4 @@ class PluggableTest extends UnitTestCase {
 	}
 
 }
-PluggableTest::run_one( 'PluggableTest' );
 ?>

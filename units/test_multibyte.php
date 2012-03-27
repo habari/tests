@@ -1,7 +1,5 @@
 <?php
 
-	include '../bootstrap.php';
-
 	/**
 	 * A unit test to verify that turning off the MultiByte library works.
 	 * 
@@ -161,7 +159,4 @@
 		}
 		
 	}
-
-	MultiByteTest::run_one('MultiByteTest');
-	
 ?>

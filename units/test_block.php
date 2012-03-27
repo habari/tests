@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class BlockTest extends UnitTestCase
 {
 	private $title = 'Test Block Title';
@@ -98,7 +96,4 @@ class BlockTest extends UnitTestCase
 	}
 
 }
-
-BlockTest::run_one( 'BlockTest' );
-
 ?>

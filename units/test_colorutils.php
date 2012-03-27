@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class ColorUtilsTest extends UnitTestCase
 {
 	function module_setup()
@@ -51,7 +49,4 @@ class ColorUtilsTest extends UnitTestCase
 		$this->assert_equal( 'Not a valid color format.', $invalid_color_format->getMessage() );
 	}
 }
-
-ColorUtilsTest::run_one( 'ColorUtilsTest' );
-
 ?>

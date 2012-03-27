@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 	/**
 	 * Tests for the Posts class
 	 *
@@ -888,7 +886,5 @@ class PostsTest extends UnitTestCase
 		$this->mark_test_incomplete();
 	}
 }
-
-PostsTest::run_one( 'PostsTest' );
 
 ?>

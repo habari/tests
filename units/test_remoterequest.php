@@ -1,7 +1,5 @@
 <?php
 
-include '../bootstrap.php';
-
 class RemoteRequestTest extends UnitTestCase {
 
 	function do_stupid_things_in_global_scope() {
@@ -108,7 +106,4 @@ class RemoteRequestTest extends UnitTestCase {
 		$this->mark_test_incomplete('No tests in this unit are valid yet.');
 	}
 }
-
-RemoteRequestTest::run_one( 'RemoteRequestTest' );
-
 ?>

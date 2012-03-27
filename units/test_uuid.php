@@ -1,5 +1,4 @@
 <?php
-include '../bootstrap.php';
 
 class UUIDTest extends UnitTestCase
 {
@@ -41,6 +40,4 @@ class UUIDTest extends UnitTestCase
 		// does this need to be unset?
 	}
 }
-
-UUIDTest::run_one( 'UUIDTest' );
 ?>
