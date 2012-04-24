@@ -664,144 +664,196 @@ class PostsTest extends UnitTestCase
 	 * - any:info => a post info key and value pair or array of post info key and value pairs, any of which can match
 	 * - not:any:info => a post info key and value pair or array of post info key and value pairs, to exclude if any are present and match
 	 */
-//	public function test_get_posts_by_info()
-//	{
-//		// has:info
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'comments_disabled'
-//					WHERE
-//						pi1.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'has:info' => array( 'comments_disabled' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'comments_disabled'
-//				LEFT JOIN {postinfo} pi2 ON
-//					{posts}.id = pi2.post_id AND
-//					pi2.name = 'html_title'
-//					WHERE
-//						pi1.name <> '' OR
-//						pi2.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'has:info' => array( 'comments_disabled', 'html_title' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-////		$query = Posts::get( array( 'has:info' => array( 'comments_disabled', 'html_title' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
-////		Utils::debug( $query );die();
-//
-//		// all:info
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'comments_disabled' AND pi1.value = 1
-//					WHERE
-//						pi1.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'comments_disabled' AND pi1.value = 1
-//				LEFT JOIN {postinfo} pi2 ON
-//					{posts}.id = pi2.post_id AND
-//					pi2.name = 'html_title' AND pi2.value = 'Chili, The Breakfast of Champions'
-//					WHERE
-//						pi1.name <> '' AND
-//						pi2.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		// any:info
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'comments_disabled' AND
-//					pi1.value = 1
-//				LEFT JOIN {postinfo} pi2 ON
-//					{posts}.id = pi2.post_id AND
-//					pi2.name = 'html_title' AND
-//					pi2.value = 'Chili, The Breakfast of Champions'
-//					WHERE
-//						pi1.name <> '' OR
-//						pi2.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts}
-//				LEFT JOIN {postinfo} pi1 ON
-//					{posts}.id = pi1.post_id AND
-//					pi1.name = 'html_title' AND
-//					pi1.value IN ( 'Chili, The Breakfast of Champions', 'This is a Post' )
-//					WHERE
-//						pi1.name <> ''
-//		" );
-//		$count_posts = Posts::get( array( 'any:info' => array( 'html_title' => array( 'Chili, The Breakfast of Champions', 'This is a Post' ) ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		// not:all:info
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts} WHERE
-//				{posts}.id NOT IN (
-//					SELECT post_id FROM {postinfo}
-//						WHERE ( name = 'comments_disabled' AND value = 1 )
-//						GROUP BY post_id
-//						HAVING COUNT(*) = 1
-//				)
-//		" );
-//		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts} WHERE
-//				{posts}.id NOT IN (
-//					SELECT post_id FROM {postinfo}
-//						WHERE ( name = 'comments_disabled' AND value = 1 OR
-//						 name = 'html_title' AND value = 'Chili, The Breakfast of Champions' )
-//						GROUP BY post_id
-//						HAVING COUNT(*) = 2
-//				)
-//		" );
-//		$count_posts = Posts::get( array( 'not:all:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		// not:any:info
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts} WHERE
-//				{posts}.id NOT IN (
-//					SELECT post_id FROM {postinfo}
-//						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 )
-//				)
-//		" );
-//		$count_posts = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-//
-//		$count = DB::get_value(
-//			"SELECT COUNT(*) FROM {posts} WHERE
-//				{posts}.id NOT IN (
-//					SELECT post_id FROM {postinfo}
-//						WHERE ( {postinfo}.name = 'comments_disabled' AND {postinfo}.value = 1 OR
-//						 {postinfo}.name = 'html_title' AND {postinfo}.value = 'Chili, The Breakfast of Champions' )
-//				)
-//		" );
-//		$count_posts = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'count' => 1, 'nolimit' => 1 ) );
-//		$this->assert_equal( $count_posts, $count );
-////		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
-////		Utils::debug( $query );die();
-//	}
+	public function test_get_posts_by_info()
+	{
+		// setup
+		$informationless_post = Post::create( array(
+			'title' => 'This is a Post without information',
+			'content' => 'The real point of this post is to make sure that there is at least one countable post without info for the sake of testing.',
+			'user_id' => $this->user->id,
+			'status' => Post::status( 'published' ),
+			'content_type' => Post::type( 'entry' ),
+			'pubdate' => HabariDateTime::date_create( time() ),
+		));
+
+		$seven_things = array( "one", "two", "red", "blue", "black", "old", "new" );
+
+		// create some posts with info
+		for( $i = 1; $i < 42; $i++ ) {
+			$post = Post::create( array(
+				'title' => 'This Post has Info',
+				'content' => 'If this wwere really a post, would it have such useless information?',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_info = true;
+			$post->info->$seven_things[ ($i % 7) ] = true;
+			$post->info->i = $i;
+			$post->info->commit();
+		}
+
+		// has:info
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'red'
+					WHERE
+						pi1.name <> ''
+		" );
+		$count_info_posts = Posts::get( array( 'has:info' => 'testing_info', 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_not_equal( Posts::count_total(), $count_info_posts );
+
+		$count_posts = Posts::get( array( 'has:info' => array( 'red' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'testing_info'
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'red'
+					WHERE
+						pi1.name <> '' OR
+						pi2.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'has:info' => array( 'testing_info', 'red' ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+//		$query = Posts::get( array( 'has:info' => array( 'testing_info', 'red' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		Utils::debug( $query );die();
+
+		// all:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'blue' AND pi1.value = 1
+					WHERE
+						pi1.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'all:info' => array( 'blue' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'blue' AND pi1.value = true
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'two' AND pi2.value = true
+					WHERE
+						pi1.name <> '' AND
+						pi2.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'all:info' => array( 'blue' => true, 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		// any:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'black' AND
+					pi1.value = 1
+				LEFT JOIN {postinfo} pi2 ON
+					{posts}.id = pi2.post_id AND
+					pi2.name = 'blue' AND
+					pi2.value = true
+					WHERE
+						pi1.name <> '' OR
+						pi2.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = Posts::get( array( 'all:info' => array( 'black' => true ), 'count' => 1, 'nolimit' => 1 ) ) +
+				Posts::get( array( 'all:info' => array( 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts}
+				LEFT JOIN {postinfo} pi1 ON
+					{posts}.id = pi1.post_id AND
+					pi1.name = 'i' AND
+					pi1.value IN ( 0,1,2,3,4,5 )
+					WHERE
+						pi1.name <> ''
+		" );
+		$count_posts = Posts::get( array( 'any:info' => array( 'i' => array( 1, 2, 3, 4, 5 ) ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		// not:all:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( name = 'testing_info' AND value = true )
+						GROUP BY post_id
+						HAVING COUNT(*) = 1
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:all:info' => array( 'testing_info' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( name = 'one' AND value = true )
+						GROUP BY post_id
+						HAVING COUNT(*) = 1
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:all:info' => array( 'one' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( name = 'old' AND value = true OR
+						 name = 'new' AND value = true )
+						GROUP BY post_id
+						HAVING COUNT(*) = 2
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:all:info' => array( 'old' => true, 'new' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		// not:any:info
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'two' AND {postinfo}.value = true )
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:any:info' => array( 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+
+		$count = DB::get_value(
+			"SELECT COUNT(*) FROM {posts} WHERE
+				{posts}.id NOT IN (
+					SELECT post_id FROM {postinfo}
+						WHERE ( {postinfo}.name = 'black' AND {postinfo}.value = true OR
+						 {postinfo}.name = 'blue' AND {postinfo}.value = true )
+				)
+		" );
+		$count_posts = Posts::get( array( 'not:any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_equal( $count_posts, $count );
+//		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
+//		Utils::debug( $query );die();
+
+		// teardown
+		foreach( Posts::get( array( 'has:info' => 'testing_info', 'nolimit' => 1 ) ) as $post) $post->delete();
+		$informationless_post->delete();
+	}
 //
 //	/*
 //	 * @todo Make this test do something useful. It currently illustrates #1220 by failing on postgres, but it should actually assert things.
