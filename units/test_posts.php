@@ -42,8 +42,7 @@ class PostsTest extends UnitTestCase
 	 */
 	protected function teardown()
 	{
-		$posts = Posts::get(array('nolimit' => 1));
-		foreach ( $posts as $post ) $post->delete();
+		Posts::get(array('nolimit' => 1))->delete();
 	}
 
 	/**
