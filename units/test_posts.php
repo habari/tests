@@ -851,7 +851,7 @@ class PostsTest extends UnitTestCase
 //		Utils::debug( $query );die();
 
 		// teardown
-		foreach( Posts::get( array( 'has:info' => 'testing_info', 'nolimit' => 1 ) ) as $post) $post->delete();
+		Posts::get( array( 'has:info' => 'testing_info', 'nolimit' => 1 ) )->delete();
 		$informationless_post->delete();
 	}
 //
