@@ -652,7 +652,53 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_vocabulary()
 	{
-		$this->mark_test_incomplete();
+		// setup
+		if( Vocabulary::get( "fizz" ) ) {
+			Vocabulary::get( "fizz" )->delete();
+		}
+		$fizz = new Vocabulary( array(
+			'name' => 'fizz',
+			'description' => 'Vocabulary for Posts testing.',
+			'features' => array( 'free' )
+		));
+
+		if( Vocabulary::get( "buzz" ) ) {
+			Vocabulary::get( "buzz" )->delete();
+		}
+		$buzz = new Vocabulary( array(
+			'name' => 'buzz',
+			'description' => 'Another Vocabulary for Posts testing.',
+			'features' => array( 'free' )
+		));
+
+		// create some Posts and associate them with the two Vocabularies
+		for( $i = 1; $i < 20; $i++ ) {
+			$post = Post::create( array(
+				'title' => "Test Post $i",
+				'content' => 'If this were really a post...',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_vocab = true;
+			$post->info->i = $i;
+			$post->info->commit();
+
+			if( $i % 3 === 0 ) {
+				$fizz->set_object_terms( 'post', $post->id, array( "fizz" ) );
+			}
+			if( $i % 5 === 0 ) {
+				$buzz->set_object_terms( 'post', $post->id, array( "buzz" ) );
+			}
+		}
+
+
+
+		// teardown
+		Posts::get( array( 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
+		$fizz->delete();
+		$buzz->delete();
 	}
 
 	/**
@@ -681,7 +727,7 @@ class PostsTest extends UnitTestCase
 		for( $i = 1; $i < 42; $i++ ) {
 			$post = Post::create( array(
 				'title' => 'This Post has Info',
-				'content' => 'If this wwere really a post, would it have such useless information?',
+				'content' => 'If this were really a post, would it have such useless information?',
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
