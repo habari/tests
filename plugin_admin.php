@@ -26,6 +26,15 @@
 <?php if (isset($results)): ?>
 
 <div class="container">
+	<div class="item settings clear" id="config">
+		<ul class="attributes">
+			<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
+			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>"><?php echo $direct_url; ?></a> (<a href="<?php echo $symbolic_url; ?>">symbolic</a>)</li>
+		</ul>
+	</div>
+</div>
+
+<div class="container">
 	<?php foreach ( $results as $result ): ?>
 	<div class='item settings clear' id='<?php echo $result['name']?>'>
 		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a><?php if (isset($test)) echo ': '.$test; ?></h2>

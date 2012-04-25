@@ -95,6 +95,9 @@ class TestsPlugin extends Plugin
 			}
 
 			if($parsed_xml) {
+				$theme->connection_string = $results['connection_string'];
+				$theme->symbolic_url = $url;
+				$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
 				foreach ($results->unit as $result) {
 					$result_array = (array)$result->attributes();
 					$result_array = array_shift($result_array);

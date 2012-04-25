@@ -1107,6 +1107,8 @@ class TestResults extends ArrayObject
 		$xml = new SimpleXMLElement('<results></results>');
 
 		$xml->addAttribute('unit_count', $this->count());
+		$connection = Config::get('db_connection');
+		$xml->addAttribute('connection_string', $connection->connection_string);
 
 		$totals = $this->initial_results();
 
