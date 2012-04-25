@@ -712,6 +712,19 @@ class PostsTest extends UnitTestCase
 		$this->assert_true( $not_vocab_posts < $total_posts, "Not: $not_vocab_posts should be less than Total: $total_posts" );
 		$this->assert_equal( $any_vocab_posts + $not_vocab_posts, $total_posts, "Any: $any_vocab_posts plus Not: $not_vocab_posts should equal Total: $total_posts" );
 
+		// Property-based syntax
+
+		$any_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:term" => "fizz", "buzz:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$all_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:all:term" => "fizz", "buzz:all:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$not_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:not:term" => "fizz", "buzz:not:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+
+		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
+		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
+		$this->assert_true( $not_vocab_posts < $total_posts, "Not: $not_vocab_posts should be less than Total: $total_posts" );
+		$this->assert_equal( $any_vocab_posts + $not_vocab_posts, $total_posts, "Any: $any_vocab_posts plus Not: $not_vocab_posts should equal Total: $total_posts" );
+
+
+
 		// teardown
 		Posts::get( array( 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
 		$fizz->delete();
