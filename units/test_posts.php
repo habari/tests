@@ -653,26 +653,33 @@ class PostsTest extends UnitTestCase
 	public function test_get_posts_by_vocabulary()
 	{
 		// setup
+		// create a couple Vocabularies and Terms
 		if( Vocabulary::get( "fizz" ) ) {
 			Vocabulary::get( "fizz" )->delete();
 		}
-		$fizz = new Vocabulary( array(
+		$fizz = Vocabulary::create( array(
 			'name' => 'fizz',
 			'description' => 'Vocabulary for Posts testing.',
 			'features' => array( 'free' )
 		));
 
+		$fizz_term = new Term( array( 'term' => 'fizz', 'term_display' => 'Fizz' ) );
+		$fizz->add_term( $fizz_term );
+
 		if( Vocabulary::get( "buzz" ) ) {
 			Vocabulary::get( "buzz" )->delete();
 		}
-		$buzz = new Vocabulary( array(
+		$buzz = Vocabulary::create( array(
 			'name' => 'buzz',
 			'description' => 'Another Vocabulary for Posts testing.',
 			'features' => array( 'free' )
 		));
 
+		$buzz_term = new Term( array( 'term' => 'buzz', 'term_display' => 'Buzz' ) );
+		$buzz->add_term( $buzz_term );
+
 		// create some Posts and associate them with the two Vocabularies
-		for( $i = 1; $i < 20; $i++ ) {
+		for( $i = 1; $i <= 20; $i++ ) {
 			$post = Post::create( array(
 				'title' => "Test Post $i",
 				'content' => 'If this were really a post...',
@@ -686,14 +693,24 @@ class PostsTest extends UnitTestCase
 			$post->info->commit();
 
 			if( $i % 3 === 0 ) {
-				$fizz->set_object_terms( 'post', $post->id, array( "fizz" ) );
+				$fizz->set_object_terms( 'post', $post->id, array( $fizz_term->term_display ) );
 			}
 			if( $i % 5 === 0 ) {
-				$buzz->set_object_terms( 'post', $post->id, array( "buzz" ) );
+				$buzz->set_object_terms( 'post', $post->id, array( $buzz_term->term_display ) );
 			}
 		}
 
+		// Object-based syntax
 
+		$total_posts = Posts::count_total();
+		$any_vocab_posts = Posts::get( array( 'vocabulary' => array( "any" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$all_vocab_posts = Posts::get( array( 'vocabulary' => array( "all" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$not_vocab_posts = Posts::get( array( 'vocabulary' => array( "not" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+
+		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
+		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
+		$this->assert_true( $not_vocab_posts < $total_posts, "Not: $not_vocab_posts should be less than Total: $total_posts" );
+		$this->assert_equal( $any_vocab_posts + $not_vocab_posts, $total_posts, "Any: $any_vocab_posts plus Not: $not_vocab_posts should equal Total: $total_posts" );
 
 		// teardown
 		Posts::get( array( 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
