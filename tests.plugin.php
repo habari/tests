@@ -68,6 +68,7 @@ class TestsPlugin extends Plugin
 		foreach ($test_list->unit as $unit) {
 			$unit_names[] = (string)$unit->attributes()->name;
 		}
+		$theme->unit_names = $unit_names;
 
 		if (isset($_GET['run']) && isset($_GET['unit'])) {
 			$unit = $_GET['unit'];
@@ -81,46 +82,56 @@ class TestsPlugin extends Plugin
 				$url = $this->get_url($url);
 			}
 			$results = preg_replace("/^\n/", "", file_get_contents($url));
-			$results = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 
 			$results_array = array();
-			foreach ($results->unit as $result) {
-				$result_array = (array)$result->attributes();
-				$result_array = array_shift($result_array);
-
-				$result_array['methods'] = array();
-				foreach ($result->method as $method) {
-					$method_array = (array)$method;
-					$output_array = array();
-					if( isset( $method->output ) ) { // output is on, and output can appear whether passing or failing.
-						foreach( $method->output as $output ) {
-							$output_array[] = "<div class='method_output'>{$method->output}</div>";
-						}
-					}
-
-					if( ! isset( $method->message ) ) { // no <message> means the method passed
-						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass", "output" => implode( " ", $output_array ) ) );
-					} else {
-						$message_array = array();
-						$result = (string)$method->message->attributes()->type;
-						foreach( $method->message as $message ) {
-							$message_array[] = "{$message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($message->attributes()->file) . ":{$message->attributes()->line}</em>");
-						}
-						$result_array['methods'][] = array_merge( array_shift($method_array), array(
-							"result" => $result,
-							"messages" => implode( "<br>", $message_array ),
-							"output" => implode( " ", $output_array ),
-						));
-					}
-				}
-				$results_array[] = $result_array;
+			$parsed_xml = true;
+			try {
+				$xmldata = file_get_contents($url);
+				$results = @new SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
 			}
-			$theme->results = $results_array;
-			$theme->unit = $unit;
+			catch(Exception $e) {
+				$theme->error = var_export($e->getMessage(), true) . '<textarea style="width:100%;height: 20em;">' . htmlentities($xmldata) . '</textarea>';
+				$parsed_xml = false;
+			}
+
+			if($parsed_xml) {
+				foreach ($results->unit as $result) {
+					$result_array = (array)$result->attributes();
+					$result_array = array_shift($result_array);
+
+					$result_array['methods'] = array();
+					foreach ($result->method as $method) {
+						$method_array = (array)$method;
+						$output_array = array();
+						if( isset( $method->output ) ) { // output is on, and output can appear whether passing or failing.
+							foreach( $method->output as $outputz ) {
+								$output_array[] = "<div class='method_output'>{$method->output}</div>";
+							}
+						}
+
+						if( ! isset( $method->message ) ) { // no <message> means the method passed
+							$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass", "output" => implode( " ", $output_array ) ) );
+						} else {
+							$message_array = array();
+							$result = (string)$method->message->attributes()->type;
+							foreach( $method->message as $message ) {
+								$message_array[] = "{$message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($message->attributes()->file) . ":{$message->attributes()->line}</em>");
+							}
+							$result_array['methods'][] = array_merge( array_shift($method_array), array(
+								"result" => $result,
+								"messages" => implode( "<br>", $message_array ),
+								"output" => implode( " ", $output_array ),
+							));
+						}
+					}
+					$results_array[] = $result_array;
+				}
+				$theme->results = $results_array;
+				$theme->unit = $unit;
+			}
 		}
 
 		$theme->content = $output;
-		$theme->unit_names = $unit_names;
 		$theme->display('header');
 		$theme->display('tests_admin');
 		$theme->display('footer');

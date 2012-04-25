@@ -77,7 +77,7 @@ class UnitTestCase
 	protected $timer_track = array();
 	protected $timers = array();
 
-	public function assert_something($true, $message, $file = null, $line = null, $type = self::FAIL)
+	public function assert_something($true, $message, $file = null, $line = null, $type = self::FAIL, $output = null)
 	{
 		if(empty($file) && empty($line)) {
 			$trace = debug_backtrace(false);
@@ -91,51 +91,52 @@ class UnitTestCase
 		if($true !== true) {
 			$this->messages[] = array('type' => self::FAIL, 'message' => $message, 'file' => $file, 'line' => $line);
 			$this->result->fail_count++;
+			$this->output($output);
 		}
 		else {
 			$this->result->pass_count++;
 		}
 	}
 
-	public function assert_true($value, $message = 'Assertion failed')
+	public function assert_true($value, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something(true == $value, $message);
+		$this->assert_something(true == $value, $message, null, null, null, $output);
 	}
 
-	public function assert_false($value, $message = 'Assertion failed')
+	public function assert_false($value, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something($value === false, $message);
+		$this->assert_something($value === false, $message, null, null, null, $output);
 	}
 
-	public function assert_equal($value1, $value2, $message = 'Assertion failed')
+	public function assert_equal($value1, $value2, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something($value1 == $value2, $message);
+		$this->assert_something($value1 == $value2, $message, null, null, null, $output);
 	}
 
-	public function assert_not_equal($value1, $value2, $message = 'Assertion failed')
+	public function assert_not_equal($value1, $value2, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something($value1 != $value2, $message);
+		$this->assert_something($value1 != $value2, $message, null, null, null, $output);
 	}
 
-	public function assert_identical($value1, $value2, $message = 'Assertion failed')
+	public function assert_identical($value1, $value2, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something($value1 === $value2, $message);
+		$this->assert_something($value1 === $value2, $message, null, null, null, $output);
 	}
 
-	public function assert_not_identical($value1, $value2, $message = 'Assertion failed')
+	public function assert_not_identical($value1, $value2, $message = 'Assertion failed', $output = null)
 	{
-		$this->assert_something($value1 !== $value2, $message);
+		$this->assert_something($value1 !== $value2, $message, null, null, null, $output);
 	}
 
-	public function assert_exception($exception = '', $message = 'Expected exception')
+	public function assert_exception($exception = '', $message = 'Expected exception', $output = null)
 	{
-		$this->asserted_exception = array($exception, $message);
+		$this->asserted_exception = array($exception, $message, null, null, null, $output);
 	}
 
-	public function assert_type( $type, $object, $message = 'Types not equal' )
+	public function assert_type( $type, $object, $message = 'Types not equal', $output = null)
 	{
 		$class = get_class( $object );
-		$this->assert_something($type == $class, $message);
+		$this->assert_something($type == $class, $message, null, null, null, $output);
 	}
 
 	public function mark_test_incomplete( $message = 'Tests not implemented' )
@@ -1139,7 +1140,10 @@ class TestResults extends ArrayObject
 				foreach($messages as $message) {
 					if(isset($message['output'])) {
 						if(isset($this->options['o'])) {
-							$xmethod->addChild('output', $message['output']);
+							$o = $xmethod->addChild('output');
+							$node = dom_import_simplexml($o);
+							$no = $node->ownerDocument;
+							$node->appendChild($no->createCDATASection($message['output']));
 						}
 						$has_output = 1;
 					}

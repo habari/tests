@@ -20,12 +20,16 @@ class PostsTest extends UnitTestCase
 	protected function module_setup()
 	{
 		set_time_limit(0);
-
-		$this->user = User::create(array (
-			'username'=>'posts_test',
-			'email'=>'posts_test@example.com',
-			'password'=>md5('q' . rand( 0,65535 ) ),
-		) );
+		if($user = User::get_by_name( 'posts_test' )) {
+			$this->skip_all();
+		}
+		else {
+			$this->user = User::create(array (
+				'username'=>'posts_test',
+				'email'=>'posts_test@example.com',
+				'password'=>md5('q' . rand( 0,65535 ) ),
+			) );
+		}
 	}
 
 	/**
@@ -175,6 +179,7 @@ class PostsTest extends UnitTestCase
 		$result = Posts::get( array('not:id' => $ids ) );
 
 		$this->assert_true($result instanceof Posts, 'Result should be of type Posts');
+
 		foreach ( $result as $r ) {
 			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
 			$this->assert_false( in_array( $r->id, $ids ), 'id of returned Post should not be in the list of the ones excluded' );
@@ -411,7 +416,7 @@ class PostsTest extends UnitTestCase
 
 		$result = Posts::get(array('not:content_type' => $unexpected->content_type));
 
-		$this->assert_true($result instanceof Posts, 'Result should be of type Posts');
+		$this->assert_true($result instanceof Posts, 'Result should be of type Posts', $result);
 		$result = $result[0];
 		$this->assert_true($result instanceof Post, 'Items should be of type Post');
 		$this->assert_equal($expected->content_type, $result->content_type, 'Returned posts should be of the requested content type');
@@ -703,9 +708,9 @@ class PostsTest extends UnitTestCase
 		// Object-based syntax
 
 		$total_posts = Posts::count_total();
-		$any_vocab_posts = Posts::get( array( 'vocabulary' => array( "any" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
-		$all_vocab_posts = Posts::get( array( 'vocabulary' => array( "all" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
-		$not_vocab_posts = Posts::get( array( 'vocabulary' => array( "not" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "any" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "all" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "not" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
 
 		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
 		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
@@ -714,9 +719,9 @@ class PostsTest extends UnitTestCase
 
 		// Property-based syntax
 
-		$any_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:term" => "fizz", "buzz:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
-		$all_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:all:term" => "fizz", "buzz:all:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
-		$not_vocab_posts = Posts::get( array( 'vocabulary' => array( "fizz:not:term" => "fizz", "buzz:not:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:term" => "fizz", "buzz:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:all:term" => "fizz", "buzz:all:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:not:term" => "fizz", "buzz:not:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
 
 		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
 		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
@@ -726,7 +731,7 @@ class PostsTest extends UnitTestCase
 
 
 		// teardown
-		Posts::get( array( 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
 		$fizz->delete();
 		$buzz->delete();
 	}
@@ -779,10 +784,10 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> ''
 		" );
-		$count_info_posts = Posts::get( array( 'has:info' => 'testing_info', 'count' => 1, 'nolimit' => 1 ) );
+		$count_info_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_info', 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_not_equal( Posts::count_total(), $count_info_posts );
 
-		$count_posts = Posts::get( array( 'has:info' => array( 'red' ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => array( 'red' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
@@ -797,7 +802,7 @@ class PostsTest extends UnitTestCase
 						pi1.name <> '' OR
 						pi2.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'has:info' => array( 'testing_info', 'red' ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => array( 'testing_info', 'red' ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 //		$query = Posts::get( array( 'has:info' => array( 'testing_info', 'red' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
 //		Utils::debug( $query );die();
@@ -811,7 +816,7 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'all:info' => array( 'blue' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'all:info' => array( 'blue' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
@@ -826,7 +831,7 @@ class PostsTest extends UnitTestCase
 						pi1.name <> '' AND
 						pi2.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'all:info' => array( 'blue' => true, 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'all:info' => array( 'blue' => true, 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		// any:info
@@ -844,10 +849,10 @@ class PostsTest extends UnitTestCase
 						pi1.name <> '' OR
 						pi2.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
-		$count = Posts::get( array( 'all:info' => array( 'black' => true ), 'count' => 1, 'nolimit' => 1 ) ) +
+		$count = Posts::get( array( 'ignore_permissions' => true, 'all:info' => array( 'black' => true ), 'count' => 1, 'nolimit' => 1 ) ) +
 				Posts::get( array( 'all:info' => array( 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
@@ -860,7 +865,9 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'any:info' => array( 'i' => array( 1, 2, 3, 4, 5 ) ), 'count' => 1, 'nolimit' => 1 ) );
+		$params = array( 'ignore_permissions' => true, 'any:info' => array( 'i' => array( 1, 2, 3, 4, 5 ) ), 'count' => 1, 'nolimit' => 1 );
+		//$this->output(Posts::get(array_merge($params, array('fetch_fn' => 'get_query'))));
+		$count_posts = Posts::get( $params );
 		$this->assert_equal( $count_posts, $count );
 
 		// not:all:info
@@ -873,8 +880,8 @@ class PostsTest extends UnitTestCase
 						HAVING COUNT(*) = 1
 				)
 		" );
-		$count_posts = Posts::get( array( 'not:all:info' => array( 'testing_info' => true ), 'count' => 1, 'nolimit' => 1 ) );
-		$this->assert_equal( $count_posts, $count );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'testing_info' => true ), 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_equal( $count_posts, $count, _t('not:all:info expected %d, got %d', array($count, $count_posts) ));
 
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts} WHERE
@@ -885,7 +892,7 @@ class PostsTest extends UnitTestCase
 						HAVING COUNT(*) = 1
 				)
 		" );
-		$count_posts = Posts::get( array( 'not:all:info' => array( 'one' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'one' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
@@ -898,7 +905,7 @@ class PostsTest extends UnitTestCase
 						HAVING COUNT(*) = 2
 				)
 		" );
-		$count_posts = Posts::get( array( 'not:all:info' => array( 'old' => true, 'new' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'old' => true, 'new' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		// not:any:info
@@ -909,7 +916,7 @@ class PostsTest extends UnitTestCase
 						WHERE ( {postinfo}.name = 'two' AND {postinfo}.value = true )
 				)
 		" );
-		$count_posts = Posts::get( array( 'not:any:info' => array( 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
@@ -920,13 +927,13 @@ class PostsTest extends UnitTestCase
 						 {postinfo}.name = 'blue' AND {postinfo}.value = true )
 				)
 		" );
-		$count_posts = Posts::get( array( 'not:any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 //		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
 //		Utils::debug( $query );die();
 
 		// teardown
-		Posts::get( array( 'has:info' => 'testing_info', 'nolimit' => 1 ) )->delete();
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_info', 'nolimit' => 1 ) )->delete();
 		$informationless_post->delete();
 	}
 //

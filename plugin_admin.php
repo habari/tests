@@ -14,6 +14,14 @@
 </div>
 </form>
 
+<?php if(!empty($error)): ?>
+<div class="container">
+	<div class='item settings clear' id='error'>
+		<?php echo $error; ?>
+	</div>
+</div>
+<?php endif; ?>
+
 
 <?php if (isset($results)): ?>
 
@@ -55,10 +63,10 @@
 				<td class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></td>
 				<td class="hasoutput <?php echo (! empty( $method['output'] )) ? 'hasoutput_yes' : 'hasoutput_no' ?>"><?php echo (! empty( $method['output'] )) ? '<a href="#">details</a>' : '--' ?></td>
 			</tr>
-		<?php endforeach;
-		if (! empty( $method['output'] )):?>
+		<?php if (! empty( $method['output'] )):?>
 			<tr><td class="output" colspan="4"><?php echo $method['output']; ?></td></tr>
 		<?php endif; ?>
+		<?php endforeach; ?>
 		</table>
 	</div>
 	<?php endforeach; ?>
