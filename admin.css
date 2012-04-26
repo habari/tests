@@ -80,6 +80,16 @@
 	background-color: #F8F8C5;
 }
 
+.methods .Dry:nth-child(even),
+.methods .Skipped:nth-child(even){
+	background-color: #DDF;
+}
+
+.methods .Dry:nth-child(odd),
+.methods .Skipped:nth-child(odd) {
+	background-color: #D6D6F8;
+}
+
 .methods .messages {
 	display: block;
 	padding-left: 4px;

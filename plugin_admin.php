@@ -1,6 +1,6 @@
 <form action="" accept-charset="UTF-8">
 <div class="container navigation">
-	<span class="pct75">
+	<span class="pct70">
 		<select name="unit" tabindex="1">
 			<option value="all">All tests</option>
 			<?php foreach($unit_names as $unit_name): ?>
@@ -8,7 +8,9 @@
 			<?php endforeach; ?>
 		</select>
 	</span>
-<span class="pct20" id="run"><input type="submit" name="run" class="button" value="Run" tabindex="3">
+<span class="pct10" id="run"><input type="submit" name="run" class="button" value="Run" tabindex="3">
+</span>
+<span class="pct10" id="run"><input type="submit" name="run" class="button" value="Dry Run" tabindex="3">
 </span>
 
 </div>
@@ -61,7 +63,7 @@
 			<?php foreach ( $result['methods'] as $method ): ?>
 			<tr class="<?php echo $method['result']; ?>">
 				<td class="passfail"><?php
-					// todo: Haha, this will be completely untranslatable later...
+					// @todo: Haha, this will be completely untranslatable later...
 					echo '<span title="' . $method['result'] . '">';
 					switch($method['result']) {
 						case 'Pass':
@@ -71,16 +73,19 @@
 						case 'Incomplete':
 							echo '&#x21e5;';break;
 						case 'Skipped':
+						case 'Dry Run':
 							echo '&#x21b7;';break;
 					}
 					echo '</span>';
 				?></td>
 				<td class="methodname"><a href="tests?unit=<?php echo $result['name']; ?>&test=<?php echo $method['name']; ?>&run=Run" title="Run <?php echo $method['name']; ?>"><?php echo $method['name']?></a></td>
 				<td class="messages"><?php echo isset( $method['messages'] ) ? $method['messages'] : ''; ?></td>
-				<td class="hasoutput <?php echo (! empty( $method['output'] )) ? 'hasoutput_yes' : 'hasoutput_no' ?>"><?php echo (! empty( $method['output'] )) ? '<a href="#">details</a>' : '--' ?></td>
+				<td class="hasoutput <?php echo (! empty( $method['output'] )) ? 'hasoutput_yes' : 'hasoutput_no' ?>"><?php echo (! empty( $method['output'] ) && trim($method['output']) != '') ? '<a href="#">details</a>' : '--' ?></td>
 			</tr>
 		<?php if (! empty( $method['output'] )):?>
-			<tr><td class="output" colspan="4"><?php echo $method['output']; ?></td></tr>
+			<tr><td class="output" colspan="4">
+				<div class='method_output'><?php echo ($method['output']); ?></div>
+			</td></tr>
 		<?php endif; ?>
 		<?php endforeach; ?>
 		</table>

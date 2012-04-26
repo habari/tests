@@ -60,8 +60,8 @@ class TestsPlugin extends Plugin
 	 */
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
-		$url = $this->get_url('/index.php?c=symbolic&o=1');
-		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url.'&d=1')));
+		$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
+		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 
 		$output = '';
 		$unit_names = array();
@@ -71,6 +71,7 @@ class TestsPlugin extends Plugin
 		$theme->unit_names = $unit_names;
 
 		if (isset($_GET['run']) && isset($_GET['unit'])) {
+			$dryrun = false;
 			$unit = $_GET['unit'];
 			if ($unit != 'all') {
 				$url = '/index.php?c=symbolic&o=1&u='.$unit;
@@ -81,61 +82,75 @@ class TestsPlugin extends Plugin
 				}
 				$url = $this->get_url($url);
 			}
-			$results = preg_replace("/^\n/", "", file_get_contents($url));
-
-			$results_array = array();
-			$parsed_xml = true;
-			try {
-				$xmldata = file_get_contents($url);
-				$results = @new SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
+			if($_GET['run'] == 'Dry Run') {
+				$url .= '&d=1';
+				$dryrun = true;
 			}
-			catch(Exception $e) {
-				$theme->error = var_export($e->getMessage(), true) . '<textarea style="width:100%;height: 20em;">' . htmlentities($xmldata) . '</textarea>';
-				$parsed_xml = false;
-			}
-			$theme->xmldata = $xmldata;
+		}
+		else {
+			$dryrun = true;
+			$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
+		}
 
-			if($parsed_xml) {
-				$theme->connection_string = $results['connection_string'];
-				$theme->symbolic_url = $url;
-				$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
-				$dom = dom_import_simplexml($results)->ownerDocument;
-				$dom->formatOutput = true;
-				$theme->xmldata = $dom->saveXML();
-				foreach ($results->unit as $result) {
-					$result_array = (array)$result->attributes();
-					$result_array = array_shift($result_array);
+		$results = preg_replace("/^\n/", "", file_get_contents($url));
 
-					$result_array['methods'] = array();
-					foreach ($result->method as $method) {
-						$method_array = (array)$method;
-						$output_array = array();
-						if( isset( $method->output ) ) { // output is on, and output can appear whether passing or failing.
-							foreach( $method->output as $outputz ) {
-								$output_array[] = "<div class='method_output'>{$method->output}</div>";
-							}
-						}
+		$results_array = array();
+		$parsed_xml = true;
+		try {
+			$xmldata = file_get_contents($url);
+			$results = @new SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
+		}
+		catch(Exception $e) {
+			$theme->error = var_export($e->getMessage(), true) . '<textarea style="width:100%;height: 20em;">' . htmlentities($xmldata) . '</textarea>';
+			$parsed_xml = false;
+			$theme->unit = $unit;
+		}
+		$theme->xmldata = $xmldata;
 
-						if( ! isset( $method->message ) ) { // no <message> means the method passed
-							$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => "Pass", "output" => implode( " ", $output_array ) ) );
-						} else {
-							$message_array = array();
-							$result = (string)$method->message->attributes()->type;
-							foreach( $method->message as $message ) {
-								$message_array[] = "{$message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($message->attributes()->file) . ":{$message->attributes()->line}</em>");
-							}
-							$result_array['methods'][] = array_merge( array_shift($method_array), array(
-								"result" => $result,
-								"messages" => implode( "<br>", $message_array ),
-								"output" => implode( " ", $output_array ),
-							));
+		if($parsed_xml) {
+			$theme->connection_string = $results['connection_string'];
+			$theme->symbolic_url = $url;
+			$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
+			$dom = dom_import_simplexml($results)->ownerDocument;
+			$dom->formatOutput = true;
+			$theme->xmldata = $dom->saveXML();
+			foreach ($results->unit as $result) {
+				$result_array = (array)$result->attributes();
+				$result_array = array_shift($result_array);
+
+				$result_array['methods'] = array();
+				foreach ($result->method as $method) {
+					$method_array = (array)$method;
+					$output_array = array();
+					if( isset( $method->output ) ) { // output is on, and output can appear whether passing or failing.
+						foreach( $method->output as $outputz ) {
+							$output_array[] = $outputz;
 						}
 					}
-					$results_array[] = $result_array;
+
+					if( ! isset( $method->message ) ) { // no <message> means the method passed
+						$method_result = 'Pass';
+						if($dryrun) {
+							$method_result = 'Dry Run';
+						}
+						$result_array['methods'][] = array_merge( array_shift($method_array), array( "result" => $method_result, "output" => implode( " ", $output_array ) ) );
+					} else {
+						$message_array = array();
+						$result = (string)$method->message->attributes()->type;
+						foreach( $method->message as $message ) {
+							$message_array[] = "{$message}" . ( $result != "Fail" ? "" : "<br><em>" . basename($message->attributes()->file) . ":{$message->attributes()->line}</em>");
+						}
+						$result_array['methods'][] = array_merge( array_shift($method_array), array(
+							"result" => $result,
+							"messages" => implode( "<br>", $message_array ),
+							"output" => implode( " ", $output_array ),
+						));
+					}
 				}
-				$theme->results = $results_array;
-				$theme->unit = $unit;
+				$results_array[] = $result_array;
 			}
+			$theme->results = $results_array;
+			$theme->unit = $unit;
 		}
 
 		$theme->content = $output;
