@@ -33,6 +33,10 @@ if(!isset($querystring_options)) {
 	$options = array_merge($options, $querystring_options);
 }
 
+if(file_exists(dirname(__FILE__) . '/selenium.php')) {
+	include 'selenium.php';
+}
+
 if(!defined('HABARI_PATH')) {
 	if(isset($options['r'])) {
 		define('HABARI_PATH', $options['r']);
@@ -108,6 +112,16 @@ class UnitTestCase
 		$this->assert_something($value === false, $message, null, null, null, $output);
 	}
 
+	public function assert_empty($value, $message = 'Assertion failed', $output = null)
+	{
+		$this->assert_something(empty($value), $message, null, null, null, $output);
+	}
+
+	public function assert_not_empty($value, $message = 'Assertion failed', $output = null)
+	{
+		$this->assert_something(!empty($value), $message, null, null, null, $output);
+	}
+
 	public function assert_equal($value1, $value2, $message = 'Assertion failed', $output = null)
 	{
 		$this->assert_something($value1 == $value2, $message, null, null, null, $output);
@@ -167,10 +181,10 @@ class UnitTestCase
 		$this->conditions[$condition] = $reason;
 	}
 
-	public function skip_all()
+	public function skip_all($reason = 'Skipping all tests.')
 	{
 		foreach($this->methods as $method => $data) {
-			$this->methods[$method]['go'] = 'Skipping all tests.';
+			$this->methods[$method]['go'] = $reason;
 		}
 	}
 
@@ -248,8 +262,10 @@ class UnitTestCase
 
 		$this->run_init();
 
+		$dryrun = isset($options['d']);
+
 		// Execute any module setup that might exist
-		if(method_exists($this, 'module_setup')) {
+		if(method_exists($this, 'module_setup') && !$dryrun) {
 			$this->module_setup();
 		}
 
@@ -264,8 +280,6 @@ class UnitTestCase
 				unset($options['t']);
 			}
 		}
-
-		$dryrun = isset($options['d']);
 
 		// Attempt to execute test methods in this unit
 		foreach($this->methods as $method => $run_status) {
@@ -387,7 +401,7 @@ class UnitTestCase
 			xdebug_stop_code_coverage();
 		}
 
-		if(method_exists($this, 'module_teardown')) {
+		if(method_exists($this, 'module_teardown') && !$dryrun) {
 			$this->module_teardown();
 		}
 
@@ -462,6 +476,12 @@ class FeatureTestCase extends UnitTestCase
 			elseif($state == 'scenario') {
 				$features[$feature]['scenarios'][$scenario][] = array($line, $ln);
 			}
+			elseif(preg_match('#^\s*@\w+#i', $line)) {
+				preg_match_all('#(?<!\w)@(\w+)#i', $line, $matches);
+				foreach($matches[1] as $directive) {
+
+				}
+			}
 			if($feature != '') {
 				$features[$feature]['full'][$ln] = $file;
 			}
@@ -513,7 +533,7 @@ class FeatureTestCase extends UnitTestCase
 
 		foreach($story as $linenumber => $step) {
 			if(preg_match('#(Given|When|Then|And|But)\s+(.+)$#i', $step, $matches)) {
-				if(!$this->execute_step($matches[2])) {
+				if(!$this->execute_step($matches[2], $linenumber, $step)) {
 					$file = basename($this->feature_file);
 					throw new Exception("Step '{$matches[0]}' is not defined in {$file}:#{$linenumber}");
 				}
@@ -531,12 +551,16 @@ class FeatureTestCase extends UnitTestCase
 		}
 	}
 
-	public function execute_step($stripped_step)
+	public function execute_step($stripped_step, $linenumber, $step)
 	{
 		foreach($this->steps as $regex => $fn) {
 			if(preg_match($regex, $stripped_step, $matches)) {
 				array_shift($matches);
-				$fn[0] = $this->feature_contexts[$fn[0]];
+				$obj = $this->feature_contexts[$fn[0]];
+				$obj->linenumber = $linenumber;
+				$obj->step = $step;
+				$obj->feature_file = $this->feature_file;
+				$fn[0] = $obj;
 				call_user_func_array($fn, $matches);
 				return true;
 			}
@@ -734,6 +758,13 @@ class FeatureContext
 	public function __call($method, $args)
 	{
 		if(method_exists($this->testcase, $method)) {
+			if(strpos($method, 'assert_') == 0) {
+				foreach($args as $k => $arg) {
+					if(is_string($arg) && strpos($arg, '{step}') !== false) {
+						$args[$k] = str_replace('{step}', "In: {$this->feature_file}\nStep: {$this->step}\nLine number: {$this->linenumber}\n", $arg);
+					}
+				}
+			}
 			call_user_func_array(array($this->testcase, $method), $args);
 		}
 		else {

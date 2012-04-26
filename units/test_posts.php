@@ -21,7 +21,8 @@ class PostsTest extends UnitTestCase
 	{
 		set_time_limit(0);
 		if($user = User::get_by_name( 'posts_test' )) {
-			$this->skip_all();
+			$this->user = $user;
+			//$this->skip_all("User {$user->id} is required 'posts_test' user.");
 		}
 		else {
 			$this->user = User::create(array (
@@ -823,10 +824,10 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts}
 				LEFT JOIN {postinfo} pi1 ON
 					{posts}.id = pi1.post_id AND
-					pi1.name = 'blue' AND pi1.value = true
+					pi1.name = 'blue' AND pi1.value = 'true'
 				LEFT JOIN {postinfo} pi2 ON
 					{posts}.id = pi2.post_id AND
-					pi2.name = 'two' AND pi2.value = true
+					pi2.name = 'two' AND pi2.value = 'true'
 					WHERE
 						pi1.name <> '' AND
 						pi2.name <> ''
@@ -844,7 +845,7 @@ class PostsTest extends UnitTestCase
 				LEFT JOIN {postinfo} pi2 ON
 					{posts}.id = pi2.post_id AND
 					pi2.name = 'blue' AND
-					pi2.value = true
+					pi2.value = 'true'
 					WHERE
 						pi1.name <> '' OR
 						pi2.name <> ''
@@ -875,7 +876,7 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( name = 'testing_info' AND value = true )
+						WHERE ( name = 'testing_info' AND value = 'true' )
 						GROUP BY post_id
 						HAVING COUNT(*) = 1
 				)
@@ -887,7 +888,7 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( name = 'one' AND value = true )
+						WHERE ( name = 'one' AND value = 'true' )
 						GROUP BY post_id
 						HAVING COUNT(*) = 1
 				)

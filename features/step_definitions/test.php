@@ -14,7 +14,9 @@ class TestFeatureContext extends FeatureContext
 	 * @Given /the (.+) is running$/
 	 */
 	function the_test_suite_is_running($running_thing) {
-		$this->mark_test_incomplete("The {$running_thing} may be running, but this test is incomplete.");
+		// Well, if we're here, it's running, right?
+		$this->assert_true(true);
+		//$this->mark_test_incomplete("The {$running_thing} may be running, but this test is incomplete.");
 	}
 
 	/**
@@ -37,5 +39,14 @@ class TestFeatureContext extends FeatureContext
 	function some_output_should_exist() {
 		$this->assert_true(true);
 	}
+
+	/**
+	 * @When /I visit the URL:\s*(.+?)$/
+	 */
+	function i_visit_the_url($url) {
+
+		$this->assert_true(true);
+	}
+
 
 }

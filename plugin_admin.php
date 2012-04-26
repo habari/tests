@@ -29,8 +29,15 @@
 	<div class="item settings clear" id="config">
 		<ul class="attributes">
 			<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
-			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>"><?php echo $direct_url; ?></a> (<a href="<?php echo $symbolic_url; ?>">symbolic</a>)</li>
+			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
+			<li><a href="#xml" onclick="$('#xml').toggle();return false;">Show XML results</a></li>
 		</ul>
+	</div>
+</div>
+
+<div class="container" style="display:none;" id="xml">
+	<div class="item settings clear">
+		<textarea style="width:100%;height:300px"><?php echo $xmldata; ?></textarea>
 	</div>
 </div>
 

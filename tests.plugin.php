@@ -93,11 +93,15 @@ class TestsPlugin extends Plugin
 				$theme->error = var_export($e->getMessage(), true) . '<textarea style="width:100%;height: 20em;">' . htmlentities($xmldata) . '</textarea>';
 				$parsed_xml = false;
 			}
+			$theme->xmldata = $xmldata;
 
 			if($parsed_xml) {
 				$theme->connection_string = $results['connection_string'];
 				$theme->symbolic_url = $url;
 				$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
+				$dom = dom_import_simplexml($results)->ownerDocument;
+				$dom->formatOutput = true;
+				$theme->xmldata = $dom->saveXML();
 				foreach ($results->unit as $result) {
 					$result_array = (array)$result->attributes();
 					$result_array = array_shift($result_array);
