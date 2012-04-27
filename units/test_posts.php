@@ -694,7 +694,7 @@ class PostsTest extends UnitTestCase
 				'content_type' => Post::type( 'entry' ),
 				'pubdate' => HabariDateTime::date_create( time() ),
 			));
-			$post->info->testing_vocab = true;
+			$post->info->testing_vocab = 1;
 			$post->info->i = $i;
 			$post->info->commit();
 
@@ -769,8 +769,8 @@ class PostsTest extends UnitTestCase
 				'content_type' => Post::type( 'entry' ),
 				'pubdate' => HabariDateTime::date_create( time() ),
 			));
-			$post->info->testing_info = true;
-			$post->info->$seven_things[ ($i % 7) ] = true;
+			$post->info->testing_info = 1;
+			$post->info->$seven_things[ ($i % 7) ] = 1;
 			$post->info->i = $i;
 			$post->info->commit();
 		}
@@ -824,10 +824,10 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts}
 				LEFT JOIN {postinfo} pi1 ON
 					{posts}.id = pi1.post_id AND
-					pi1.name = 'blue' AND pi1.value = 'true'
+					pi1.name = 'blue' AND pi1.value = 1
 				LEFT JOIN {postinfo} pi2 ON
 					{posts}.id = pi2.post_id AND
-					pi2.name = 'two' AND pi2.value = 'true'
+					pi2.name = 'two' AND pi2.value = 1
 					WHERE
 						pi1.name <> '' AND
 						pi2.name <> ''
@@ -845,15 +845,15 @@ class PostsTest extends UnitTestCase
 				LEFT JOIN {postinfo} pi2 ON
 					{posts}.id = pi2.post_id AND
 					pi2.name = 'blue' AND
-					pi2.value = 'true'
+					pi2.value = 1
 					WHERE
 						pi1.name <> '' OR
 						pi2.name <> ''
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'any:info' => array( 'black' => 1, 'blue' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
-		$count = Posts::get( array( 'ignore_permissions' => true, 'all:info' => array( 'black' => true ), 'count' => 1, 'nolimit' => 1 ) ) +
+		$count = Posts::get( array( 'ignore_permissions' => true, 'all:info' => array( 'black' => 1 ), 'count' => 1, 'nolimit' => 1 ) ) +
 				Posts::get( array( 'all:info' => array( 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
@@ -876,37 +876,37 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( name = 'testing_info' AND value = 'true' )
+						WHERE ( name = 'testing_info' AND value = 1 )
 						GROUP BY post_id
 						HAVING COUNT(*) = 1
 				)
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'testing_info' => true ), 'nolimit' => 1, 'count' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'testing_info' => 1 ), 'nolimit' => 1, 'count' => 1 ) );
 		$this->assert_equal( $count_posts, $count, _t('not:all:info expected %d, got %d', array($count, $count_posts) ));
 
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( name = 'one' AND value = 'true' )
+						WHERE ( name = 'one' AND value = 1 )
 						GROUP BY post_id
 						HAVING COUNT(*) = 1
 				)
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'one' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'one' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( name = 'old' AND value = true OR
-						 name = 'new' AND value = true )
+						WHERE ( name = 'old' AND value = 1 OR
+						 name = 'new' AND value = 1 )
 						GROUP BY post_id
 						HAVING COUNT(*) = 2
 				)
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'old' => true, 'new' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:all:info' => array( 'old' => 1, 'new' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		// not:any:info
@@ -914,21 +914,21 @@ class PostsTest extends UnitTestCase
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( {postinfo}.name = 'two' AND {postinfo}.value = true )
+						WHERE ( {postinfo}.name = 'two' AND {postinfo}.value = 1 )
 				)
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'two' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'two' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
 			"SELECT COUNT(*) FROM {posts} WHERE
 				{posts}.id NOT IN (
 					SELECT post_id FROM {postinfo}
-						WHERE ( {postinfo}.name = 'black' AND {postinfo}.value = true OR
-						 {postinfo}.name = 'blue' AND {postinfo}.value = true )
+						WHERE ( {postinfo}.name = 'black' AND {postinfo}.value = 1 OR
+						 {postinfo}.name = 'blue' AND {postinfo}.value = 1 )
 				)
 		" );
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'black' => true, 'blue' => true ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'not:any:info' => array( 'black' => 1, 'blue' => 1 ), 'count' => 1, 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 //		$query = Posts::get( array( 'not:any:info' => array( 'comments_disabled' => 1, 'html_title' => 'Chili, The Breakfast of Champions' ), 'nolimit' => 1, 'fetch_fn' => 'get_query' ) );
 //		Utils::debug( $query );die();
