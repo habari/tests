@@ -29,8 +29,8 @@
 
 <div class="container">
 	<div class="item settings clear" id="config">
-		<ul class="attributes">
-			<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
+		<ul class="$connection_string">
+		<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
 			<li><a href="#xml" onclick="$('#xml').toggle();return false;">Show XML results</a></li>
 		</ul>
@@ -42,6 +42,20 @@
 		<textarea style="width:100%;height:300px"><?php echo $xmldata; ?></textarea>
 	</div>
 </div>
+
+<?php elseif(isset($direct_url)): ?>
+
+<div class="container">
+	<div class="item settings clear" id="preconfig">
+		<ul class="$connection_string">
+			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
+		</ul>
+	</div>
+</div>
+
+<?php endif; ?>
+
+<?php if (isset($results)): ?>
 
 <div class="container">
 	<?php foreach ( $results as $result ): ?>

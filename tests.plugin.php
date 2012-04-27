@@ -61,12 +61,7 @@ class TestsPlugin extends Plugin
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
-		try {
-			$test_list = @new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
-		}
-		catch(Exception $e) {
-			$test_list = new SimpleXMLElement('<results></results>');
-		}
+		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 
 		$output = '';
 		$unit_names = array();
@@ -75,24 +70,18 @@ class TestsPlugin extends Plugin
 		}
 		$theme->unit_names = $unit_names;
 
-		if (isset($_GET['run']) && isset($_GET['unit']) && $_GET['unit'] != 'all') {
+		if (isset($_GET['run']) && isset($_GET['unit'])) {
 			$dryrun = false;
 			$unit = $_GET['unit'];
-			$url = '/index.php?c=symbolic&o=1&u='.$unit;
-			if (isset($_GET['test'])) {
-				$test = $_GET['test'];
-				$url = $url.'&t='.$test;
-				$theme->test = $test;
+			if ($unit != 'all') {
+				$url = '/index.php?c=symbolic&o=1&u='.$unit;
+				if (isset($_GET['test'])) {
+					$test = $_GET['test'];
+					$url = $url.'&t='.$test;
+					$theme->test = $test;
+				}
+				$url = $this->get_url($url);
 			}
-			$url = $this->get_url($url);
-			if($_GET['run'] == 'Dry Run') {
-				$url .= '&d=1';
-				$dryrun = true;
-			}
-		}
-		elseif(isset($_GET['run'])) {
-			$dryrun = false;
-			$url = $this->get_url('/index.php?c=symbolic&o=1');
 			if($_GET['run'] == 'Dry Run') {
 				$url .= '&d=1';
 				$dryrun = true;
@@ -107,6 +96,10 @@ class TestsPlugin extends Plugin
 
 		$results_array = array();
 		$parsed_xml = true;
+
+		$theme->symbolic_url = $url;
+		$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
+
 		try {
 			$xmldata = file_get_contents($url);
 			$results = @new SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
@@ -119,12 +112,10 @@ class TestsPlugin extends Plugin
 		$theme->xmldata = $xmldata;
 
 		if($parsed_xml) {
-			$theme->connection_string = $results['connection_string'];
-			$theme->symbolic_url = $url;
-			$theme->direct_url = str_replace('c=symbolic', 'c=html', $url);
 			$dom = dom_import_simplexml($results)->ownerDocument;
 			$dom->formatOutput = true;
 			$theme->xmldata = $dom->saveXML();
+			$theme->connection_string = $results['connection_string'];
 			foreach ($results->unit as $result) {
 				$result_array = (array)$result->attributes();
 				$result_array = array_shift($result_array);

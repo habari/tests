@@ -442,6 +442,9 @@ class FeatureTestCase extends UnitTestCase
 		$features = array();
 		$ln = 0;
 
+		$feature = '';
+		$scenario = '';
+		$file = '';
 		foreach($feature_file as $line) {
 			$ln++;
 			$line = trim($line);
@@ -628,6 +631,7 @@ class TestSuite {
 
 	public static function load_steps()
 	{
+		$class = '';
 		foreach(self::$step_files as $step_file) {
 			include $step_file;
 			$phpfile = file_get_contents($step_file);
@@ -716,21 +720,25 @@ class TestSuite {
 		}
 		// Find unit tests, include them
 		$unit_tests = glob($directory . '/units/test_*.php');
+		$unit_tests = Plugins::filter('list_unit_tests', $unit_tests);
 		foreach($unit_tests as $test) {
 			include($test);
 		}
 
 		// Find feature steps, include them
 		$feature_steps = glob($directory . '/steps/step_*.php');
+		$feature_steps = Plugins::filter('list_feature_steps', $feature_steps);
 		foreach($feature_steps as $step) {
 			include($step);
 		}
 
 		// Find feature files, list them
 		self::$features = glob($directory . '/features/*.feature');
+		self::$features = Plugins::filter('list_features', self::$features);
 
 		// Find step files, list them
 		self::$step_files = glob($directory . '/features/step_definitions/*.php');
+		self::$step_files = Plugins::filter('list_step_definitions', self::$step_files);
 
 		self::run_all();
 	}
