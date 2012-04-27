@@ -61,7 +61,12 @@ class TestsPlugin extends Plugin
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
-		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
+		try {
+			$test_list = @new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
+		}
+		catch(Exception $e) {
+			$test_list = new SimpleXMLElement('<results></results>');
+		}
 
 		$output = '';
 		$unit_names = array();
@@ -70,18 +75,24 @@ class TestsPlugin extends Plugin
 		}
 		$theme->unit_names = $unit_names;
 
-		if (isset($_GET['run']) && isset($_GET['unit'])) {
+		if (isset($_GET['run']) && isset($_GET['unit']) && $_GET['unit'] != 'all') {
 			$dryrun = false;
 			$unit = $_GET['unit'];
-			if ($unit != 'all') {
-				$url = '/index.php?c=symbolic&o=1&u='.$unit;
-				if (isset($_GET['test'])) {
-					$test = $_GET['test'];
-					$url = $url.'&t='.$test;
-					$theme->test = $test;
-				}
-				$url = $this->get_url($url);
+			$url = '/index.php?c=symbolic&o=1&u='.$unit;
+			if (isset($_GET['test'])) {
+				$test = $_GET['test'];
+				$url = $url.'&t='.$test;
+				$theme->test = $test;
 			}
+			$url = $this->get_url($url);
+			if($_GET['run'] == 'Dry Run') {
+				$url .= '&d=1';
+				$dryrun = true;
+			}
+		}
+		elseif(isset($_GET['run'])) {
+			$dryrun = false;
+			$url = $this->get_url('/index.php?c=symbolic&o=1');
 			if($_GET['run'] == 'Dry Run') {
 				$url .= '&d=1';
 				$dryrun = true;
