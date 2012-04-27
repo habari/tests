@@ -718,6 +718,10 @@ class TestSuite {
 		if(!isset($directory)) {
 			$directory = dirname(__FILE__);
 		}
+
+		spl_autoload_register( array( 'Plugins', '_autoload' ) );
+		Plugins::load_active();
+
 		// Find unit tests, include them
 		$unit_tests = glob($directory . '/units/test_*.php');
 		$unit_tests = Plugins::filter('list_unit_tests', $unit_tests);
