@@ -684,6 +684,9 @@ class PostsTest extends UnitTestCase
 		$buzz_term = new Term( array( 'term' => 'buzz', 'term_display' => 'Buzz' ) );
 		$buzz->add_term( $buzz_term );
 
+		Vocabulary::add_object_type( 'fizz' );
+		Vocabulary::add_object_type( 'buzz' );
+
 		// create some Posts and associate them with the two Vocabularies
 		for( $i = 1; $i <= 20; $i++ ) {
 			$post = Post::create( array(
@@ -699,10 +702,10 @@ class PostsTest extends UnitTestCase
 			$post->info->commit();
 
 			if( $i % 3 === 0 ) {
-				$fizz->set_object_terms( 'post', $post->id, array( $fizz_term->term_display ) );
+				$fizz->set_object_terms( 'fizz', $post->id, array( $fizz_term->term ) );
 			}
 			if( $i % 5 === 0 ) {
-				$buzz->set_object_terms( 'post', $post->id, array( $buzz_term->term_display ) );
+				$buzz->set_object_terms( 'buzz', $post->id, array( $buzz_term->term ) );
 			}
 		}
 
