@@ -632,13 +632,111 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_tag()
 	{
-		$this->mark_test_incomplete();
-//		tags:term_display
-//		tags:term
+		// setup
+		$tags = array();
+		if ( Tags::vocabulary()->get_term( "laser" ) ) { Tags::vocabulary()->delete_term( "laser" ); }
+		if ( Tags::vocabulary()->get_term( "dog" ) ) { Tags::vocabulary()->delete_term( "dog" ); }
+
+		$tags[] = Tags::vocabulary()->add_term( "laser" );
+
+		$five_tags = array( "mattress", "freeze", "DOG", "Name", "hash" );
+		foreach( $five_tags as $tag ) {
+			$tags[] = Tags::vocabulary()->add_term( $tag );
+			$count_before[ $tag ] = Posts::get( array( 'vocabulary' => array( 'tags:term' => $tag ), 'count' => 1, 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		}
+
+		for( $i = 1; $i <= 15; $i++ ) {
+			$post_tags = array();
+			for( $j = 0; $j < 5; $j++ ) {
+				if( $i % ( $j+2 ) == 0 ) {
+				$post_tags[] = $five_tags[ $j ];
+				}
+			}
+			$post = Post::create( array(
+				'title' => "Test post $i",
+				'content' => 'Post for testing tags (' . implode( ',', $post_tags ) . '). This is not a real post.',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'tags' => $post_tags,
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_tag = 1;
+			$post->info->commit();
+		}
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+                LEFT JOIN {object_terms} o ON p.id = o.object_id
+				WHERE o.term_id IN (
+					SELECT id FROM {terms} WHERE term_display = 'DOG'
+						AND vocabulary_id = ( SELECT id FROM vocabularies WHERE name = 'tags' )
+				)
+        " );
+
+		// tags:term_display
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term_display' => 'DOG'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		// tags:term
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'dog'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+                LEFT JOIN {object_terms} o ON p.id = o.object_id
+				WHERE o.term_id IN (
+					SELECT id FROM {terms} WHERE term = 'name'
+						AND vocabulary_id = ( SELECT id FROM vocabularies WHERE name = 'tags' )
+				)
+        " );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'name'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+                LEFT JOIN {object_terms} o ON
+                    p.id = o.object_id
+				WHERE o.term_id IN (
+					SELECT id FROM {terms} WHERE term in ( 'mattress', 'freeze' )
+						AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' )
+				)
+        " );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+
+		// tags:all:term
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id IN (
+					SELECT o1.object_id FROM {object_terms} o1
+						LEFT JOIN {object_terms} o2 ON
+							o1.object_id = o2.object_id AND
+							o1.term_id != o2.term_id AND
+							o1.term_id = ( SELECT id FROM {terms} WHERE term = 'mattress'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) ) AND
+							o2.term_id = ( SELECT id FROM {terms} WHERE term = 'freeze'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+        " );
+
+		$any_count = $post_count;
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
 //		tags:all:term_display
-//		tags:all:term
 //		tags:not:term_display
 //		tags:not:term
+
+		// teardown
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_tag', 'nolimit' => 1 ) )->delete();
+		foreach( $tags as $tag ) {
+			Tags::vocabulary()->delete_term( $tag );
+		}
 	}
 
 	/**
