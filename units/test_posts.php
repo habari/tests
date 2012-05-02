@@ -702,19 +702,19 @@ class PostsTest extends UnitTestCase
 			$post->info->commit();
 
 			if( $i % 3 === 0 ) {
-				$fizz->set_object_terms( 'fizz', $post->id, array( $fizz_term->term ) );
+				$fizz->set_object_terms( 'post', $post->id, array( $fizz_term->term ) );
 			}
 			if( $i % 5 === 0 ) {
-				$buzz->set_object_terms( 'buzz', $post->id, array( $buzz_term->term ) );
+				$buzz->set_object_terms( 'post', $post->id, array( $buzz_term->term ) );
 			}
 		}
 
 		// Object-based syntax
 
 		$total_posts = Posts::count_total();
-		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "any" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
-		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "all" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
-		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "not" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 1 ) );
+		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "any" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "all" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "not" => array( $fizz_term, $buzz_term ) ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 
 		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
 		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
@@ -723,16 +723,14 @@ class PostsTest extends UnitTestCase
 
 		// Property-based syntax
 
-		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:term" => "fizz", "buzz:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
-		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:all:term" => "fizz", "buzz:all:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
-		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:not:term" => "fizz", "buzz:not:term" => "buzz" ), 'nolimit' => 1, 'count' => 1 ) );
+		$any_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:term" => "fizz", "buzz:term" => "buzz" ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$all_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:all:term" => "fizz", "buzz:all:term" => "buzz" ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$not_vocab_posts = Posts::get( array( 'ignore_permissions' => true, 'vocabulary' => array( "fizz:not:term" => "fizz", "buzz:not:term" => "buzz" ), 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 
 		$this->assert_true( $any_vocab_posts > $all_vocab_posts, "Any: $any_vocab_posts should be greater than All: $all_vocab_posts" );
 		$this->assert_true( $not_vocab_posts > $all_vocab_posts, "Not: $not_vocab_posts should be greater than All: $all_vocab_posts" );
 		$this->assert_true( $not_vocab_posts < $total_posts, "Not: $not_vocab_posts should be less than Total: $total_posts" );
 		$this->assert_equal( $any_vocab_posts + $not_vocab_posts, $total_posts, "Any: $any_vocab_posts plus Not: $not_vocab_posts should equal Total: $total_posts" );
-
-
 
 		// teardown
 		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_vocab', 'nolimit' => 1 ) )->delete();
