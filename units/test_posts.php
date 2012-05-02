@@ -642,7 +642,7 @@ class PostsTest extends UnitTestCase
 		$five_tags = array( "mattress", "freeze", "DOG", "Name", "hash" );
 		foreach( $five_tags as $tag ) {
 			$tags[] = Tags::vocabulary()->add_term( $tag );
-			$count_before[ $tag ] = Posts::get( array( 'vocabulary' => array( 'tags:term' => $tag ), 'count' => 1, 'ignore_permissions' => true, 'nolimit' => 1 ) );
+			$count_before[ $tag ] = Posts::get( array( 'vocabulary' => array( 'tags:term' => $tag ), 'count' => 'DISTINCT {posts}.id', 'ignore_permissions' => true, 'nolimit' => 1 ) );
 		}
 
 		for( $i = 1; $i <= 15; $i++ ) {
@@ -675,11 +675,11 @@ class PostsTest extends UnitTestCase
         " );
 
 		// tags:term_display
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term_display' => 'DOG'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term_display' => 'DOG'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 		// tags:term
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'dog'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'dog'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 		$sql_count = DB::get_value(
@@ -691,7 +691,7 @@ class PostsTest extends UnitTestCase
 				)
         " );
 
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'name'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'name'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 		$sql_count = DB::get_value(
@@ -704,7 +704,7 @@ class PostsTest extends UnitTestCase
 				)
         " );
 
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 
@@ -724,7 +724,7 @@ class PostsTest extends UnitTestCase
         " );
 
 		$any_count = $post_count;
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 1 ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
@@ -884,10 +884,10 @@ class PostsTest extends UnitTestCase
 					WHERE
 						pi1.name <> ''
 		" );
-		$count_info_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_info', 'count' => 1, 'nolimit' => 1 ) );
+		$count_info_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_info', 'count' => 'DISTINCT {posts}.id', 'nolimit' => 1 ) );
 		$this->assert_not_equal( Posts::count_total(), $count_info_posts );
 
-		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => array( 'red' ), 'count' => 1, 'nolimit' => 1 ) );
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => array( 'red' ), 'count' => 'DISTINCT {posts}.id', 'nolimit' => 1 ) );
 		$this->assert_equal( $count_posts, $count );
 
 		$count = DB::get_value(
