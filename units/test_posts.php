@@ -654,7 +654,7 @@ class PostsTest extends UnitTestCase
 			}
 			$post = Post::create( array(
 				'title' => "Test post $i",
-				'content' => 'Post for testing tags (' . implode( ',', $post_tags ) . '). This is not a real post.',
+				'content' => count( $post_tags ) . " tags: " . implode( ', ', $post_tags ),
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'tags' => $post_tags,
@@ -664,6 +664,25 @@ class PostsTest extends UnitTestCase
 			$post->info->testing_tag = 1;
 			$post->info->commit();
 		}
+
+		/**
+		 * At this point, these are the posts and their tags:
+		 *  1 (no tags)
+		 *  2: mattress
+		 *  3: freeze
+		 *  4: mattress, DOG
+		 *  5: Name
+		 *  6: mattress, freeze, hash
+		 *  7 (no tags)
+		 *  8: mattress, DOG
+		 *  9: freeze
+		 * 10: mattress, Name
+		 * 11 (no tags)
+		 * 12: mattress, freeze, DOG, hash
+		 * 13 (no tags)
+		 * 14: mattress
+		 * 15: freeze, Name
+		 */
 
 		$sql_count = DB::get_value(
             "SELECT COUNT(DISTINCT id) FROM {posts} p
