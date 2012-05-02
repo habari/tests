@@ -636,6 +636,7 @@ class PostsTest extends UnitTestCase
 		$tags = array();
 		if ( Tags::vocabulary()->get_term( "laser" ) ) { Tags::vocabulary()->delete_term( "laser" ); }
 		if ( Tags::vocabulary()->get_term( "dog" ) ) { Tags::vocabulary()->delete_term( "dog" ); }
+		if ( Tags::vocabulary()->get_term( "name" ) ) { Tags::vocabulary()->delete_term( "name" ); }
 
 		$tags[] = Tags::vocabulary()->add_term( "laser" );
 
@@ -726,7 +727,6 @@ class PostsTest extends UnitTestCase
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
-
 		// tags:all:term
 		$sql_count = DB::get_value(
             "SELECT COUNT(DISTINCT id) FROM {posts} p
@@ -748,9 +748,80 @@ class PostsTest extends UnitTestCase
 		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
-//		tags:all:term_display
-//		tags:not:term_display
-//		tags:not:term
+		// tags:all:term_display
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id IN (
+					SELECT o1.object_id FROM {object_terms} o1
+						LEFT JOIN {object_terms} o2 ON
+							o1.object_id = o2.object_id AND
+							o1.term_id != o2.term_id
+					WHERE
+						o1.term_id = ( SELECT id FROM {terms} WHERE term_display = 'Name'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) ) AND
+						o2.term_id = ( SELECT id FROM {terms} WHERE term_display = 'DOG'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$any_count = $post_count;
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => 'Name', 'DOG' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		// tags:not:term
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'laser'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term' => 'laser' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'laser'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+				AND id IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'mattress'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term' => 'laser', 'tags:term' => 'mattress' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		// tags:not:term_display
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term_display = 'DOG'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+				AND id IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'mattress'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term_display' => 'DOG', 'tags:term' => 'mattress' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 		// teardown
 		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_tag', 'nolimit' => 1 ) )->delete();
