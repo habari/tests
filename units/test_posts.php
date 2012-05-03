@@ -698,6 +698,9 @@ class PostsTest extends UnitTestCase
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term_display' => 'DOG'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
+		$post_count = Posts::count_by_tag( 'DOG', Post::status( 'published' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Posts::count_by_tag(): $post_count" );
+
 		// tags:term
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'dog'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
@@ -1278,6 +1281,11 @@ class PostsTest extends UnitTestCase
 		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) );
 		$this->assert_true( count( $posts ) > 2 );
 
+		// OFFSET based on page number (and limit)
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2, 'page' => 2 ) );
+		$this->assert_equal( count( $posts ), 2 );
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2, 'page' => 3 ) );
+		$this->assert_equal( count( $posts ), 1 );
 
 		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) )->delete();
 	}
@@ -1290,7 +1298,7 @@ class PostsTest extends UnitTestCase
 	{
 		$this->assert_equal( Posts::get()->content_type(), 'posts' );
 		// test with a preset.
-		$this->assert_equal( Posts::get( 'asides' )->content_type(), 'posts.asides', "test_content_type() with a prefix is not set up correctly. Fix this test."  );
+		$this->assert_equal( Posts::get( 'asides' )->content_type(), 'posts.asides', "test_content_type() with a preset is not set up correctly. Please fix this test."  );
 	}
 
 
