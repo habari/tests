@@ -905,6 +905,9 @@ class PostsTest extends UnitTestCase
 		$fizz_term = new Term( array( 'term' => 'fizz', 'term_display' => 'Fizz' ) );
 		$fizz->add_term( $fizz_term );
 
+		$extra_fizz_term = new Term( array( 'term' => 'extra fizzy', 'term_display' => 'Extra Fizzy' ) );
+		$fizz->add_term( $extra_fizz_term );
+
 		if( Vocabulary::get( "buzz" ) ) {
 			Vocabulary::get( "buzz" )->delete();
 		}
@@ -916,9 +919,6 @@ class PostsTest extends UnitTestCase
 
 		$buzz_term = new Term( array( 'term' => 'buzz', 'term_display' => 'Buzz' ) );
 		$buzz->add_term( $buzz_term );
-
-		Vocabulary::add_object_type( 'fizz' );
-		Vocabulary::add_object_type( 'buzz' );
 
 		// create some Posts and associate them with the two Vocabularies
 		for( $i = 1; $i <= 20; $i++ ) {
@@ -1252,7 +1252,33 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_with_limit()
 	{
-		$this->mark_test_incomplete();
+		for( $i = 1; $i <= 5; $i++ ) {
+			$post = Post::create( array(
+				'title' => "Test Post $i",
+				'content' => 'If this were really a post...',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_limit = 1;
+			$post->info->i = $i;
+			$post->info->commit();
+		}
+
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'count' => 1, 'limit' => 2 ) );
+		$this->assert_equal( $count_posts, 2, "Value returned was $count_posts." );
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2 ) );
+		$this->assert_equal( count( $posts ), 2 );
+
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_true( $count_posts > 2 );
+
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) );
+		$this->assert_true( count( $posts ) > 2 );
+
+
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) )->delete();
 	}
 }
 
