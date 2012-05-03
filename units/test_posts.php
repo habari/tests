@@ -624,7 +624,33 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_date()
 	{
-		$this->mark_test_incomplete();
+		// setup
+		$year = 2008;
+		for( $month = 1; $month <= 12; $month++ ) {
+			for( $i = 0; $i <= 9; $i++ ) {
+				$day = ( $month + 3 * $i ) % 29 + 1; // Won't result in a date > 29 until after month 2, i.e. February
+				$date = "$year-$month-$day";
+
+				$post = Post::create( array(
+					'title' => "Test post from $date",
+					'content' => "The test post from $date has no useful content.",
+					'user_id' => $this->user->id,
+					'status' => Post::status( 'published' ),
+					'content_type' => Post::type( 'entry' ),
+					'pubdate' => HabariDateTime::date_create( $date ),
+				));
+				$post->info->testing_date = 1;
+				$post->info->commit();
+			}
+		}
+		$month_cts = Posts::get( array( 'month_cts' => 1, 'ignore_permissions' => true, 'has:info' => 'testing_date' ) );
+
+		for( $i = 0; $i < 12; $i++ ) {
+			$this->assert_equal( $month_cts[ $i ]->year, 2008, "Post created in the wrong year." );
+			$this->assert_equal( $month_cts[ $i ]->ct, 10, "Wrong number of posts created." );
+		}
+		// teardown
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_date', 'nolimit' => 1 ) )->delete();
 	}
 
 	/**
