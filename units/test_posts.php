@@ -1280,6 +1280,29 @@ class PostsTest extends UnitTestCase
 
 		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) )->delete();
 	}
+
+	/**
+	 * Return the type of the content represented by this object
+	 * Will return a suffixed preset if it is set on the object.
+	 */
+	public function test_content_type()
+	{
+		$this->assert_equal( Posts::get()->content_type(), 'posts' );
+		// test with a preset.
+		$this->assert_equal( Posts::get( 'asides' )->content_type(), 'posts.asides', "test_content_type() with a prefix is not set up correctly. Fix this test."  );
+	}
+
+
+	public function test_filter_posts_get_all_presets()
+	{
+		// This is not a good way to do this. This section of Posts should be exercised when speficying a preset to the Posts::get query.
+		$presets = array();
+		$presets = Posts::filter_posts_get_all_presets( $presets );
+		$this->assert_equal( array_diff_assoc( $presets['page_list'], array( 'content_type' => 'page', 'status' => 'published', 'nolimit' => true ) ), array() );
+		$this->assert_equal( array_diff_assoc( $presets['asides'], array( 'vocabulary' => array( 'tags:term' => 'aside' ), 'limit' => 5 ) ), array() );
+
+	}
+
 }
 
 ?>
