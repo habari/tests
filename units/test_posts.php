@@ -1267,7 +1267,8 @@ class PostsTest extends UnitTestCase
 		}
 
 		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'count' => 1, 'limit' => 2 ) );
-		$this->assert_equal( $count_posts, 2, "Value returned was $count_posts." );
+		$this->assert_equal( $count_posts, 5, "LIMIT with a COUNT is pointless - COUNTing anything should return a single value." );
+
 		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2 ) );
 		$this->assert_equal( count( $posts ), 2 );
 
