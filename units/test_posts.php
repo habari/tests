@@ -649,6 +649,41 @@ class PostsTest extends UnitTestCase
 			$this->assert_equal( $month_cts[ $i ]->year, 2008, "Post created in the wrong year." );
 			$this->assert_equal( $month_cts[ $i ]->ct, 10, "Wrong number of posts created." );
 		}
+
+		$posts = Posts::get( array( 'day' => '01', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'day' => '03', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$posts = Posts::get( array( 'day' => '05', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+
+		$posts = Posts::get( array( 'month' => '01', 'year' => '2007', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+
+		$posts = Posts::get( array( 'year' => '2007', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+
+
+
+		$posts = Posts::get( array( 'before' => '2008-01-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'before' => '2008-02-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+		$posts = Posts::get( array( 'before' => '2009-01-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+
+		$posts = Posts::get( array( 'after' => '2007-12-31', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+		$posts = Posts::get( array( 'after' => '2008-11-30', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+		$posts = Posts::get( array( 'after' => '2008-12-31', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+
+
 		// teardown
 		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_date', 'nolimit' => 1 ) )->delete();
 	}
