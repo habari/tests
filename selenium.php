@@ -52,6 +52,13 @@ class LocatorStrategy {
 	const xpath="xpath";
 }
 
+class WebDriverException extends Exception {
+
+	public function __construct($message, $code, $previous = null) {
+		parent::__construct($message, $code);
+	}
+}
+
 class NoSuchElementException extends WebDriverException {
 	private $json_response;
 	public function __construct($json_response) {
@@ -652,13 +659,6 @@ class WebDriverBase {
 		return null;
 	}
 
-}
-
-class WebDriverException extends Exception {
-
-	public function __construct($message, $code, $previous = null) {
-		parent::__construct($message, $code);
-	}
 }
 
 class WebDriverResponseStatus {
