@@ -14,6 +14,7 @@
  *   -c {console|html|symbolic} : Output type.
  *   -t {testname|linenumber} : Run a specific test, or multiple separated by commas
  *   -r {path} : Set the root path for habari.
+ *   -e {env} : Set the environment tag for habari.
  *   -o : Display output.
  *   -i : Display method timers.
  *   -u {unitname} : Run only the specified units.
@@ -21,7 +22,7 @@
  */
 
 if(defined('STDIN') && function_exists( 'getopt' ) ) {
-	$shortopts = 'u::d::c::t::r::o::vi';
+	$shortopts = 'u::d::c::t::r::e::o::vi';
 	$options = getopt($shortopts);
 }
 if(!isset($options) || !$options) {
@@ -55,7 +56,12 @@ if(!defined('HABARI_PATH')) {
 }
 
 if(!defined('UNIT_TEST')) {
-	define('UNIT_TEST', true);
+	if(isset($options['e'])) {
+		define('UNIT_TEST', $options['e']);
+	}
+	else {
+		define('UNIT_TEST', true);
+	}
 }
 if(!defined('DEBUG')) {
 	define('DEBUG', true);
