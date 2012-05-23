@@ -624,7 +624,68 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_date()
 	{
-		$this->mark_test_incomplete();
+		// setup
+		$year = 2008;
+		for( $month = 1; $month <= 12; $month++ ) {
+			for( $i = 0; $i <= 9; $i++ ) {
+				$day = ( $month + 3 * $i ) % 29 + 1; // Won't result in a date > 29 until after month 2, i.e. February
+				$date = "$year-$month-$day";
+
+				$post = Post::create( array(
+					'title' => "Test post from $date",
+					'content' => "The test post from $date has no useful content.",
+					'user_id' => $this->user->id,
+					'status' => Post::status( 'published' ),
+					'content_type' => Post::type( 'entry' ),
+					'pubdate' => HabariDateTime::date_create( $date ),
+				));
+				$post->info->testing_date = 1;
+				$post->info->commit();
+			}
+		}
+		$month_cts = Posts::get( array( 'month_cts' => 1, 'ignore_permissions' => true, 'has:info' => 'testing_date' ) );
+
+		for( $i = 0; $i < 12; $i++ ) {
+			$this->assert_equal( $month_cts[ $i ]->year, 2008, "Post created in the wrong year." );
+			$this->assert_equal( $month_cts[ $i ]->ct, 10, "Wrong number of posts created." );
+		}
+
+		$posts = Posts::get( array( 'day' => '01', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'day' => '03', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$posts = Posts::get( array( 'day' => '05', 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+
+		$posts = Posts::get( array( 'month' => '01', 'year' => '2007', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'month' => '04', 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+
+		$posts = Posts::get( array( 'year' => '2007', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'year' => '2008', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+
+
+
+		$posts = Posts::get( array( 'before' => '2008-01-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+		$posts = Posts::get( array( 'before' => '2008-02-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+		$posts = Posts::get( array( 'before' => '2009-01-01', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+
+		$posts = Posts::get( array( 'after' => '2007-12-31', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 120 );
+		$posts = Posts::get( array( 'after' => '2008-11-30', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+		$posts = Posts::get( array( 'after' => '2008-12-31', 'has:info' => 'testing_date', 'ignore_permissions' => true, 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+
+
+		// teardown
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_date', 'nolimit' => 1 ) )->delete();
 	}
 
 	/**
@@ -697,6 +758,9 @@ class PostsTest extends UnitTestCase
 		// tags:term_display
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term_display' => 'DOG'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$post_count = Posts::count_by_tag( 'DOG', Post::status( 'published' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Posts::count_by_tag(): $post_count" );
 
 		// tags:term
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:term' => 'dog'), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
@@ -788,6 +852,25 @@ class PostsTest extends UnitTestCase
 				WHERE id NOT IN (
 					SELECT object_id FROM {object_terms}
 					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'mattress'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+				AND id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'freeze'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term' => array ( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
 						term_id in ( SELECT id FROM {terms} WHERE term = 'laser'
 							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
 				)
@@ -821,6 +904,31 @@ class PostsTest extends UnitTestCase
 			" );
 
 		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term_display' => 'DOG', 'tags:term' => 'mattress' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
+
+		$sql_count = DB::get_value(
+            "SELECT COUNT(DISTINCT id) FROM {posts} p
+				WHERE id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term_display = 'DOG'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+				AND id NOT IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'freeze'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+				AND id IN (
+					SELECT object_id FROM {object_terms}
+					WHERE
+						term_id in ( SELECT id FROM {terms} WHERE term = 'mattress'
+							AND vocabulary_id = ( SELECT id FROM {vocabularies} WHERE name = 'tags' ) )
+				)
+			" );
+
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:not:term_display' => array( 'DOG', 'freeze'), 'tags:term' => 'mattress' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
 		// teardown
@@ -861,6 +969,9 @@ class PostsTest extends UnitTestCase
 		$fizz_term = new Term( array( 'term' => 'fizz', 'term_display' => 'Fizz' ) );
 		$fizz->add_term( $fizz_term );
 
+		$extra_fizz_term = new Term( array( 'term' => 'extra fizzy', 'term_display' => 'Extra Fizzy' ) );
+		$fizz->add_term( $extra_fizz_term );
+
 		if( Vocabulary::get( "buzz" ) ) {
 			Vocabulary::get( "buzz" )->delete();
 		}
@@ -872,9 +983,6 @@ class PostsTest extends UnitTestCase
 
 		$buzz_term = new Term( array( 'term' => 'buzz', 'term_display' => 'Buzz' ) );
 		$buzz->add_term( $buzz_term );
-
-		Vocabulary::add_object_type( 'fizz' );
-		Vocabulary::add_object_type( 'buzz' );
 
 		// create some Posts and associate them with the two Vocabularies
 		for( $i = 1; $i <= 20; $i++ ) {
@@ -1208,8 +1316,63 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_with_limit()
 	{
-		$this->mark_test_incomplete();
+		for( $i = 1; $i <= 5; $i++ ) {
+			$post = Post::create( array(
+				'title' => "Test Post $i",
+				'content' => 'If this were really a post...',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_limit = 1;
+			$post->info->i = $i;
+			$post->info->commit();
+		}
+
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'count' => 1, 'limit' => 2 ) );
+		$this->assert_equal( $count_posts, 5, "LIMIT with a COUNT is pointless - COUNTing anything should return a single value." );
+
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2 ) );
+		$this->assert_equal( count( $posts ), 2 );
+
+		$count_posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'count' => 1, 'nolimit' => 1 ) );
+		$this->assert_true( $count_posts > 2 );
+
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) );
+		$this->assert_true( count( $posts ) > 2 );
+
+		// OFFSET based on page number (and limit)
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2, 'page' => 2 ) );
+		$this->assert_equal( count( $posts ), 2 );
+		$posts = Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'limit' => 2, 'page' => 3 ) );
+		$this->assert_equal( count( $posts ), 1 );
+
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_limit', 'nolimit' => 1 ) )->delete();
 	}
+
+	/**
+	 * Return the type of the content represented by this object
+	 * Will return a suffixed preset if it is set on the object.
+	 */
+	public function test_content_type()
+	{
+		$this->assert_equal( Posts::get()->content_type(), 'posts' );
+		// test with a preset.
+		$this->assert_equal( Posts::get( 'asides' )->content_type(), 'posts.asides', "test_content_type() with a preset is not set up correctly. Please fix this test."  );
+	}
+
+
+	public function test_filter_posts_get_all_presets()
+	{
+		// This is not a good way to do this. This section of Posts should be exercised when speficying a preset to the Posts::get query.
+		$presets = array();
+		$presets = Posts::filter_posts_get_all_presets( $presets );
+		$this->assert_equal( array_diff_assoc( $presets['page_list'], array( 'content_type' => 'page', 'status' => 'published', 'nolimit' => true ) ), array() );
+		$this->assert_equal( array_diff_assoc( $presets['asides'], array( 'vocabulary' => array( 'tags:term' => 'aside' ), 'limit' => 5 ) ), array() );
+
+	}
+
 }
 
 ?>
