@@ -1,5 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <?php
+		$min_versions = array(
+			'5.2' => '0.8',
+			'5.3.3' => '0.9',
+		);
 		define('MIN_PHP_VERSION', '5.3.3');
 
 		// Required extensions, this list will augment with time
@@ -20,7 +24,12 @@
 		$requirements_met = true;
 
 		/* Check versions of PHP */
-		$php_version_ok = version_compare(phpversion(), MIN_PHP_VERSION, '>=');
+		$php_version_ok = false;
+		foreach($min_versions as $min_php_version => $max_habari_version) {
+			if(version_compare(phpversion(), $min_php_version, '>=')) {
+				$php_version_ok = $max_habari_version;
+			}
+		}
 
 		/* If the version isn't ok, there's no point going any further*/
 		if (! $php_version_ok) {
@@ -248,7 +257,7 @@ ul {
 
 <?php } else { ?>
 	<div id="header">
-	<h1>Your system is ready for Habari!</h1>
+	<h1>Your system is ready for Habari <?php echo $php_version_ok; ?>!</h1>
 	</div>
 	<ul>
 		<li>Download the <a href="http://www.habariproject.org/en/download">latest stable version of Habari</a></li>
