@@ -25,6 +25,24 @@ class FormatTest extends UnitTestCase
 		}
 	}
 
+	public function test_format_priority()
+	{
+		Format::apply(function($v){return $v . '7';}, 'test_filter_7');
+		Format::apply(function($v){return $v . '8';}, 'test_filter');
+		$result = Plugins::filter('test_filter', 'test');
+		$this->assert_equal('test78', $result);
+
+		Format::apply(function($v, $c){return $v . '7' . $c;}, 'test_filter2_7', 'a');
+		Format::apply(function($v, $c){return $v . '8' . $c;}, 'test_filter2', 'b');
+		$result = Plugins::filter('test_filter2', 'test');
+		$this->assert_equal('test7a8b', $result);
+
+		Format::apply_with_hook_params(function($v, $h, $c){return $v . '7' . $h . $c;}, 'test_filter3_7', 'a');
+		Format::apply_with_hook_params(function($v, $h, $c){return $v . '8' . $h . $c;}, 'test_filter3', 'b');
+		$result = Plugins::filter('test_filter3', 'test', 'h');
+		$this->assert_equal('test7ha8hb', $result);
+	}
+
 	public function autop_data_provider()
 	{
 		$autop_data_path = dirname(dirname( __FILE__ )) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'autop';
