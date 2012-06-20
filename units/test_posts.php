@@ -808,7 +808,7 @@ class PostsTest extends UnitTestCase
 			" );
 
 		$any_count = $post_count;
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => 'mattress', 'freeze' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
@@ -1297,7 +1297,86 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_title()
 	{
-		$this->mark_test_incomplete();
+		// key is the title, value will be replaced with the post_id
+		$titles = array(
+			'Loomings' => 0,
+			'The Carpet-Bag' => 0,
+			'The Spouter-Inn' => 0,
+			'The Counterpane' => 0,
+			'Breakfast' => 0,
+			'The Street' => 0,
+			'The Chapel' => 0,
+			'The Pulpit' => 0,
+			'The Sermon' => 0,
+			'A Bosom Friend' => 0,
+			'Nightgown' => 0,
+			'Biographical' => 0,
+			'Wheelbarrow' => 0,
+			'Nantucket' => 0,
+			'Chowder' => 0,
+			'The Ship' => 0,
+			'The Ramadan' => 0,
+			'His Mark' => 0,
+			'The Prophet' => 0,
+			'All Astir' => 0,
+		);
+
+		// create some posts with those titles
+		foreach( array_keys( $titles ) as $title ) {
+			$post = Post::create( array(
+				'title' => $title,
+				'content' => 'The title says it all, really',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_titles = 1;
+			$post->info->commit();
+			$titles[ $title ] = $post->id;
+		}
+		$this->assert_not_equal( $titles[ 'Loomings' ], 0, "There appears to be a problem setting up the test posts" );
+
+		// title should not be found
+		$count_posts = Posts::get( array( 'title' => 'Moby Dick', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 0 );
+
+		$posts = Posts::get( array( 'title' => 'Moby Dick', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+
+		// exact title
+		$count_posts = Posts::get( array( 'title' => 'Loomings', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+
+		$posts = Posts::get( array( 'title' => 'Loomings', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$this->assert_equal( $posts[0]->id, $titles[ 'Loomings' ] );
+
+		// different character cases
+		$count_posts = Posts::get( array( 'title' => 'CHOWDER', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+		$count_posts = Posts::get( array( 'title' => 'the carpet-BAG', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+		$count_posts = Posts::get( array( 'title' => 'wHEeLbarrOw', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+
+		$posts = Posts::get( array( 'title' => 'CHOWDER', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( $posts[0]->id, $titles[ 'Chowder' ] );
+		$posts = Posts::get( array( 'title' => 'the carpet-BAG', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( $posts[0]->id, $titles[ 'The Carpet-Bag' ] );
+		$posts = Posts::get( array( 'title' => 'wHEeLbarrOw', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( $posts[0]->id, $titles[ 'Wheelbarrow' ] );
+
+		// SQL wildcards (::get uses LIKE)
+		$count_posts = Posts::get( array( 'title' => '%Spouter%', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+
+		$posts = Posts::get( array( 'title' => '%Spouter%', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$this->assert_equal( $posts[0]->id, $titles[ 'The Spouter-Inn' ] );
+
+		// teardown
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) )->delete();
 	}
 
 	/**
@@ -1306,7 +1385,86 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_get_posts_by_title_search()
 	{
-		$this->mark_test_incomplete();
+		// key is the title, value will be replaced with the post_id
+		$titles = array(
+			'Loomings' => 0,
+			'The Carpet-Bag' => 0,
+			'The Spouter-Inn' => 0,
+			'The Counterpane' => 0,
+			'Breakfast' => 0,
+			'The Street' => 0,
+			'The Chapel' => 0,
+			'The Pulpit' => 0,
+			'The Sermon' => 0,
+			'A Bosom Friend' => 0,
+			'Nightgown' => 0,
+			'Biographical' => 0,
+			'Wheelbarrow' => 0,
+			'Nantucket' => 0,
+			'Chowder' => 0,
+			'The Ship' => 0,
+			'The Ramadan' => 0,
+			'His Mark' => 0,
+			'The Prophet' => 0,
+			'All Astir' => 0,
+		);
+
+		// create some posts with those titles
+		foreach( array_keys( $titles ) as $title ) {
+			$post = Post::create( array(
+				'title' => $title,
+				'content' => 'The title says it all, really',
+				'user_id' => $this->user->id,
+				'status' => Post::status( 'published' ),
+				'content_type' => Post::type( 'entry' ),
+				'pubdate' => HabariDateTime::date_create( time() ),
+			));
+			$post->info->testing_titles = 1;
+			$post->info->commit();
+			$titles[ $title ] = $post->id;
+		}
+		$this->assert_not_equal( $titles[ 'Loomings' ], 0, "There appears to be a problem setting up the test posts" );
+
+		// title should not be found
+		$count_posts = Posts::get( array( 'title_search' => 'Moby Dick', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 0 );
+
+		$posts = Posts::get( array( 'title_search' => 'Moby Dick', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 0 );
+
+		// word in title
+		$count_posts = Posts::get( array( 'title_search' => 'The', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 10 );
+
+		$posts = Posts::get( array( 'title_search' => 'The', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 10 );
+		$this->assert_equal( $posts[0]->id, $titles[ $posts[0]->title ] );
+		$this->assert_equal( $posts[9]->id, $titles[ $posts[9]->title ] );
+
+		// mixed up title
+		$count_posts = Posts::get( array( 'title_search' => 'Friend A Bosom', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 1 );
+
+		$posts = Posts::get( array( 'title_search' => 'Friend A Bosom', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$this->assert_equal( $posts[0]->id, $titles[ $posts[0]->title ] );
+
+		// match part of a word
+		$count_posts = Posts::get( array( 'title_search' => 'ow', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'count' => 1 ) );
+		$this->assert_equal( $count_posts, 3, $count_posts . " were found, should have been 3 (wheelbarrow, nightgown, chowder)." );
+
+		$posts = Posts::get( array( 'title_search' => 'ow', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 3 );
+		$this->assert_equal( $posts[0]->id, $titles[ $posts[0]->title ] );
+		$this->assert_equal( $posts[1]->id, $titles[ $posts[1]->title ] );
+		$this->assert_equal( $posts[2]->id, $titles[ $posts[2]->title ] );
+
+		$posts = Posts::get( array( 'title_search' => 'ow whe', 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) );
+		$this->assert_equal( count( $posts ), 1 );
+		$this->assert_equal( $posts[0]->id, $titles[ 'Wheelbarrow' ] );
+
+		// teardown
+		Posts::get( array( 'ignore_permissions' => true, 'has:info' => 'testing_titles', 'nolimit' => 1 ) )->delete();
 	}
 
 	/**
