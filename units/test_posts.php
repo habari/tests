@@ -828,7 +828,7 @@ class PostsTest extends UnitTestCase
 			" );
 
 		$any_count = $post_count;
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => 'Name', 'DOG' ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'Name', 'DOG' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
 		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
