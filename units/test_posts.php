@@ -1520,10 +1520,12 @@ class PostsTest extends UnitTestCase
 				return $presets;
 			}, 'filter', 'posts_get_all_presets' );
 
+		$this->output(Posts::get()->content_type());
 		$this->assert_equal( Posts::get()->content_type(), array( 0 => 'posts') );
 
 		// test with a preset.
-		$this->assert_equal( Posts::get( $preset_name )->content_type(), 'posts'.$preset_name, var_export( Posts::get( $preset_name)->content_type() ) );
+		$this->output(Posts::get( $preset_name)->content_type());
+		$this->assert_equal( Posts::get( $preset_name )->content_type(), 'posts'.$preset_name );
 	}
 
 }
