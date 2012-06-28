@@ -13,7 +13,6 @@
 	 */
 class PostsTest extends UnitTestCase
 {
-
 	/**
 	 * Set up for the whole test suite
 	 */
@@ -1515,20 +1514,16 @@ class PostsTest extends UnitTestCase
 	 */
 	public function test_content_type()
 	{
-		$this->assert_equal( Posts::get()->content_type(), 'posts' );
+		$preset_name = UUID::get();
+		Plugins::register( function( $presets ) use ( $preset_name ) {
+				$presets[ $preset_name ] = array( );
+				return $presets;
+			}, 'filter', 'posts_get_all_presets' );
+
+		$this->assert_equal( Posts::get()->content_type(), array( 0 => 'posts') );
+
 		// test with a preset.
-		$this->assert_equal( Posts::get( 'asides' )->content_type(), 'posts.asides', "test_content_type() with a preset is not set up correctly. Please fix this test."  );
-	}
-
-
-	public function test_filter_posts_get_all_presets()
-	{
-		// This is not a good way to do this. This section of Posts should be exercised when speficying a preset to the Posts::get query.
-		$presets = array();
-		$presets = Posts::filter_posts_get_all_presets( $presets );
-		$this->assert_equal( array_diff_assoc( $presets['page_list'], array( 'content_type' => 'page', 'status' => 'published', 'nolimit' => true ) ), array() );
-		$this->assert_equal( array_diff_assoc( $presets['asides'], array( 'vocabulary' => array( 'tags:term' => 'aside' ), 'limit' => 5 ) ), array() );
-
+		$this->assert_equal( Posts::get( $preset_name )->content_type(), 'posts'.$preset_name, var_export( Posts::get( $preset_name)->content_type() ) );
 	}
 
 }
