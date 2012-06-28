@@ -807,7 +807,7 @@ class PostsTest extends UnitTestCase
 			" );
 
 		$any_count = $post_count;
-		$post_count = Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1, 'count' => 'DISTINCT {posts}.id' ) );
+		$post_count = count( Posts::get( array( 'vocabulary' => array( 'tags:all:term' => array( 'mattress', 'freeze' ) ), 'ignore_permissions' => true, 'nolimit' => 1 ) ) );
 		$this->assert_not_equal( $any_count, $post_count, "Any: $any_count All: $post_count" );
 		$this->assert_equal( $sql_count, $post_count, "SQL: $sql_count Post: $post_count" );
 
@@ -1520,12 +1520,10 @@ class PostsTest extends UnitTestCase
 				return $presets;
 			}, 'filter', 'posts_get_all_presets' );
 
-		$this->output(Posts::get()->content_type());
 		$this->assert_equal( Posts::get()->content_type(), array( 0 => 'posts') );
 
 		// test with a preset.
-		$this->output(Posts::get( $preset_name)->content_type());
-		$this->assert_equal( Posts::get( $preset_name )->content_type(), 'posts'.$preset_name );
+		$this->assert_true( in_array( "posts.$preset_name", Posts::get( $preset_name )->content_type() ) );
 	}
 
 }
