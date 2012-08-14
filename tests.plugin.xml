@@ -7,4 +7,7 @@
 	<version>1.0</version>
 	<description><![CDATA[Execute and view the results of the test suite from within Habari.]]></description>
 	<copyright>2009</copyright>
+	<provides>
+		<feature>tests</feature>
+	</provides>
 </pluggable>
