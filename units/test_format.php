@@ -85,24 +85,24 @@ class FormatTest extends UnitTestCase
 		$m = $v->add_term( "M", $v->get_term( $i->id ) );
 		$n = $v->add_term( "N", $v->get_term( $j->id ) );
 
-		$tree_output = Format::term_tree( $v->get_tree(), 'test', array( 'wrapper' => '%s' ) );
+		$tree_output = Format::term_tree( $v->get_tree(), 'test', array( 'itemstart' => '<li>', 'itemattr' => '', 'liststart' => '<ol>', 'wrapper' => '%s' ) );
 
 		$expected_output = <<<END
-<ol class="tree" id="tree_test"><li class="treeitem" id="test_1661">A<ol><li class="treeitem" id="test_1662">B<ol><li class="treeitem" id="test_1664">D<ol><li class="treeitem" id="test_1667">G</li>
-<li class="treeitem" id="test_1668">H<ol><li class="treeitem" id="test_1671">K</li>
-<li class="treeitem" id="test_1672">L</li>
+<ol class="tree" id="tree_test"><li>A<ol><li>B<ol><li>D<ol><li>G</li>
+<li>H<ol><li>K</li>
+<li>L</li>
+</ol></li>
+</ol></li>
+</ol></li>
+<li>C<ol><li>E</li>
+<li>F<ol><li>I<ol><li>M</li>
+</ol></li>
+<li>J<ol><li>N</li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
 </ol>
-</li></ol>
-</li></ol>
-</li><li class="treeitem" id="test_1663">C<ol><li class="treeitem" id="test_1665">E</li>
-<li class="treeitem" id="test_1666">F<ol><li class="treeitem" id="test_1669">I<ol><li class="treeitem" id="test_1673">M</li>
-</ol>
-</li><li class="treeitem" id="test_1670">J<ol><li class="treeitem" id="test_1674">N</li>
-</ol>
-</li></ol>
-</li></ol>
-</li></ol>
-</li></ol>
 END;
 
 		$result = $tree_output === $expected_output;
