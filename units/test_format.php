@@ -71,20 +71,20 @@ class FormatTest extends UnitTestCase
 		 **/
 
 		$a = $v->add_term( "A" );
-		$c = $v->add_term( "C", $a );
-		$b = $v->add_term( "B", $c, true );
-		$d = $v->add_term( "D", $b );
-		$f = $v->add_term( "F", $c );
-		$e = $v->add_term( "E", $f, true );
-/* 		$g = $v->add_term( "G", $d );
-		$h = $v->add_term( "H", $d );
-		$i = $v->add_term( "I", $f );
-		$j = $v->add_term( "J", $f );
-		$k = $v->add_term( "K", $h );
-		$l = $v->add_term( "L", $h );
-		$m = $v->add_term( "M", $i );
-		$n = $v->add_term( "N", $j );
-*/
+		$b = $v->add_term( "B", $v->get_term( $a->id ) );
+		$c = $v->add_term( "C", $v->get_term( $a->id ) );
+		$d = $v->add_term( "D", $v->get_term( $b->id ) );
+		$e = $v->add_term( "E", $v->get_term( $c->id ) );
+		$f = $v->add_term( "F", $v->get_term( $c->id ) );
+ 		$g = $v->add_term( "G", $v->get_term( $d->id ) );
+		$h = $v->add_term( "H", $v->get_term( $d->id ) );
+		$i = $v->add_term( "I", $v->get_term( $f->id ) );
+		$j = $v->add_term( "J", $v->get_term( $f->id ) );
+		$k = $v->add_term( "K", $v->get_term( $h->id ) );
+		$l = $v->add_term( "L", $v->get_term( $h->id ) );
+		$m = $v->add_term( "M", $v->get_term( $i->id ) );
+		$n = $v->add_term( "N", $v->get_term( $j->id ) );
+
 		$this->output( Format::term_tree( $v->get_tree(), 'hi' ) );
 		// define expected output.
 		// check actual output.
