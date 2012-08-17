@@ -43,6 +43,56 @@ class FormatTest extends UnitTestCase
 		$this->assert_equal('test7ha8hb', $result);
 	}
 
+	public function test_term_tree()
+	{
+		// create a vocabulary.
+		if( Vocabulary::get( 'format_test' ) ) {
+			Vocabulary::get( 'format_test' )->delete();
+		}
+
+		$v = new Vocabulary( array(
+			'name' => 'format_test',
+			'description' => "Vocabulary used for testing Format::term_tree()",
+			'features' => array( 'hierarchical' )
+		) );
+
+		// nest some terms.
+
+		/**
+		 * A
+		 * | \
+		 * B  C
+		 * |  | \
+		 * D  E  F 		// E has no descendants!
+		 * | \   | \
+		 * G  H  I  J	// G has no descendants!
+		 *   / \  \   \
+		 *  K   L  M   N
+		 **/
+
+		$a = $v->add_term( "A" );
+		$c = $v->add_term( "C", $a );
+		$b = $v->add_term( "B", $c, true );
+		$d = $v->add_term( "D", $b );
+		$f = $v->add_term( "F", $c );
+		$e = $v->add_term( "E", $f, true );
+/* 		$g = $v->add_term( "G", $d );
+		$h = $v->add_term( "H", $d );
+		$i = $v->add_term( "I", $f );
+		$j = $v->add_term( "J", $f );
+		$k = $v->add_term( "K", $h );
+		$l = $v->add_term( "L", $h );
+		$m = $v->add_term( "M", $i );
+		$n = $v->add_term( "N", $j );
+*/
+		$this->output( Format::term_tree( $v->get_tree(), 'hi' ) );
+		// define expected output.
+		// check actual output.
+
+		// clean up
+		$v->delete();
+	}
+
 	public function autop_data_provider()
 	{
 		$autop_data_path = dirname(dirname( __FILE__ )) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'autop';
