@@ -159,6 +159,60 @@ class UnitTestCase
 		$this->assert_something($type == $class, $message, null, null, null, $output);
 	}
 
+	public function assert_associative_equal($value1, $value2, $message = 'Assertion failed', $output = null)
+	{
+		$fn = function($value1, $value2) use (&$fn) {
+			$l = function($v) {
+				if(Utils::is_traversable($v)) {
+					return (array) $v;
+				}
+				if(is_object($v)) {
+					return get_object_vars($v);
+				}
+				return $v;
+			};
+			$value1 = $l($value1);
+			$value2 = $l($value2);
+
+			if(is_array($value1) && is_array($value2)) {
+				if(count(array_diff_key($value1, $value2)) > 0) {
+					return false;
+				}
+				if(count(array_diff_key($value2, $value1)) > 0) {
+					return false;
+				}
+			}
+			if(gettype($value1) != gettype($value2)) {
+				return false;
+			}
+			foreach($value1 as $k => $v) {
+				if(is_scalar($v)) {
+					if(!is_scalar($value2[$k]) || $value2[$k] != $v) {
+						return false;
+					}
+				}
+				elseif(Utils::is_traversable($v) ) {
+					if(!Utils::is_traversable($value2[$k])) {
+						return false;
+					}
+					if(!$f = $fn($v, $value2[$k])) {
+						return $f;
+					}
+				}
+				elseif(is_object($v)) {
+					if(!is_object($value2[$k])) {
+						return false;
+					}
+					if(!$f = $fn(get_object_vars($v), get_object_vars($value2[$k]))) {
+						return $f;
+					}
+				}
+			}
+			return true;
+		};
+		$this->assert_something($fn($value1, $value2), $message, null, null, null, $output);
+	}
+
 	public function mark_test_incomplete( $message = 'Tests not implemented' )
 	{
 		$this->messages[] = array( 'type' => self::INCOMPLETE, 'message' => $message);
