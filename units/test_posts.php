@@ -1526,6 +1526,52 @@ class PostsTest extends UnitTestCase
 		$this->assert_true( in_array( "posts.$preset_name", Posts::get( $preset_name )->content_type() ) );
 	}
 
+	/**
+	 * Test to make sure that a parameter in a preset can be overridden
+	 * Issue habari/habari#355
+	 */
+	public function test_preset_override()
+	{
+		$preset_name = UUID::get();
+		Plugins::register( function( $presets ) use ( $preset_name ) {
+			$presets[ $preset_name ] = array(
+				'content_type' => 1,
+			);
+			return $presets;
+		}, 'filter', 'posts_get_all_presets' );
+
+		$q1 = Posts::get($preset_name);
+		$expected1 = array(
+			'preset' => array(
+				0 => $preset_name
+			),
+			'content_type' => 1,
+		);
+		$this->assert_associative_equal(
+			$q1->get_param_cache,
+			$expected1,
+			"The parameters defined for the preset aren't the same as those returned by the preset",
+			array($q1->get_param_cache, $expected1)
+		);
+
+		$q2 = Posts::get(array('preset' => $preset_name, 'content_type' => 2, 'status' => 'published'));
+		$expected2 = array(
+			'status' => 'published',
+			'content_type' => 2,
+			'preset' => array(
+				0 => $preset_name
+			),
+		);
+		$this->assert_associative_equal(
+			$q2->get_param_cache,
+			$expected2,
+			"The parameters provided to Posts::get() aren't the same as those returned",
+			array($q2->get_param_cache, $expected2)
+		);
+
+
+	}
+
 }
 
 ?>
