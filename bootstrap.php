@@ -673,11 +673,11 @@ class TestSuite {
 			}
 		}
 
+		self::load_steps();
 		foreach(self::$features as $feature_file) {
 			if(isset($options['u']) && !in_array(basename($feature_file), $options['u'])) {
 				continue;
 			}
-			self::load_steps();
 			$obj = new FeatureTestCase($feature_file);
 			$obj->assign_step_map(self::$steps, self::$classes);
 			$results[$feature_file] = $obj->run();
@@ -698,7 +698,9 @@ class TestSuite {
 			$tokens = token_get_all($phpfile);
 			$state = null;
 			$comment = '';
+			$ct = 0;
 			foreach($tokens as $token_value) {
+				$ct++;
 				if(count($token_value) > 1) {
 					list($token, $value) = $token_value;
 				}
