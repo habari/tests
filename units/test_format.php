@@ -16,9 +16,9 @@ class FormatTest extends UnitTestCase
 			if( ! $result ) {
 				$this->output( ( sprintf( '<h2>Test %s</h2><br><strong>Input:</strong><br><textarea>%s</textarea><br><strong>Expected:</strong><br><textarea>%s</textarea><br><strong>Got:</strong><br><textarea>%s</textarea>',
 					$index,
-					nl2br( Utils::htmlspecialchars( $datum['in'] ) ),
-					nl2br( Utils::htmlspecialchars( $datum['want'] ) ),
-					nl2br( Utils::htmlspecialchars( Format::autop( $datum['in'] ) ) )
+					Utils::htmlspecialchars( $datum['in'] ),
+					Utils::htmlspecialchars( $datum['want'] ),
+					Utils::htmlspecialchars( Format::autop( $datum['in'] ) )
 				) ) );
 			}
 			$this->assert_true( $result, sprintf("Output does not match desired output in %s", $index) );
