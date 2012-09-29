@@ -1121,7 +1121,16 @@ class TestResults extends ArrayObject
 
 		$output .= '<h3>Options</h3><table>';
 		foreach($this->options as $k => $v) {
-			$output .= "<tr><th>{$k}</th><td>{$v}</td></tr>";
+			if(is_array($v)) {
+				$output .= "<tr><th>{$k}</th><td><ol>";
+				foreach($v as $e) {
+					$output .= "<li>{$e}</li>";
+				}
+				$output .= "</ol></td></tr>";
+			}
+			else {
+				$output .= "<tr><th>{$k}</th><td>{$v}</td></tr>";
+			}
 		}
 		$output .= '</table></footer>';
 
