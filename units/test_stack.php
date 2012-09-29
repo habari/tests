@@ -37,10 +37,14 @@ class StackTest extends UnitTestCase
 
 	function test_stack_items()
 	{
-		StackItem::register('jquery', '1.7');
-		StackItem::register('jquery.ui', '1.3')->add_dependency('jquery', '1.7');
+		StackItem::register('jquery', 'http://example.com/jquery.js', '1.7');
+		StackItem::register('jquery_ui', 'http://example.com/jquery.ui.js', '1.3')->add_dependency('jquery', '1.7');
 
-		Stack::add('test_stack', StackItem('jquery'));
+		//Stack::add( 'test_stack', StackItem::get('jquery_ui') );
+		Stack::add( 'test_stack', 'http://localhost/my.js', 'my', array('jquery_ui') );
+		$sorted = Stack::get_sorted_stack('test_stack');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'http://example.com/jquery.js, http://example.com/jquery.ui.js, http://localhost/my.js' );
 	}
 }
 ?>
