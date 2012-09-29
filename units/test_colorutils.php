@@ -23,9 +23,10 @@ class ColorUtilsTest extends UnitTestCase
 		$this->assert_equal( $this->green_hex, '7fff40');
 	}
 
-	function test_RGV_to_HSV()
+	function test_RGB_to_HSV()
 	{
-		$this->assert_equal( $this->green_hsv, array ( 'h' => 100, 's' => 75, 'v' => 255, ) );
+		$this->output($this->green_hsv);
+		$this->assert_equal( $this->green_hsv, array ( 'h' => 90, 's' => 191, 'v' => 255, ) );
 	}
 
 	function test_HSV_back_to_RGB()
