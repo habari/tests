@@ -34,5 +34,13 @@ class StackTest extends UnitTestCase
 		$this->output(implode(', ', $sorted));
 		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), c after(b,d,f), e after(b), g after(e)' );
 	}
+
+	function test_stack_items()
+	{
+		StackItem::register('jquery', '1.7');
+		StackItem::register('jquery.ui', '1.3')->add_dependency('jquery', '1.7');
+
+		Stack::add('test_stack', StackItem('jquery'));
+	}
 }
 ?>
