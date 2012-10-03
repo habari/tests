@@ -69,5 +69,24 @@ class StackTest extends UnitTestCase
 		$this->output(implode(', ', $sorted));
 		$this->assert_equal( implode(', ', $sorted), 'http://example.com/jquery.js, http://example.com/jquery.ui.js, http://localhost/my.js' );
 	}
+
+	function test_stack_item_versions()
+	{
+		StackItem::register('foo', 'foo2', '2.0');
+		StackItem::register('foo', 'foo1', '1.0');
+
+		$item = StackItem::get('foo');
+		$this->assert_equal( (string)$item, 'foo2' );
+	}
+
+	function test_stack_item_lambda()
+	{
+		StackItem::register('bar', function(){
+			return 'true';
+		});
+
+		$item = StackItem::get('bar');
+		$this->assert_equal( (string)$item, 'true' );
+	}
 }
 ?>
