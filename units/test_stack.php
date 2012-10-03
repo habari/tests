@@ -27,7 +27,7 @@ class StackTest extends UnitTestCase
 
 		Stack::add( 'test_stack', 'f after(b)', 'f', 'b' );
 		$sorted = Stack::get_sorted_stack('test_stack');
-		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), e after(b), c after(b,d,f)' );
+		$this->assert_equal( implode(', ', $sorted), 'a, b after(a), d after(b), f after(b), c after(b,d,f), e after(b)' );
 
 		Stack::add( 'test_stack', 'g after(e)', 'g', 'e');
 		$sorted = Stack::get_sorted_stack('test_stack');
