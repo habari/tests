@@ -88,5 +88,40 @@ class StackTest extends UnitTestCase
 		$item = StackItem::get('bar');
 		$this->assert_equal( (string)$item, 'true' );
 	}
+
+	function test_stack_duplicate_dependencies()
+	{
+		Stack::add( 'test_duplicates', 'http://example.com/deep.js', 'deep' );
+		Stack::add( 'test_duplicates', 'http://example.com/dependent.js', 'dependent', 'deep' );
+		Stack::add( 'test_duplicates', 'http://localhost/one.js', 'one', 'dependent' );
+		Stack::add( 'test_duplicates', 'http://localhost/two.js', 'two', 'dependent' );
+
+		$sorted = Stack::get_sorted_stack('test_duplicates');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'http://example.com/deep.js, http://example.com/dependent.js, http://localhost/one.js, http://localhost/two.js' );
+	}
+
+	function test_stack_circular_dependencies()
+	{
+		// Don't do this!  But it shouldn't lock Habari up.
+		Stack::add( 'test_circular', 'http://example.com/first.js', 'first', 'second' );
+		Stack::add( 'test_circular', 'http://example.com/second.js', 'second', 'first' );
+
+		// If the sort fails, the system locks up.
+		$sorted = Stack::get_sorted_stack('test_circular');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'http://example.com/first.js, http://example.com/second.js' );
+
+		// More complex
+		Stack::add( 'test_circular_2', 'http://example.com/circular_a.js', 'circular_a', 'circular_b' );
+		Stack::add( 'test_circular_2', 'http://example.com/circular_b.js', 'circular_b', 'circular_c' );
+		Stack::add( 'test_circular_2', 'http://example.com/circular_c.js', 'circular_c', 'circular_a' );
+
+		// If the sort fails, the system locks up.
+		$sorted = Stack::get_sorted_stack('test_circular_2');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'http://example.com/circular_a.js, http://example.com/circular_c.js, http://example.com/circular_b.js' );
+	}
+
 }
 ?>
