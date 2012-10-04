@@ -123,5 +123,17 @@ class StackTest extends UnitTestCase
 		$this->assert_equal( implode(', ', $sorted), 'http://example.com/circular_a.js, http://example.com/circular_c.js, http://example.com/circular_b.js' );
 	}
 
+	function test_stack_duplicate_names()
+	{
+		Stack::add( 'test_dupe_names', 'http://example.com/dupedep.js', 'dupedep' );
+		Stack::add( 'test_dupe_names', 'http://example.com/dupe1.js', 'dupe', 'dupedep' );
+		Stack::add( 'test_dupe_names', 'http://example.com/dupe2.js', 'dupe', 'dupedep' );
+
+		$sorted = Stack::get_sorted_stack('test_dupe_names');
+		$this->output(implode(', ', $sorted));
+		$this->assert_equal( implode(', ', $sorted), 'http://example.com/dupedep.js, http://example.com/dupe2.js' );
+
+	}
+
 }
 ?>
