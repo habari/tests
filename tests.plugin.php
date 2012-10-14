@@ -29,7 +29,7 @@ class TestsPlugin extends Plugin
 	public function action_admin_header( $theme )
 	{
 		if ( $theme->page == 'tests' ) {
-			Stack::add( 'admin_stylesheet', array( $this->get_url() . '/admin.css', 'screen' ), 'admin-css' );
+			Stack::add( 'admin_stylesheet', array( $this->get_url() . '/admin.css', 'screen' ), 'tests-admin-css' );
 		}
 	}
 
