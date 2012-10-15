@@ -5,16 +5,22 @@ class TagTest extends UnitTestCase
 	private $text = 'Test Tag';
 	private $slug;
 	private $tag;
+	private $tag_empty_term_display;
+	private $tag_empty_term;
 
 	public function module_setup()
 	{
 		$this->slug = Utils::slugify( $this->text );
 		$this->tag = new Tag( array( 'term_display' => $this->text, 'term' => $this->slug ) );
+		$this->tag_empty_term_display = new Tag( array( 'term_display' => '', 'term' => 'no-display' ) );
+		$this->tag_empty_term = new Tag( array( 'term_display' => 'Empty Term', 'term' => '' ) );
 	}
 
 	public function module_teardown()
 	{
 		unset( $this->tag );
+		unset( $this->tag_empty_term_display );
+		unset( $this->tag_empty_term );
 	}
 
 	public function test_construct_tag()
@@ -60,9 +66,15 @@ class TagTest extends UnitTestCase
 			Tags::vocabulary()->delete_term( $t );
 		}
 		else {
-			$this->assert_equal( $res, FALSE );
+			$this->assert_false( $res );
 		}
 
+		$res = Tags::vocabulary()->add_term( $this->tag_empty_term_display );
+		$this->assert_false( $res );
+
+		$res = Tags::vocabulary()->add_term( $this->tag_empty_term );
+		$this->assert_true( $res );
+		Tags::vocabulary()->delete_term( $this->tag_empty_term );
 	}
 
 	public function test_update_tag()
