@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class PostTest extends UnitTestCase
 {
@@ -40,7 +41,7 @@ class PostTest extends UnitTestCase
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
 			'tags' => 'one, two, THREE',
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		);
 		$post = Post::create($params);
 
@@ -70,7 +71,7 @@ class PostTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('test_type'),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		);
 		$post = Post::create($params);
 

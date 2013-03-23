@@ -1,5 +1,7 @@
 <?php
 
+namespace Habari;
+
 /**
 * Habari unit test bootstrap file
 *
@@ -289,7 +291,7 @@ class UnitTestCase
 		$methods = array_filter($methods, array($this, 'named_test_filter'));
 
 		foreach($methods as $method) {
-			$ref_method = new ReflectionMethod($this, $method);
+			$ref_method = new \ReflectionMethod($this, $method);
 			$method_data = array(
 				'go' => true,
 				'start_line' => $ref_method->getStartLine(),
@@ -300,7 +302,7 @@ class UnitTestCase
 		}
 
 		// Get class info and build a result object, which will be returned
-		$class = new ReflectionClass( get_class( $this ) );
+		$class = new \ReflectionClass( get_class( $this ) );
 		$this->result = new TestResult(get_class($this), $class->getFileName());
 	}
 
@@ -416,7 +418,7 @@ class UnitTestCase
 					$output = ob_get_clean();
 				}
 				// If exceptions occurred, determine if we were asserting them or not
-				catch(Exception $e) {
+				catch(\Exception $e) {
 					if(strpos($e->getMessage(), $this->asserted_exception[0]) !== false || get_class($e) == $this->asserted_exception[0]) {
 						$this->result->pass_count++;
 						$this->asserted_exception = null;
@@ -598,7 +600,7 @@ class FeatureTestCase extends UnitTestCase
 			if(preg_match('#(Given|When|Then|And|But)\s+(.+)$#i', $step, $matches)) {
 				if(!$this->execute_step($matches[2], $linenumber, $step)) {
 					$file = basename($this->feature_file);
-					throw new Exception("Step '{$matches[0]}' is not defined in {$file}:#{$linenumber}");
+					throw new \Exception("Step '{$matches[0]}' is not defined in {$file}:#{$linenumber}");
 				}
 			}
 		}
@@ -610,6 +612,7 @@ class FeatureTestCase extends UnitTestCase
 	{
 		$this->steps = $steps;
 		foreach($classes as $class) {
+			$class = 'Habari\\'. $class;
 			$this->feature_contexts[$class] = new $class($this);
 		}
 	}
@@ -663,11 +666,11 @@ class TestSuite {
 
 		$results = new TestResults();
 		foreach($classes as $class) {
-			if($class == 'FeatureTestCase' || (isset($options['u']) && !in_array($class, $options['u']))) {
+			if($class == 'Habari\FeatureTestCase' || (isset($options['u']) && !in_array($class, $options['u']))) {
 				continue;
 			}
 			$parents = class_parents($class, false);
-			if(in_array('UnitTestCase', $parents)) {
+			if(in_array('Habari\UnitTestCase', $parents)) {
 				$obj = new $class();
 				$results[$class] = $obj->run();
 			}
@@ -781,7 +784,7 @@ class TestSuite {
 			$directory = dirname(__FILE__);
 		}
 
-		spl_autoload_register( array( 'Plugins', '_autoload' ) );
+		spl_autoload_register( array( '\Habari\Plugins', '_autoload' ) );
 		Plugins::load_active();
 
 		// Find unit tests, include them
@@ -843,7 +846,7 @@ class FeatureContext
 		}
 		else {
 			$class = get_called_class();
-			throw new Exception("Method ->{$method} does not exist in test case for '{$class}'.");
+			throw new \Exception("Method ->{$method} does not exist in test case for '{$class}'.");
 		}
 	}
 }
@@ -923,7 +926,7 @@ class TestResult
 }
 
 
-class TestResults extends ArrayObject
+class TestResults extends \ArrayObject
 {
 	private $options = array();
 	private $type = array();
@@ -1218,7 +1221,7 @@ class TestResults extends ArrayObject
 		$has_output = false;
 		$totals = $this->initial_results();
 
-		$xml = new SimpleXMLElement('<results></results>');
+		$xml = new \SimpleXMLElement('<results></results>');
 
 		$xml->addAttribute('unit_count', $this->count());
 		$connection = Config::get('db_connection');
@@ -1325,7 +1328,6 @@ class TestResults extends ArrayObject
 	}
 
 }
-
 include HABARI_PATH . '/index.php';
 
 endif;

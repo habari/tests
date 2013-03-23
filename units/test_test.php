@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class TestTest extends UnitTestCase
 {
@@ -9,9 +10,9 @@ class TestTest extends UnitTestCase
 
 	public function test_assertions()
 	{
-		$a = new stdClass();
+		$a = new \stdClass();
 		$b = &$a;
-		$c = new stdClass();
+		$c = new \stdClass();
 
 		$this->assert_true(true);
 		$this->assert_false(false);

@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 /**
  * class to get fields/newfields to test logic

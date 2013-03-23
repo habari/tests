@@ -1,5 +1,7 @@
 <?php
 
+namespace Habari;
+
 class TestsPlugin extends Plugin
 {
 	private $attributes = array(
@@ -61,7 +63,7 @@ class TestsPlugin extends Plugin
 	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
-		$test_list = new SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
+		$test_list = new \SimpleXMLElement(preg_replace("/^\n/", "", file_get_contents($url)));
 
 		$output = '';
 		$unit_names = array();
@@ -102,9 +104,9 @@ class TestsPlugin extends Plugin
 
 		try {
 			$xmldata = file_get_contents($url);
-			$results = @new SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
+			$results = @new \SimpleXMLElement(preg_replace("/^\n/", "", $xmldata));
 		}
-		catch(Exception $e) {
+		catch(\Exception $e) {
 			$theme->error = var_export($e->getMessage(), true) . '<textarea style="width:100%;height: 20em;">' . htmlentities($xmldata) . '</textarea>';
 			$parsed_xml = false;
 			$theme->unit = $unit;

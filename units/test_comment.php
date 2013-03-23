@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class CommentTest extends UnitTestCase
 {
@@ -42,7 +43,7 @@ class CommentTest extends UnitTestCase
 			'ip' => ip2long('127.0.0.1'),
 			'content' => 'test content',
 			'status' => Comment::STATUS_UNAPPROVED,
-			'date' => HabariDateTime::date_create(),
+			'date' => DateTime::date_create(),
 			'type' => Comment::COMMENT
 		);
 		$this->comment = Comment::create( $this->paramarray );

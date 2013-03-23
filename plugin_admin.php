@@ -29,7 +29,7 @@
 
 <div class="container">
 	<div class="item settings clear" id="config">
-		<ul class="$connection_string">
+		<ul class="<?php echo $connection_string ?>">
 		<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
 			<li><a href="#xml" onclick="$('#xml').toggle();return false;">Show XML results</a></li>
@@ -47,7 +47,7 @@
 
 <div class="container">
 	<div class="item settings clear" id="preconfig">
-		<ul class="$connection_string">
+		<ul class="<?php echo $connection_string ?>">
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
 		</ul>
 	</div>

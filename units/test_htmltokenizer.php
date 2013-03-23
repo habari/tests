@@ -1,4 +1,6 @@
 <?php
+namespace Habari;
+
 /**
  * Test for the HTMLTokenizer class.
  */

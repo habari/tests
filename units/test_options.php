@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class OptionsTest extends UnitTestCase
 {

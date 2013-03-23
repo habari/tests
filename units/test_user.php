@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class UserTest extends UnitTestCase
 {

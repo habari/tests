@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class TaxonomyTest extends UnitTestCase
 {
@@ -67,7 +68,7 @@ class TaxonomyTest extends UnitTestCase
 		try {
 			$v->delete();
 		}
-		catch ( Exception $e ) {
+		catch ( \Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -96,7 +97,7 @@ class TaxonomyTest extends UnitTestCase
 		try {
 			$v->delete();
 		}
-		catch ( Exception $e ) {
+		catch ( \Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -139,7 +140,7 @@ class TaxonomyTest extends UnitTestCase
 		try {
 			$v->delete();
 		}
-		catch ( Exception $e ) {
+		catch ( \Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 	}
@@ -164,7 +165,7 @@ class TaxonomyTest extends UnitTestCase
 		try {
 			$v->delete();
 		}
-		catch ( Exception $e ) {
+		catch ( \Exception $e ) {
 			echo 'Caught exception: ',$e->getMessage(), "\n";
 		}
 
@@ -757,7 +758,7 @@ class TaxonomyTest extends UnitTestCase
 		'user_id' => 1,
 		'status' => Post::status( 'draft' ),
 		'content_type' => Post::type( 'entry' ),
-		'pubdate' => HabariDateTime::date_create(),
+		'pubdate' => DateTime::date_create(),
 		) );
 
 		$v = Vocabulary::get( 'tags' );

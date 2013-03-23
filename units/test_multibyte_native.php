@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 	/**
 	 * A unit test to verify that turning off the MultiByte library works.

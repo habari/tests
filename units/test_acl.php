@@ -1,5 +1,7 @@
 <?php
 
+namespace Habari;
+
 class ACLTest extends UnitTestCase {
 	private $acl_group;
 	private $acl_user_alice;

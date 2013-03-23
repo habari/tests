@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 	/**
 	 * Tests for the Posts class
@@ -60,7 +61,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$result = Posts::get( array( 'id' => $expected->id ) );
@@ -85,7 +86,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$expected[] = Post::create( array(
 			'title' => 'I am not a Post',
@@ -93,7 +94,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$ids = array();
@@ -123,7 +124,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = Post::create(array(
 			'title' => 'I am not a Post',
@@ -131,7 +132,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$result = Posts::get(array('not:id' => $unexpected->id));
@@ -153,7 +154,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = array();
 		$unexpected[] = Post::create(array(
@@ -162,7 +163,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected[] = Post::create(array(
 			'title' => 'Chili',
@@ -170,7 +171,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$ids = array();
@@ -197,7 +198,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$result = Posts::get( array( 'slug' => $expected->slug ) );
@@ -222,7 +223,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$expected[] = Post::create( array(
 			'title' => 'I am not a Post',
@@ -230,7 +231,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$slugs = array();
@@ -260,7 +261,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = Post::create(array(
 			'title' => 'I am not a Post',
@@ -268,7 +269,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$result = Posts::get(array('not:slug' => $unexpected->slug));
@@ -290,7 +291,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = array();
 		$unexpected[] = Post::create(array(
@@ -299,7 +300,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected[] = Post::create(array(
 			'title' => 'Chili',
@@ -307,7 +308,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$slugs = array();
@@ -333,7 +334,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$unexpected = Post::create( array(
 			'title' => 'I am not a Post',
@@ -341,7 +342,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'page' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$result = Posts::get( array( 'content_type' => Post::type( 'entry' ) ) );
@@ -367,7 +368,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$expected[] = Post::create( array(
 			'title' => 'I am not a Post',
@@ -375,7 +376,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'page' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$types = array();
@@ -403,7 +404,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = Post::create(array(
 			'title' => 'I am not a Post',
@@ -411,7 +412,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('page'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$result = Posts::get(array('not:content_type' => $unexpected->content_type));
@@ -434,7 +435,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published' ),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected[] = Post::create(array(
 			'title' => 'I am not a Post',
@@ -442,7 +443,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('page'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$types = array();
@@ -467,7 +468,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$unexpected = Post::create( array(
 			'title' => 'I am not a Post',
@@ -475,7 +476,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'draft' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$result = Posts::get( array( 'status' => Post::status( 'draft' ) ) );
@@ -501,7 +502,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 		$expected[] = Post::create( array(
 			'title' => 'I am not a Post',
@@ -509,7 +510,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'draft' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$statuses = array();
@@ -546,7 +547,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$unexpected = Post::create(array(
 			'title' => 'I am not a Post',
@@ -554,7 +555,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $decoy->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$result = Posts::get( array( 'user_id' => $this->user->id ) );
@@ -588,7 +589,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 		$expected[] = Post::create(array(
 			'title' => 'I am not a Post',
@@ -596,7 +597,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $decoy->id,
 			'status' => Post::status('published'),
 			'content_type' => Post::type('entry'),
-			'pubdate' => HabariDateTime::date_create(time()),
+			'pubdate' => DateTime::date_create(time()),
 		));
 
 		$result = Posts::get(array('user_id' => array($this->user->id, $decoy->id)));
@@ -636,7 +637,7 @@ class PostsTest extends UnitTestCase
 					'user_id' => $this->user->id,
 					'status' => Post::status( 'published' ),
 					'content_type' => Post::type( 'entry' ),
-					'pubdate' => HabariDateTime::date_create( $date ),
+					'pubdate' => DateTime::date_create( $date ),
 				));
 				$post->info->testing_date = 1;
 				$post->info->commit();
@@ -720,7 +721,7 @@ class PostsTest extends UnitTestCase
 				'status' => Post::status( 'published' ),
 				'tags' => $post_tags,
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_tag = 1;
 			$post->info->commit();
@@ -991,7 +992,7 @@ class PostsTest extends UnitTestCase
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_vocab = 1;
 			$post->info->i = $i;
@@ -1051,7 +1052,7 @@ class PostsTest extends UnitTestCase
 			'user_id' => $this->user->id,
 			'status' => Post::status( 'published' ),
 			'content_type' => Post::type( 'entry' ),
-			'pubdate' => HabariDateTime::date_create( time() ),
+			'pubdate' => DateTime::date_create( time() ),
 		));
 
 		$seven_things = array( "one", "two", "red", "blue", "black", "old", "new" );
@@ -1064,7 +1065,7 @@ class PostsTest extends UnitTestCase
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_info = 1;
 			$post->info->$seven_things[ ($i % 7) ] = 1;
@@ -1328,7 +1329,7 @@ class PostsTest extends UnitTestCase
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_titles = 1;
 			$post->info->commit();
@@ -1416,7 +1417,7 @@ class PostsTest extends UnitTestCase
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_titles = 1;
 			$post->info->commit();
@@ -1480,7 +1481,7 @@ class PostsTest extends UnitTestCase
 				'user_id' => $this->user->id,
 				'status' => Post::status( 'published' ),
 				'content_type' => Post::type( 'entry' ),
-				'pubdate' => HabariDateTime::date_create( time() ),
+				'pubdate' => DateTime::date_create( time() ),
 			));
 			$post->info->testing_limit = 1;
 			$post->info->i = $i;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Habari;
+
 	include 'bootstrap.php';
 	
 	// prevent it from running

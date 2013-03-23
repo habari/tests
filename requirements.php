@@ -1,5 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <?php
+namespace Habari;
+
 		$min_versions = array(
 			'5.2' => '0.8',
 			'5.3.3' => '0.9',
@@ -30,6 +32,8 @@
 				$php_version_ok = $max_habari_version;
 			}
 		}
+namespace Habari;
+
 
 		/* If the version isn't ok, there's no point going any further*/
 		if (! $php_version_ok) {
@@ -47,7 +51,7 @@
 
 			if ( extension_loaded('pdo') ) {
 				/* Check for PDO drivers */
-				$pdo_drivers = PDO::getAvailableDrivers();
+				$pdo_drivers = \PDO::getAvailableDrivers();
 				if ( ! empty( $pdo_drivers ) ) {
 					$pdo_drivers = array_combine( $pdo_drivers, $pdo_drivers );
 					// Include only those drivers that we include database support for
@@ -183,7 +187,7 @@ ul {
 	<?php if (! $php_version_ok) { ?>
 		<h2>PHP Upgrade needed...</h2>
 		<p class="instructions">
-			<em>Habari</em> <?php echo('requires PHP 5.2 or newer. Your current PHP version is ' . phpversion()); ?>
+			<em>Habari</em> <?php echo('requires PHP 5.3.3 or newer. Your current PHP version is ' . phpversion()); ?>
 		</p>
 		<strong>@todo Upgrading PHP instructions</strong>
 	<?php } else { ?>

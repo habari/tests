@@ -1,5 +1,7 @@
 <?php
 
+//namespace Habari;
+
 /*
 	Copyright 2011 3e software house & interactive agency
 
@@ -692,7 +694,7 @@ class WebElement extends WebDriverBase {
 
 	public function sendKeys($value) {
 		if (!is_array($value)) {
-			throw new Exception("$value must be an array");
+			throw Exception("$value must be an array");
 		}
 		$request = $this->requestURL . "/value";
 		$session = $this->curlInit($request);

@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 /**
  * Test for the InputFilter class.

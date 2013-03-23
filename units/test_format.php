@@ -1,4 +1,5 @@
 <?php
+namespace Habari;
 
 class FormatTest extends UnitTestCase
 {
