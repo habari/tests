@@ -70,7 +70,7 @@ class CommentTest extends UnitTestCase
 		$comment = Comment::create( $this->paramarray );
 		$id = DB::last_insert_id();
 
-		$this->assert_type( 'Comment', $comment );
+		$this->assert_type( 'Habari\Comment', $comment );
 		foreach( $this->paramarray as $key => $val ) {
 			switch ( $key ) {
 				case 'id':
@@ -101,7 +101,7 @@ class CommentTest extends UnitTestCase
 	{
 		$comment = Comment::get( $this->comment->id );
 
-		$this->assert_type( 'Comment', $comment );
+		$this->assert_type( 'Habari\Comment', $comment );
 		$this->assert_equal( $comment->id, $this->comment->id );
 	}
 
@@ -116,7 +116,7 @@ class CommentTest extends UnitTestCase
 
 	public function test__get()
 	{
-		$this->assert_type( 'Post', $this->comment->post, 'Expected Post. Received ' . get_class( $this->comment->post ) );
+		$this->assert_type( 'Habari\Post', $this->comment->post, 'Expected Post. Received ' . get_class( $this->comment->post ) );
 		$this->assert_equal( $this->comment->post->id, $this->post_id );
 
 		$this->assert_equal( $this->comment->statusname, 'unapproved' );
@@ -125,7 +125,7 @@ class CommentTest extends UnitTestCase
 
 		$this->assert_equal( $this->comment->editlink, URL::get( 'admin', "page=comment&id={$this->comment->id}" ) );
 
-		$this->assert_type( 'CommentInfo', $this->comment->info );
+		$this->assert_type( 'Habari\CommentInfo', $this->comment->info );
 	}
 
 	/**
@@ -147,7 +147,7 @@ class CommentTest extends UnitTestCase
 
 		// make sure construction works with info
 		$new_comment = new Comment();
-		$this->assert_type( 'CommentInfo', $new_comment->info );
+		$this->assert_type( 'Habari\CommentInfo', $new_comment->info );
 		$this->assert_false( $new_comment->info->is_key_set() );
 		$new_comment->info->test = 'test';
 		$new_comment->insert();

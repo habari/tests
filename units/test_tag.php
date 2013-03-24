@@ -33,7 +33,7 @@ class TagTest extends UnitTestCase
 		);
 		$t = new Tag($params);
 
-		$this->assert_type('Tag', $t, 'Result should be of type Tag');
+		$this->assert_type('Habari\Tag', $t, 'Result should be of type Tag');
 		$this->assert_equal($this->slug, $t->term, 'The slug should equal the slug value passed in.' );
 		$this->assert_equal($this->text, $t->term_display, 'The text should equal the text value passed in.' );
 
@@ -42,7 +42,7 @@ class TagTest extends UnitTestCase
 	public function test_create_tag()
 	{
 		$t = Tag::create( array( 'term_display' => $this->text, 'term' => $this->slug ) );
-		$this->assert_type( 'Tag', $t );
+		$this->assert_type( 'Habari\Tag', $t );
 		// Check the tag's id is set.
 		$this->assert_true((int)$t->id > 0, 'The Tag id should be greater than zero');
 		$this->assert_equal($this->slug, $t->term, 'The slug should equal the slug value passed in.' );
@@ -57,12 +57,12 @@ class TagTest extends UnitTestCase
 		$count = Tags::vocabulary()->count_total();
 		$res = Tags::vocabulary()->add_term( $this->tag );
 		if ( $res ) {
-			$this->assert_type( 'Tag', $res );
+			$this->assert_type( 'Habari\Tag', $res );
 			$this->assert_equal( $count + 1, Tags::vocabulary()->count_total() );
 			// Dies on PHP versions with the PDO bug if you try to get the tag as a Tag
 			$t = Tags::vocabulary()->get_term( $this->text );
 			// Settle for testing for a Term
-			$this->assert_type( 'Term', $t );
+			$this->assert_type( 'Habari\Term', $t );
 			$this->assert_equal( $this->text, $t->term_display, $this->text . ' is not the same as ' . $t->term_display );
 			Tags::vocabulary()->delete_term( $t );
 		}
