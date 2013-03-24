@@ -154,8 +154,9 @@ namespace Habari;
 		public function test_detect_encoding ( ) {
 			
 			$this->assert_equal( MultiByte::detect_encoding( 'foo' ), 'ASCII' );
-			$this->assert_equal( MultiByte::detect_encoding( $this->test_strings['jis'] ), 'JIS' );
-			//echo MultiByte::detect_encoding( '' ); die();
+
+			$str = MultiByte::convert_encoding( $this->test_strings['jis'], 'JIS' );
+			$this->assert_equal( MultiByte::detect_encoding( $str ), 'JIS' );
 			
 		}
 		
