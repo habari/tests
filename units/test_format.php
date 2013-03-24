@@ -51,7 +51,7 @@ class FormatTest extends UnitTestCase
 			Vocabulary::get( 'format_test' )->delete();
 		}
 
-		$v = new Vocabulary( array(
+		$v = Vocabulary::create( array(
 			'name' => 'format_test',
 			'description' => "Vocabulary used for testing Format::term_tree()",
 			'features' => array( 'hierarchical' )
