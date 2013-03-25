@@ -490,6 +490,9 @@ class FeatureTestCase extends UnitTestCase
 	public function __construct($feature_file)
 	{
 		$this->feature_file = $feature_file;
+		if(function_exists('xdebug_disable')) {
+			xdebug_disable();  // Disables fancy XDebug stack traces
+		}
 	}
 
 	public function run_init()
