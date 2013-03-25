@@ -84,6 +84,10 @@ class TestsPlugin extends Plugin
 				}
 				$url = $this->get_url($url);
 			}
+			else {
+				$url = '/index.php?c=symbolic&o=1';
+				$url = $this->get_url( $url );
+			}
 			if($_GET['run'] == 'Dry Run') {
 				$url .= '&d=1';
 				$dryrun = true;

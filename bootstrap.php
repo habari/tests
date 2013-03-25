@@ -761,6 +761,7 @@ class TestSuite {
 				// @todo Re-defined a step!  Throw an error!
 			}
 			else {
+				$class = "Habari\\" . $class;
 				self::$steps[$matches[2]] = array($class, $value);
 			}
 		}

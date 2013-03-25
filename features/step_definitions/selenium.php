@@ -8,8 +8,9 @@ class SeleniumFeatureContext extends FeatureContext
 
 	public function init_webdriver() {
 		if(empty($this->webdriver)) {
-			$this->webdriver = new WebDriver('localhost', '4444');
-			$this->webdriver->connect('firefox');
+			$this->webdriver = new \WebDriver('localhost', '4444');
+//			$this->webdriver->connect('firefox');
+			$this->webdriver->connect('chromium');
 		}
 	}
 
@@ -42,9 +43,9 @@ class SeleniumFeatureContext extends FeatureContext
 	 */
 	function i_type_into_the_field($text, $field) {
 		$this->init_webdriver();
-		$element = $this->webdriver->findElementBy(LocatorStrategy::name, $field);
+		$element = $this->webdriver->findElementBy(\LocatorStrategy::name, $field);
 		if(empty($element)) {
-			$element = $this->webdriver->findElementBy(LocatorStrategy::id, $field);
+			$element = $this->webdriver->findElementBy(\LocatorStrategy::id, $field);
 			if(empty($element)) {
 				$this->assert_true(false, sprintf('{step}Could not find the element with the id "%s"', $field));
 				return;
@@ -57,9 +58,9 @@ class SeleniumFeatureContext extends FeatureContext
 	 */
 	function i_submit_the_form($form) {
 		$this->init_webdriver();
-		$element = $this->webdriver->findElementBy(LocatorStrategy::name, $form);
+		$element = $this->webdriver->findElementBy(\LocatorStrategy::name, $form);
 		if(empty($element)) {
-			$element = $this->webdriver->findElementBy(LocatorStrategy::id, $form);
+			$element = $this->webdriver->findElementBy(\LocatorStrategy::id, $form);
 			if(empty($element)) {
 				$this->assert_true(false, sprintf('{step}Could not find the form with the id "%s"', $form));
 				return;
@@ -73,7 +74,7 @@ class SeleniumFeatureContext extends FeatureContext
 	 */
 	function i_should_see($thing) {
 		$this->init_webdriver();
-		$element = $this->webdriver->findElementBy(LocatorStrategy::id, $thing);
+		$element = $this->webdriver->findElementBy(\LocatorStrategy::id, $thing);
 		$this->assert_not_empty($element, '{step}');
 	}
 
@@ -82,7 +83,7 @@ class SeleniumFeatureContext extends FeatureContext
 	 */
 	function i_click($thing) {
 		$this->init_webdriver();
-		$element = $this->webdriver->findElementBy(LocatorStrategy::id, $thing);
+		$element = $this->webdriver->findElementBy(\LocatorStrategy::id, $thing);
 		if(empty($element)) {
 			$this->assert_true(false, sprintf('{step}Could not find the element with the id "%s"', $thing));
 		}
