@@ -1,6 +1,6 @@
+<?php namespace Habari; ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <?php
-namespace Habari;
 
 		$min_versions = array(
 			'5.2' => '0.8',
@@ -32,7 +32,6 @@ namespace Habari;
 				$php_version_ok = $max_habari_version;
 			}
 		}
-namespace Habari;
 
 
 		/* If the version isn't ok, there's no point going any further*/
@@ -51,7 +50,7 @@ namespace Habari;
 
 			if ( extension_loaded('pdo') ) {
 				/* Check for PDO drivers */
-				$pdo_drivers = \PDO::getAvailableDrivers();
+				$pdo_drivers = PDO::getAvailableDrivers();
 				if ( ! empty( $pdo_drivers ) ) {
 					$pdo_drivers = array_combine( $pdo_drivers, $pdo_drivers );
 					// Include only those drivers that we include database support for
