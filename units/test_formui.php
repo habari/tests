@@ -158,9 +158,22 @@ class FormUITest extends UnitTestCase
 	{
 		if($template == 'control.customz') {
   		$this->pass_check('template');
-  		return dirname(__FILE__) . '/data/formcontrol_custom2.php';
+  		return dirname(__FILE__) . '/../data/formcontrol_custom2.php';
 		}
 		return $filename;
+	}
+
+	function test_inline_control_template()
+	{
+		$myform = new FormUI('my_identifier');
+		$myform->get_theme()->add_template('control.text.custom', dirname(__FILE__).'/../data/formcontrol_custom2.php');
+		$firstname = FormControlText::Create('firstname', 'user:username')->set_template('control.text.custom');
+		$myform->append(FormControlLabel::wrap('Firstname:', $firstname));
+		$myform->append(FormControlSubmit::create('save')->set_caption('Save') );
+		$html = $myform->get();
+		$this->output($html);
+
+		$this->assert_true(strpos($html, 'custom:formcontrol_custom2.php') !== false, 'Could not find content of custom template in form output');
 	}
 
 	function teardown()
