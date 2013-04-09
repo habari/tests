@@ -354,7 +354,60 @@ class PostsTest extends UnitTestCase
 			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
 			$this->assert_equal( $r->content_type, Post::type( 'entry' ), 'Returned posts should be of the requested content type' );
 		}
+
+		$result = Posts::get( array( 'content_type' => 'entry' ) );
+
+		$this->assert_true( $result instanceof Posts, 'Result should be of type Posts' );
+		$this->assert_equal( 1, count($result), 'The expected number of posts should be returned' );
+
+		foreach ( $result as $r ) {
+			$this->assert_true( $r instanceof Post, 'Items should be of type Post' );
+			$this->assert_equal( $r->content_type, Post::type( 'entry' ), 'Returned posts should be of the requested content type' );
+		}
 	}
+
+	/**
+	 * Get by single content type
+	 */
+	public function test_get_posts_by_no_content_type()
+	{
+		$expected = Post::create( array(
+			'title' => 'This is a Post',
+			'content' => 'If this was really a post, would it have such rslugiculous content?',
+			'user_id' => $this->user->id,
+			'status' => Post::status( 'published' ),
+			'content_type' => Post::type( 'entry' ),
+			'pubdate' => DateTime::date_create( time() ),
+		));
+		$unexpected = Post::create( array(
+			'title' => 'I am not a Post',
+			'content' => 'But I\'m certainly not a pipe',
+			'user_id' => $this->user->id,
+			'status' => Post::status( 'published' ),
+			'content_type' => Post::type( 'page' ),
+			'pubdate' => DateTime::date_create( time() ),
+		));
+
+		$result = Posts::get();
+		$this->assert_equal( 2, count($result), 'All posts should be returned when no content type is supplied');
+
+		$result = Posts::get( array('content_type' => array()) );
+		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an empty array');
+
+		$result = Posts::get( array('content_type' => 0) );
+		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is 0');
+
+		$result = Posts::get( array('content_type' => 'any') );
+		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is the string value "any"');
+
+		$result = Posts::get( array('content_type' => array(0)) );
+		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an array containing the integer 0');
+
+		$result = Posts::get( array('content_type' => array('any')) );
+		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an array containing the string value "any"');
+
+	}
+
 
 	/**
 	 * Get by an array of content types
