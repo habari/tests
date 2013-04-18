@@ -1214,7 +1214,7 @@ class TestResults extends \ArrayObject
 
 		$output[]= "\n=== Options ===";
 		foreach($this->options as $k => $v) {
-			$output[]= "  {$k}: {$v}";
+			$output[]= "  {$k}: " . var_export($v, true);
 		}
 
 		return implode("\n", $output) . "\n";
