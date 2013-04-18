@@ -176,6 +176,28 @@ class FormUITest extends UnitTestCase
 		$this->assert_true(strpos($html, 'custom:formcontrol_custom2.php') !== false, 'Could not find content of custom template in form output');
 	}
 
+	function test_validator_altering_value()
+	{
+		$self = $this;
+		$this->check('validator', 'The validator was not executed.');
+		$this->check('success', 'The on_success callback was not executed.');
+		$form = new FormUI('alter_value');
+		$form->append('text', 'test_value')->set_value('initial value')->add_validator(function($value, $control, $form) use($self) {
+			$self->assert_equal($value, 'initial value', 'The validator did not observe the correct initial value.');
+			$self->pass_check('validator');
+			$control->value = 'changed value';
+			return array();
+		});
+		$form->append('submit', 'save');
+		$form->on_success( function($form) use($self) {
+			$self->assert_equal($form->test_value->value, 'changed value', 'The validator did not change the value as expected.');
+			$self->pass_check('success');
+		} );
+		$form->simulate(array(), true);
+		$form->get();
+	}
+
+
 	function teardown()
 	{
 		Options::delete('test__username');
