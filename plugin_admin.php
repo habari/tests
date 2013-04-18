@@ -18,7 +18,7 @@
 
 <?php if(!empty($error)): ?>
 <div class="container">
-	<div class='item settings clear' id='error'>
+	<div class='item settings' id='error'>
 		<?php echo $error; ?>
 	</div>
 </div>
@@ -28,7 +28,7 @@
 <?php if (isset($results)): ?>
 
 <div class="container">
-	<div class="item settings clear" id="config">
+	<div class="item settings" id="config">
 		<ul class="<?php echo $connection_string ?>">
 		<li><b>Connection String:</b> <?php echo $connection_string; ?></li>
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
@@ -38,7 +38,7 @@
 </div>
 
 <div class="container" style="display:none;" id="xml">
-	<div class="item settings clear">
+	<div class="item settings">
 		<textarea style="width:100%;height:300px"><?php echo $xmldata; ?></textarea>
 	</div>
 </div>
@@ -46,7 +46,7 @@
 <?php elseif(isset($direct_url)): ?>
 
 <div class="container">
-	<div class="item settings clear" id="preconfig">
+	<div class="item settings" id="preconfig">
 		<ul class="<?php echo $connection_string ?>">
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
 		</ul>
@@ -59,7 +59,7 @@
 
 <div class="container">
 	<?php foreach ( $results as $result ): ?>
-	<div class='item settings clear' id='<?php echo $result['name']?>'>
+	<div class='item settings' id='<?php echo $result['name']?>'>
 		<h2><a href="tests?unit=<?php echo $result['name']; ?>&run=Run" title="Run <?php echo $result['name']; ?>"><?php echo $result['name']; ?></a><?php if (isset($test)) echo ': '.$test; ?></h2>
 		<ul class="attributes">
 			<?php if (isset($test)): ?>
