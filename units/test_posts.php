@@ -47,7 +47,14 @@ class PostsTest extends UnitTestCase
 	 */
 	protected function teardown()
 	{
-		Posts::get(array('nolimit' => 1))->delete();
+		$allposts = Posts::get(array('nolimit' => 1));
+		$allposts->delete();
+	}
+
+	protected function setup()
+	{
+		$allposts = Posts::get(array('nolimit' => 1));
+		$allposts->delete();
 	}
 
 	/**
@@ -389,23 +396,28 @@ class PostsTest extends UnitTestCase
 		));
 
 		$result = Posts::get();
-		$this->assert_equal( 2, count($result), 'All posts should be returned when no content type is supplied');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when no content type is supplied', array('@count' => count($result))));
 
 		$result = Posts::get( array('content_type' => array()) );
-		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an empty array');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when the content type is an empty array', array('@count' => count($result))));
 
 		$result = Posts::get( array('content_type' => 0) );
-		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is 0');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when the content type is 0', array('@count' => count($result))));
 
 		$result = Posts::get( array('content_type' => 'any') );
-		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is the string value "any"');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when the content type is the string value "any"', array('@count' => count($result))));
 
 		$result = Posts::get( array('content_type' => array(0)) );
-		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an array containing the integer 0');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when the content type is an array containing the integer 0', array('@count' => count($result))));
 
 		$result = Posts::get( array('content_type' => array('any')) );
-		$this->assert_equal( 2, count($result), 'All posts should be returned when the content type is an array containing the string value "any"');
+		$this->assert_equal( 2, count($result), _t('All posts (expected 2, got @count) should be returned when the content type is an array containing the string value "any"', array('@count' => count($result))));
 
+		$result = Posts::get( array('content_type' => 'entry') );
+		$this->assert_equal( 1, count($result), _t('All entries (expected 1, got @count) should be returned when the content type is requested as the string "entry"', array('@count' => count($result))));
+
+		$result = Posts::get( array('content_type' => 'page') );
+		$this->assert_equal( 1, count($result), _t('All entries (expected 1, got @count) should be returned when the content type is requested as the string "page"', array('@count' => count($result))));
 	}
 
 
