@@ -197,6 +197,34 @@ class FormUITest extends UnitTestCase
 		$form->get();
 	}
 
+	function test_encode_textarea()
+	{
+		$form = new FormUI('encode');
+		$encoded = $form->append('textarea', 'encoded')->set_value('<b>strong</b>')->add_class('target');
+		$html = $form->get();
+		$doc = new HTMLDoc($html);
+		$target = $doc->find_one('.target');
+		$this->assert_equal($target->inner_html(), '&lt;b&gt;strong&lt;/b&gt;', 'The output value was not encoded.', htmlspecialchars($target->inner_html()));
+
+		$encoded->set_value('&lt;b&gt;strong&lt;/b&gt;');
+		$html = $form->get();
+		$doc = new HTMLDoc($html);
+		$target = $doc->find_one('.target');
+		$this->assert_equal($target->inner_html(), '&amp;lt;b&amp;gt;strong&amp;lt;/b&amp;gt;', 'The output value was not encoded.', htmlspecialchars($target->inner_html()));
+	}
+
+	function test_encode_textinput()
+	{
+		$form = new FormUI('encode');
+		$encoded = $form->append('text', 'encoded')->set_value('<b>strong</b>')->add_class('target');
+		$html = $form->get();
+		$this->assert_true(strpos($html, 'value="&lt;b&gt;strong&lt;/b&gt;"') !== false, 'The output value was not encoded.');
+
+		$encoded->set_value('&lt;b&gt;strong&lt;/b&gt;');
+		$html = $form->get();
+		$this->assert_true(strpos($html, 'value="&amp;lt;b&amp;gt;strong&amp;lt;/b&amp;gt;"') !== false, 'The output value was not encoded.');
+	}
+
 
 	function teardown()
 	{
