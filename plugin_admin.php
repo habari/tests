@@ -47,7 +47,7 @@
 
 <div class="container">
 	<div class="item settings" id="preconfig">
-		<ul class="<?php echo $connection_string ?>">
+		<ul class="<?php echo $direct_url; ?>">
 			<li><b>Direct URL:</b> <a href="<?php echo $direct_url; ?>">HTML</a> &middot; <a href="<?php echo $symbolic_url; ?>">Symbolic</a></li>
 		</ul>
 	</div>
