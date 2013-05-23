@@ -26,6 +26,23 @@ class TestsPlugin extends Plugin
 	public function action_init()
 	{
 		$this->add_template('tests_admin', dirname($this->get_file()) . '/plugin_admin.php');
+		$this->add_rule(
+			new RewriteRule(
+				array(
+					'name' => 'display_tests',
+					'parse_regex' => '#^admin/tests/?$#i',
+					'build_str' => 'admin/tests',
+					'handler' => 'PluginHandler',
+					'action' => 'display_tests',
+					'priority' => 0,
+					'is_active' => 0,
+					'rule_class' => RewriteRule::RULE_CUSTOM,
+					'description' => '',
+					'parameters' => '',
+				)
+			),
+			'display_tests'
+		);
 	}
 
 	public function action_admin_header( $theme )
@@ -33,6 +50,16 @@ class TestsPlugin extends Plugin
 		if ( $theme->page == 'tests' ) {
 			Stack::add( 'admin_stylesheet', array( $this->get_url() . '/admin.css', 'screen' ), 'tests-admin-css' );
 		}
+	}
+
+	public function filter_admin_access_tokens($require_any, $page, $type)
+	{
+		if($page == 'admin') {
+			if(Controller::get_var('page') == 'tests') {
+				$require_any = array( 'manage_plugins' => true );
+			}
+		}
+		return $require_any;
 	}
 
 	public function filter_adminhandler_post_loadplugins_main_menu( array $menu )
@@ -60,7 +87,7 @@ class TestsPlugin extends Plugin
 	/**
 	 * @todo Removing initial newline shouldn't be necessary, find out what's causing it
 	 */
-	public function action_admin_theme_get_tests( AdminHandler $handler, Theme $theme )
+	public function theme_route_display_tests( Theme $theme )
 	{
 		$url = $this->get_url('/index.php?c=symbolic&o=1&d=1');
 
