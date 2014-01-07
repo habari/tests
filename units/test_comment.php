@@ -42,9 +42,9 @@ class CommentTest extends UnitTestCase
 			'url' => 'http://example.org',
 			'ip' => ip2long('127.0.0.1'),
 			'content' => 'test content',
-			'status' => Comment::STATUS_UNAPPROVED,
+			'status' => Comment::status( 'unapproved' ),
 			'date' => DateTime::date_create(),
-			'type' => Comment::COMMENT
+			'type' => Comment::type( 'comment' )
 		);
 		$this->comment = Comment::create( $this->paramarray );
 	}
@@ -123,7 +123,8 @@ class CommentTest extends UnitTestCase
 
 		$this->assert_equal( $this->comment->typename, 'comment' );
 
-		$this->assert_equal( $this->comment->editlink, URL::get( 'admin', "page=comment&id={$this->comment->id}" ) );
+//		$this->assert_equal( $this->comment->editlink, URL::get( 'admin', "page=comment&id={$this->comment->id}" ), $this->comment->editlink . ' : ' . URL::get( 'admin', "page=comment&id={$this->comment->id}" ) );
+		$this->assert_equal( $this->comment->editlink, URL::get( 'edit_comment', $this->comment, false ) );
 
 		$this->assert_type( 'Habari\CommentInfo', $this->comment->info );
 	}
@@ -175,9 +176,9 @@ class CommentTest extends UnitTestCase
 	public function test_status_action()
 	{
 		$comment_status_actions = array(
-			Comment::STATUS_UNAPPROVED => _t( 'Unapprove' ),
-			Comment::STATUS_APPROVED => _t( 'Approve' ),
-			Comment::STATUS_SPAM => _t( 'Spam' ),
+			Comment::status( 'unapproved' ) => _t( 'Unapprove' ),
+			Comment::status( 'approved' ) => _t( 'Approve' ),
+			Comment::status( 'spam' ) => _t( 'Spam' ),
 		);
 
 		foreach ( $comment_status_actions as $status => $action ) {
