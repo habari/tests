@@ -3,9 +3,10 @@
 
 		$min_versions = array(
 			'5.2' => '0.8',
-			'5.3.3' => '0.9',
+			'5.3.3' => '0.9.0',
+			'5.4' => '0.9.2',
 		);
-		define('MIN_PHP_VERSION', '5.3.3');
+		define('MIN_PHP_VERSION', '5.4');
 
 		// Required extensions, this list will augment with time
 		// Even if they are enabled by default, it seems some install turn them off
